@@ -2,6 +2,7 @@ package alignment.alignment_v2;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -138,14 +139,34 @@ public class Align
     	
     	Map<String, Object> param = new HashMap<String, Object>();
 
+    	//for *vertices*, you have a json object that you can load.
     	for(int i=0; i<verts.length; i++){
 			param.put("VERT_PROPS", verts[i]);
 			execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
     	}
+    	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
     	for(int i=0; i<edges.length; i++){
-			param.put("EDGE_PROPS", edges[i]);
-			//execute("v = GraphSONUtility.edgeFromJson(EDGE_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
-			//TODO I doubt the above will work as-is, probably need more handling to get references to in/out verts.
+			int outv_id = findVertId(edges[i].getString("_outV"));
+			int inv_id = findVertId(edges[i].getString("_inV"));
+			String label = edges[i].optString("_label");
+			param.put("OUTV", outv_id);
+			param.put("INV", inv_id);
+			param.put("LABEL", label);
+			//build your param map obj
+			Map<String, Object> props = new HashMap<String, Object>();
+			props.put("name", edges[i].get("_id"));
+			edges[i].remove("_inv");
+			edges[i].remove("_outv");
+			edges[i].remove("_id");
+			Iterator<String> k = edges[i].keys();
+			String key;
+			while(k.hasNext()){
+				key = k.next();
+				props.put(key, edges[i].get(key));
+			}
+			param.put("EDGE_PROPS", props);
+			//and now finally add edge to graph
+			execute("outv = g.v(OUTV); inv = g.v(INV);g.addEdge(outv,inv,LABEL,EDGE_PROPS);g.commit()", param);
     	}
     	return true;//TODO what if some execute()s pass and some fail?
     }
@@ -161,9 +182,25 @@ public class Align
     	return query_ret_list;
     }
     
-    public int findVertId(String name) throws IOException, RexProException{
-    	Map query_ret = (Map)(findVert(name).get(0));
-    	return Integer.parseInt((String)query_ret.get("_id"));
+    public int findVertId(String name){
+    	try{
+    		Map query_ret = (Map)(findVert(name).get(0));
+    		return Integer.parseInt((String)query_ret.get("_id"));
+    	}catch(Exception e){
+    		System.err.println("Warn: could not find id for name: " + name + ", returning 0");
+    		return 0;
+    	}
+    }
+    
+    public List findEdge(String name) throws IOException, RexProException{
+    	if(name == null || name == "")
+    		return null;
+    	Map<String, Object> param = new HashMap<String, Object>();
+    	param.put("NAME", name);
+    	Object query_ret = client.execute("g.query().has(\"name\",NAME).edges().toList();", param);
+    	List query_ret_list = (List)query_ret;
+    	System.out.println("query returned: " + query_ret_list);
+    	return query_ret_list;
     }
     
     public boolean align(String newGraphSection){
@@ -213,6 +250,15 @@ public class Align
 			        "\"http://www.google.com\"],"+
 			      "\"status\":\"Entry\","+
 			      "\"score\":1.0"+
+			      "}"+
+			      "],"+
+			      "\"edges\":["+
+			      "{"+ 
+			      "\"_id\":\"asdf\"," +
+			      "\"_inV\":\"CVE-1999-0002\"," +
+			      "\"_outV\":\"CVE-1999-nnnn\"," +
+			      "\"_label\":\"some_label_asdf\","+
+			      "\"some_property\":\"some_value\""+
 			      "}"+
 			      "]}";
     	a.load(test_graphson_verts);
