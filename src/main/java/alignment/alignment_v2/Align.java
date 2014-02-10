@@ -113,8 +113,10 @@ public class Align
 	    	if(json_verts != null){
 	    		vertCount = json_verts.length();
 	    		verts = new JSONObject[vertCount];
-	    		for(int i=0; i<vertCount; i++) 
+	    		for(int i=0; i<vertCount; i++){
 	    			verts[i] = (JSONObject)json_verts.get(i);
+	    			verts[i].put("name", verts[i].get("_id"));
+	    		}
 	    	}
 	    	//...and likewise for edges
 	    	JSONArray json_edges = graphson.optJSONArray("edges");
@@ -148,11 +150,20 @@ public class Align
     	return true;//TODO what if some execute()s pass and some fail?
     }
     
-    //TODO: stub.
-    public boolean find(String newGraphSection){
-    	if(newGraphSection == null || newGraphSection == "")
-    		return false;
-    	return true;
+    public List findVert(String name) throws IOException, RexProException{
+    	if(name == null || name == "")
+    		return null;
+    	Map<String, Object> param = new HashMap<String, Object>();
+    	param.put("NAME", name);
+    	Object query_ret = client.execute("g.query().has(\"name\",NAME).vertices().toList();", param);
+    	List query_ret_list = (List)query_ret;
+    	System.out.println("query returned: " + query_ret_list);
+    	return query_ret_list;
+    }
+    
+    public int findVertId(String name) throws IOException, RexProException{
+    	Map query_ret = (Map)(findVert(name).get(0));
+    	return Integer.parseInt((String)query_ret.get("_id"));
     }
     
     public boolean align(String newGraphSection){
@@ -172,15 +183,15 @@ public class Align
     }
     
     //will remove this later
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IOException, RexProException
     {
     	Align a = new Align();
     	a.removeAllVertices();
     	a.removeAllEdges();
     	
-    	a.execute("g.commit();g.addVertex().setProperty(\"z\",55);g.commit()");
+    	a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
     	
-    	String test_graphson = " {\"vertices\":[" +
+    	String test_graphson_verts = " {\"vertices\":[" +
 			      "{" +
 			      "\"_id\":\"CVE-1999-0002\"," +
 			      "\"_type\":\"vertex\","+
@@ -193,8 +204,21 @@ public class Align
 			        "\"XF:linux-mountd-bo\"],"+
 			      "\"status\":\"Entry\","+
 			      "\"score\":1.0"+
-			      "}]}";
-    	a.load(test_graphson);
+			      "},{"+
+			      "\"_id\":\"CVE-1999-nnnn\"," +
+			      "\"_type\":\"vertex\","+
+			      "\"source\":\"CVE\","+
+			      "\"description\":\"test description asdf.\","+
+			      "\"references\":["+
+			        "\"http://www.google.com\"],"+
+			      "\"status\":\"Entry\","+
+			      "\"score\":1.0"+
+			      "}"+
+			      "]}";
+    	a.load(test_graphson_verts);
+    	
+    	int id = a.findVertId("CVE-1999-0002");
+    	System.out.println("CVE-1999-0002 has id of " + id);
     	
         System.out.println( "Done!" );
     }
