@@ -77,6 +77,10 @@ public class Align
     	if(this.client == null)
     		return false;
     	try {
+    	    //Adding a trailing return 'g' on everything: 
+    	    // no execute() args can end up returning null, due to known API bug.
+    	    // returning 'g' everywhere is just the simplest workaround for it, since it is always defined.
+    		query += ";g";
 			client.execute(query, params);
 		} catch (RexProException e) {
 			System.err.println("'execute' method caused a rexpro problem (again)");
@@ -107,47 +111,38 @@ public class Align
     	try{
 	    	JSONObject graphson = new JSONObject(newGraphSection);
 	    	//make array of verts...
-	    	JSONArray json_verts = (JSONArray) graphson.opt("vertices");
-	    	if(json_verts != null){
-	    		vertCount = json_verts.length();
-	    		verts = new JSONObject[vertCount];
-	    		for(int i=0; i<vertCount; i++) 
-	    			verts[i] = (JSONObject)json_verts.get(i);
-	    	}
+	    	JSONArray json_verts = (JSONArray) graphson.get("vertices");
+    		vertCount = json_verts.length();
+    		verts = new JSONObject[vertCount];
+    		for(int i=0; i<vertCount; i++) 
+    			verts[i] = (JSONObject)json_verts.get(i);
 	    	//...and likewise for edges
-	    	JSONArray json_edges = (JSONArray) graphson.opt("edges");
-	    	if(json_edges != null){
-	    		edgeCount = json_edges.length();
-	    		edges = new JSONObject[edgeCount];
-	    		for(int i=0; i<edgeCount; i++) 
-	    			edges[i] = (JSONObject)json_edges.get(i);
-	    	}
-    	}catch(Exception e){
-    		//TODO fail with less panic?
+	    	JSONArray json_edges = (JSONArray) graphson.get("edges");
+    		edgeCount = json_edges.length();
+    		edges = new JSONObject[edgeCount];
+    		for(int i=0; i<edgeCount; i++) 
+    			edges[i] = (JSONObject)json_edges.get(i);
+    	}catch(Exception e){ 
+    		//we want *any* graphson problems to end up here
+    		//being noisy when these fail is probably ok, we shouldn't really ever fail here except when testing, etc.
+    		//TODO but really all of these errors should go to our slf4j stuff instead... 
     		System.err.println("Error parsing GraphSON in load()!");
+    		System.err.println("The graphson was: " + newGraphSection);
     		e.printStackTrace();
     		return false;
     	}
     	
     	Map<String, Object> param = new HashMap<String, Object>();
 
-    	//lolnope, no way to pass a graphson string to this, only a string of a path to a graphson file.  I thought that sounded too easy...
-		//execute("g.commit();g.loadGraphSON(PARAM_GRAPHSON);g.commit();g", param);
-		
-		//this looks like it should work from the documentation?  but doesn't?
-		//execute("g.commit();g.addVertex(null, VERT_PROPS);g.commit();g", param);
-		
     	for(int i=0; i<verts.length; i++){
 			param.put("VERT_PROPS", verts[i]);
-			//oh wow.  another magic undocumented convenience method that does the obvious thing in a non-obvious way.
-			execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit();g", param);
+			execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
     	}
     	for(int i=0; i<edges.length; i++){
 			param.put("EDGE_PROPS", edges[i]);
-			//execute("v = GraphSONUtility.edgeFromJson(EDGE_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit();g", param);
+			//execute("v = GraphSONUtility.edgeFromJson(EDGE_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
 			//TODO I doubt the above will work as-is, probably need more handling to get references to in/out verts.
     	}
-    	
     	return true;//TODO what if some execute()s pass and some fail?
     }
     
@@ -167,12 +162,11 @@ public class Align
     }
     
     public boolean removeAllVertices(){
-		return execute("g.V.each{g.removeVertex(it)};g.commit();g");
+		return execute("g.V.each{g.removeVertex(it)};g.commit()");
     }
     
-    //Note the commit() and trailing return 'g' - these are not well documented anywhere I've seen, but they are required just about everywhere! 
     public boolean removeAllEdges(){
-		return execute("g.E.each{g.removeVertex(it)};g.commit();g");
+		return execute("g.E.each{g.removeVertex(it)};g.commit()");
     }
     
     //will remove this later
@@ -182,7 +176,7 @@ public class Align
     	a.removeAllVertices();
     	a.removeAllEdges();
     	
-    	a.execute("g.commit();g.addVertex().setProperty(\"z\",55);g.commit();g");
+    	a.execute("g.commit();g.addVertex().setProperty(\"z\",55);g.commit()");
     	
     	String test_graphson = " {\"vertices\":[" +
 			      "{" +
