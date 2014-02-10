@@ -102,8 +102,6 @@ public class Align
 	
     public boolean load(String newGraphSection){
     	//do all the json obj parsing up front, in case you need to panic & leave early.
-    	if(newGraphSection == null || newGraphSection == "")
-    		return false;
     	int vertCount = 0;
     	JSONObject[] verts = new JSONObject[0];
     	int edgeCount = 0;
@@ -111,17 +109,21 @@ public class Align
     	try{
 	    	JSONObject graphson = new JSONObject(newGraphSection);
 	    	//make array of verts...
-	    	JSONArray json_verts = (JSONArray) graphson.get("vertices");
-    		vertCount = json_verts.length();
-    		verts = new JSONObject[vertCount];
-    		for(int i=0; i<vertCount; i++) 
-    			verts[i] = (JSONObject)json_verts.get(i);
+	    	JSONArray json_verts = graphson.optJSONArray("vertices");
+	    	if(json_verts != null){
+	    		vertCount = json_verts.length();
+	    		verts = new JSONObject[vertCount];
+	    		for(int i=0; i<vertCount; i++) 
+	    			verts[i] = (JSONObject)json_verts.get(i);
+	    	}
 	    	//...and likewise for edges
-	    	JSONArray json_edges = (JSONArray) graphson.get("edges");
-    		edgeCount = json_edges.length();
-    		edges = new JSONObject[edgeCount];
-    		for(int i=0; i<edgeCount; i++) 
-    			edges[i] = (JSONObject)json_edges.get(i);
+	    	JSONArray json_edges = graphson.optJSONArray("edges");
+	    	if(json_edges != null){
+	    		edgeCount = json_edges.length();
+	    		edges = new JSONObject[edgeCount];
+	    		for(int i=0; i<edgeCount; i++) 
+	    			edges[i] = (JSONObject)json_edges.get(i);
+	    	}
     	}catch(Exception e){ 
     		//we want *any* graphson problems to end up here
     		//being noisy when these fail is probably ok, we shouldn't really ever fail here except when testing, etc.
