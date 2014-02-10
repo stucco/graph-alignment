@@ -146,8 +146,8 @@ public class Align
     	}
     	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
     	for(int i=0; i<edges.length; i++){
-			int outv_id = findVertId(edges[i].getString("_outV"));
-			int inv_id = findVertId(edges[i].getString("_inV"));
+			String outv_id = findVertId(edges[i].getString("_outV"));
+			String inv_id = findVertId(edges[i].getString("_inV"));
 			String label = edges[i].optString("_label");
 			param.put("OUTV", outv_id);
 			param.put("INV", inv_id);
@@ -182,16 +182,17 @@ public class Align
     	return query_ret_list;
     }
     
-    public int findVertId(String name){
+    public String findVertId(String name){
     	try{
     		Map query_ret = (Map)(findVert(name).get(0));
-    		return Integer.parseInt((String)query_ret.get("_id"));
+    		return (String)query_ret.get("_id");
     	}catch(Exception e){
-    		System.err.println("Warn: could not find id for name: " + name + ", returning 0");
-    		return 0;
+    		System.err.println("Warn: could not find id for name: " + name + ", returning null");
+    		return null;
     	}
     }
     
+    /* unused
     public List findEdge(String name) throws IOException, RexProException{
     	if(name == null || name == "")
     		return null;
@@ -201,7 +202,7 @@ public class Align
     	List query_ret_list = (List)query_ret;
     	System.out.println("query returned: " + query_ret_list);
     	return query_ret_list;
-    }
+    }*/
     
     public boolean align(String newGraphSection){
     	if(this.client == null)
@@ -263,7 +264,7 @@ public class Align
 			      "]}";
     	a.load(test_graphson_verts);
     	
-    	int id = a.findVertId("CVE-1999-0002");
+    	String id = a.findVertId("CVE-1999-0002");
     	System.out.println("CVE-1999-0002 has id of " + id);
     	
         System.out.println( "Done!" );
