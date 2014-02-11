@@ -71,10 +71,15 @@ public class Align
 		super.finalize();
 	}
     
+	//only needed for tests
+	public RexsterClient getClient(){
+		return client;
+	}
+	
     //wrapper to reduce boilerplate
 	//TODO wrapper throws away any return value, 
 	//  it'd be nice to use this even when we want the query's retval... but then we're back w/ exceptions & don't gain much.
-    private boolean execute(String query, Map<String,Object> params){
+	public boolean execute(String query, Map<String,Object> params){
     	if(this.client == null)
     		return false;
     	try {
@@ -97,7 +102,7 @@ public class Align
     	return true;
     }
     //likewise.
-    private boolean execute(String query){
+    public boolean execute(String query){
     	return execute(query,null);
     }
 	
@@ -178,7 +183,7 @@ public class Align
     	param.put("NAME", name);
     	Object query_ret = client.execute("g.query().has(\"name\",NAME).vertices().toList();", param);
     	List query_ret_list = (List)query_ret;
-    	System.out.println("query returned: " + query_ret_list);
+    	//System.out.println("query returned: " + query_ret_list);
     	return query_ret_list;
     }
     
@@ -218,56 +223,6 @@ public class Align
     
     public boolean removeAllEdges(){
 		return execute("g.E.each{g.removeVertex(it)};g.commit()");
-    }
-    
-    //will remove this later
-    public static void main( String[] args ) throws IOException, RexProException
-    {
-    	Align a = new Align();
-    	a.removeAllVertices();
-    	a.removeAllEdges();
-    	
-    	a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
-    	
-    	String test_graphson_verts = " {\"vertices\":[" +
-			      "{" +
-			      "\"_id\":\"CVE-1999-0002\"," +
-			      "\"_type\":\"vertex\","+
-			      "\"source\":\"CVE\","+
-			      "\"description\":\"Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.\","+
-			      "\"references\":["+
-			        "\"CERT:CA-98.12.mountd\","+
-			        "\"http://www.ciac.org/ciac/bulletins/j-006.shtml\","+
-			        "\"http://www.securityfocus.com/bid/121\","+
-			        "\"XF:linux-mountd-bo\"],"+
-			      "\"status\":\"Entry\","+
-			      "\"score\":1.0"+
-			      "},{"+
-			      "\"_id\":\"CVE-1999-nnnn\"," +
-			      "\"_type\":\"vertex\","+
-			      "\"source\":\"CVE\","+
-			      "\"description\":\"test description asdf.\","+
-			      "\"references\":["+
-			        "\"http://www.google.com\"],"+
-			      "\"status\":\"Entry\","+
-			      "\"score\":1.0"+
-			      "}"+
-			      "],"+
-			      "\"edges\":["+
-			      "{"+ 
-			      "\"_id\":\"asdf\"," +
-			      "\"_inV\":\"CVE-1999-0002\"," +
-			      "\"_outV\":\"CVE-1999-nnnn\"," +
-			      "\"_label\":\"some_label_asdf\","+
-			      "\"some_property\":\"some_value\""+
-			      "}"+
-			      "]}";
-    	a.load(test_graphson_verts);
-    	
-    	String id = a.findVertId("CVE-1999-0002");
-    	System.out.println("CVE-1999-0002 has id of " + id);
-    	
-        System.out.println( "Done!" );
     }
 
 }
