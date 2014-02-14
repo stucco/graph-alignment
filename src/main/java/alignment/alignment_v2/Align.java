@@ -197,6 +197,21 @@ public class Align
     	}
     }
     
+    public void updateVert(String id, Map<String, Object> props){
+    	String[] keys = props.keySet().toArray(new String[0]);
+    	for(int i=0; i<keys.length; i++){
+    		updateVertProperty(id, keys[i], props.get(keys[i]));
+    	}
+    }
+    
+    public boolean updateVertProperty(String id, String key, Object val){
+    	HashMap<String, Object> param = new HashMap<String, Object>();
+    	param.put("ID", id);
+    	param.put("KEY", key);
+    	param.put("VAL", val);
+    	return execute("g.v(ID)[KEY]=VAL;g.commit()", param);
+    }
+    
     /* unused
     public List findEdge(String name) throws IOException, RexProException{
     	if(name == null || name == "")

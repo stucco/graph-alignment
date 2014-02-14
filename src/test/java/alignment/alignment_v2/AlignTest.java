@@ -3,6 +3,7 @@ package alignment.alignment_v2;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,6 +119,48 @@ public class AlignTest
     	
     	//System.out.println("CVE-1999-0002 has id of " + id);
 
+    }
+    
+    /**
+     * Tests updating vertex properties
+     */
+    public void testUpdate()
+    {
+    	Align a = new Align();
+    	a.removeAllVertices();
+    	a.removeAllEdges();
+    	
+		try {
+			//TODO: also should clean up these warnings.
+			a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
+	    	
+			Object query_ret;
+			String id = a.findVertId("testvert_55");
+			query_ret = a.getClient().execute("g.v("+id+").map();");
+			List query_ret_list = (List)query_ret;
+			Map query_ret_map = (Map)query_ret_list.get(0);
+			Object t = query_ret_map.get("z");
+			assertEquals( "55", query_ret_map.get("z").toString());
+			
+			Map<String, Object> newProps = new HashMap<String, Object>();
+			newProps.put("y", "33");
+			newProps.put("z", "44");
+			a.updateVert(id, newProps);
+			
+			query_ret = a.getClient().execute("g.v("+id+").map();");
+			query_ret_list = (List)query_ret;
+			query_ret_map = (Map)query_ret_list.get(0);
+			assertEquals("33", query_ret_map.get("y").toString());
+			assertEquals("44", query_ret_map.get("z").toString());
+			
+		} catch (RexProException e) {
+			fail("RexProException");
+			e.printStackTrace();
+		} catch (IOException e) {
+			fail("IOException");
+			e.printStackTrace();
+		}
+    	
     }
     
     /**
