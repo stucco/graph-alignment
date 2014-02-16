@@ -161,9 +161,9 @@ public class AlignTest
     }
     
     /**
-     * This is getting very long - should probably break it up
+     * Testing the keepNew option for AlignVertProps
      */
-    public void testAlignVertProps()
+    public void testAlignVertPropsKeepNew()
     {
     	Align a = new Align();
     	a.removeAllVertices();
@@ -175,20 +175,41 @@ public class AlignTest
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 		
+		String testVal, testProp;
+		
     	//add a new prop
-		String testVal = "aaaa";
+		testVal = "aaaa";
 		newProps.put("testprop", testVal);
     	a.alignVertProps(id, newProps, mergeMethods);
-    	String testprop = (String)a.getVertByID(id).get("testprop");
-    	assertEquals(testVal, testprop);
+    	testProp = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testProp);
     	
     	//update a prop (keepNew) (always updates)
     	mergeMethods.put("testprop", "keepNew");
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
     	a.alignVertProps(id, newProps, mergeMethods);
-    	testprop = (String)a.getVertByID(id).get("testprop");
-    	assertEquals(testVal, testprop);
+    	testProp = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testProp);
+    	
+    }
+    
+    /**
+     * Testing the appendList option for AlignVertProps
+     */
+    public void testAlignVertPropsAppendList()
+    {
+    	Align a = new Align();
+    	a.removeAllVertices();
+    	a.removeAllEdges();
+    	
+		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = a.findVertId("testvert_align_props");
+		
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+		
+		String testVal, testProp;
     	
     	//update a prop (appendList) (always updates) (list/list case)
     	mergeMethods.put("testproparray", "keepNew");
@@ -227,7 +248,7 @@ public class AlignTest
     	testVal = "aaa";
 		newProps.put("testproparray", testVal);
     	a.alignVertProps(id, newProps, mergeMethods);
-    	testprop = (String)a.getVertByID(id).get("testproparray");
+    	testProp = (String)a.getVertByID(id).get("testproparray");
     	assertTrue(Arrays.equals(testArrayVal, testproparray));
     	
     	mergeMethods.put("testproparray", "appendList");
@@ -243,7 +264,7 @@ public class AlignTest
     	testVal = "aaa";
 		newProps.put("testproparray", testVal);
     	a.alignVertProps(id, newProps, mergeMethods);
-    	testprop = (String)a.getVertByID(id).get("testproparray");
+    	testProp = (String)a.getVertByID(id).get("testproparray");
     	assertTrue(Arrays.equals(testArrayVal, testproparray));
     	
     	mergeMethods.put("testproparray", "appendList");
@@ -254,11 +275,75 @@ public class AlignTest
     	testArrayVal = new String[]{"aaa", "bbb"};
     	assertTrue(Arrays.equals(testArrayVal, testproparray));
     	
+    }
+    
+    /**
+     * Testing the keepUpdates option for AlignVertProps
+     */
+    public void testAlignVertPropsKeepUpdates()
+    {
+    	Align a = new Align();
+    	a.removeAllVertices();
+    	a.removeAllEdges();
+    	
+		a.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = a.findVertId("testvert_align_props");
+		
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+		
+		String testVal, testProp;
+		
+    	//add a new prop
+		testVal = "aaaa";
+		newProps.put("testprop", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testProp = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testProp);
+    	
     	//update a prop (keepUpdates) (update case)
     	mergeMethods.put("testprop", "keepUpdates");
+    	testVal = "bbbb";
+		newProps.put("testprop", testVal);
+		newProps.put("timestamp", 1001L);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testProp = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testProp);
     	
     	//update a prop (keepUpdates) (no update case)
     	mergeMethods.put("testprop", "keepUpdates");
+    	testVal = "cccc";
+		newProps.put("testprop", testVal);
+		newProps.put("timestamp", 999L);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testProp = (String)a.getVertByID(id).get("testprop");
+    	testVal = "bbbb";
+    	assertEquals(testVal, testProp);
+    }
+    
+    /**
+     * Testing the keepConfidence option for AlignVertProps
+     */
+    public void testAlignVertPropsKeepConfidence()
+    {
+    	Align a = new Align();
+    	a.removeAllVertices();
+    	a.removeAllEdges();
+    	
+		a.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = a.findVertId("testvert_align_props");
+		
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+		
+		String testVal, testProp;
+		
+    	//add a new prop
+		testVal = "aaaa";
+		newProps.put("testprop", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testProp = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testProp);
     	
     	//update a prop (keepConfidence) (update case)
     	mergeMethods.put("testprop", "keepConfidence");

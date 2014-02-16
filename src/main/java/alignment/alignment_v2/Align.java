@@ -262,7 +262,10 @@ public class Align
 			key = k.next();
 			if(oldProps.containsKey(key)){ //both old & new have this, so check how to merge.
 				String mergeMethod = mergeMethods.get(key);
-				if(mergeMethod == null || mergeMethod == "keepNew"){
+				if(key == "timestamp" || key == "score"){
+					//yeah... don't try to merge those here, it breaks things.
+					//TODO these will need special handling .... and it will need to be someplace else, after we finish w/ the rest of the vert's props.
+				}else if(mergeMethod == null || mergeMethod == "keepNew"){
 					oldProps.put(key, newProps.get(key));
 				}else if(mergeMethod == "appendList"){ 
 					//TODO names wat?
@@ -281,9 +284,32 @@ public class Align
 						l.add(n);
 					}
 					oldProps.put(key, l);
+				}else if(mergeMethod == "keepUpdates"){
+					Object o = oldProps.get("timestamp");
+					long oldTime = -1;
+					if(o instanceof String)
+						oldTime = Integer.parseInt((String)oldProps.get("timestamp"));
+					else if(o instanceof Long)
+						oldTime = (Long)o;
+					//TODO else warn?
+					long newTime = (Long)newProps.get("timestamp");
+					if(newTime >= oldTime){
+						oldProps.put(key, newProps.get(key));
+					}
+				}else if(mergeMethod == "keepConfidence"){
+					Object o = oldProps.get("score");
+					double oldScore = 0.0;
+					if(o instanceof String)
+						oldScore = Double.parseDouble((String)oldProps.get("score"));
+					else if(o instanceof Double)
+						oldScore = (Double)o;
+					//TODO else warn?
+					double newScore = (Long)newProps.get("score");
+					if(newScore >= oldScore){
+						oldProps.put(key, newProps.get(key));
+					}
 				}
-				//TODO other cases...
-			}else{ //oldProps did not contain this, so just add it.
+			}else{ //else oldProps did not contain this, so just add it.
 				oldProps.put(key, newProps.get(key));
 			}
 		}
