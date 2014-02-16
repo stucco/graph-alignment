@@ -2,6 +2,7 @@ package alignment.alignment_v2;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -261,9 +262,27 @@ public class Align
 			key = k.next();
 			if(oldProps.containsKey(key)){ //both old & new have this, so check how to merge.
 				String mergeMethod = mergeMethods.get(key);
-				if(mergeMethod == "keepNew"){
+				if(mergeMethod == null || mergeMethod == "keepNew"){
 					oldProps.put(key, newProps.get(key));
-				}//TODO other cases...
+				}else if(mergeMethod == "appendList"){ 
+					//TODO names wat?
+					Object o = oldProps.get(key);
+					List<Object> l;
+					if(o instanceof List ){
+						l = (List<Object>)o;
+					}else{
+						l = new ArrayList<Object>();
+						l.add(o);
+					}
+					Object n = newProps.get(key);
+					if(n instanceof List){
+						l.addAll((List<Object>)n);
+					}else{
+						l.add(n);
+					}
+					oldProps.put(key, l);
+				}
+				//TODO other cases...
 			}else{ //oldProps did not contain this, so just add it.
 				oldProps.put(key, newProps.get(key));
 			}
