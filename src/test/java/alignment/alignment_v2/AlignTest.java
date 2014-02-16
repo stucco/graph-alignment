@@ -161,12 +161,110 @@ public class AlignTest
     }
     
     /**
+     * This is getting very long - should probably break it up
      */
-    public void testAlign()
+    public void testAlignVertProps()
     {
     	Align a = new Align();
-    	//assertFalse( a.load(null) );
-    	//assertFalse( a.load("") );
-        //assertTrue( a.load("a") );
+    	a.removeAllVertices();
+    	a.removeAllEdges();
+    	
+		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = a.findVertId("testvert_align_props");
+		
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+		
+    	//add a new prop
+		String testVal = "aaaa";
+		newProps.put("testprop", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	String testprop = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testprop);
+    	
+    	//update a prop (keepNew) (always updates)
+    	mergeMethods.put("testprop", "keepNew");
+		testVal = "bbbb";
+		newProps.put("testprop", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testprop = (String)a.getVertByID(id).get("testprop");
+    	assertEquals(testVal, testprop);
+    	
+    	//update a prop (appendList) (always updates) (list/list case)
+    	mergeMethods.put("testproparray", "keepNew");
+    	String[] testArrayVal = {"aaa", "bbb"};
+		newProps.put("testproparray", Arrays.asList(testArrayVal));
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	String[] testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	mergeMethods.put("testproparray", "appendList");
+    	testArrayVal = new String[]{"ccc"};
+		newProps.put("testproparray", Arrays.asList(testArrayVal));
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+    	testArrayVal = new String[]{"aaa", "bbb", "ccc"};
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	//update a prop (appendList) (always updates) (list/val case)
+    	mergeMethods.put("testproparray", "keepNew");
+    	testArrayVal = new String[]{"aaa", "bbb"};
+		newProps.put("testproparray", Arrays.asList(testArrayVal));
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	mergeMethods.put("testproparray", "appendList");
+    	testVal = "ccc";
+		newProps.put("testproparray", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+    	testArrayVal = new String[]{"aaa", "bbb", "ccc"};
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	//update a prop (appendList) (always updates) (val/list case)
+    	mergeMethods.put("testproparray", "keepNew");
+    	testVal = "aaa";
+		newProps.put("testproparray", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testprop = (String)a.getVertByID(id).get("testproparray");
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	mergeMethods.put("testproparray", "appendList");
+    	testArrayVal = new String[]{"bbb", "ccc"};
+		newProps.put("testproparray", Arrays.asList(testArrayVal));
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+    	testArrayVal = new String[]{"aaa", "bbb", "ccc"};
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	//update a prop (appendList) (always updates) (val/val case)
+    	mergeMethods.put("testproparray", "keepNew");
+    	testVal = "aaa";
+		newProps.put("testproparray", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testprop = (String)a.getVertByID(id).get("testproparray");
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	mergeMethods.put("testproparray", "appendList");
+    	testVal = "bbb";
+		newProps.put("testproparray", testVal);
+    	a.alignVertProps(id, newProps, mergeMethods);
+    	testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+    	testArrayVal = new String[]{"aaa", "bbb"};
+    	assertTrue(Arrays.equals(testArrayVal, testproparray));
+    	
+    	//update a prop (keepUpdates) (update case)
+    	mergeMethods.put("testprop", "keepUpdates");
+    	
+    	//update a prop (keepUpdates) (no update case)
+    	mergeMethods.put("testprop", "keepUpdates");
+    	
+    	//update a prop (keepConfidence) (update case)
+    	mergeMethods.put("testprop", "keepConfidence");
+    	
+    	//update a prop (keepConfidence) (no update case)
+    	mergeMethods.put("testprop", "keepConfidence");
+    	
     }
 }
