@@ -1,11 +1,13 @@
 package alignment.alignment_v2;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.json.*;
 
@@ -176,6 +178,28 @@ public class Align
     	return true;//TODO what if some execute()s pass and some fail?
     }
     
+    public Map<String, Object> getVertByID(String id){
+		try {
+			Object query_ret = client.execute("g.v("+id+").map();");
+			List query_ret_list = (List)query_ret;
+	    	Map<String, Object> query_ret_map = (Map)query_ret_list.get(0);
+	    	return query_ret_map;
+		} catch (RexProException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (ClassCastException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
+    //TODO inconsistent with above: returning Map v List
     public List findVert(String name) throws IOException, RexProException{
     	if(name == null || name == "")
     		return null;
@@ -224,15 +248,43 @@ public class Align
     	return query_ret_list;
     }*/
     
-    public boolean align(String newGraphSection){
-    	if(this.client == null)
-    		return false;
-    	if(newGraphSection == null || newGraphSection == "")
-    		return false;
-    	return true;
+    //mergeMethods are derived from ontology definition
+    public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, String> mergeMethods){
+    	Map<String, Object> oldProps = getVertByID(vertID);
+    	Iterator<String> k = newProps.keySet().iterator();
+		String key;
+		while(k.hasNext()){
+			key = k.next();
+			if(oldProps.containsKey(key)){ //both old & new have this, so check how to merge.
+				String mergeMethod = mergeMethods.get(key);
+				if(mergeMethod == "keepNew"){
+					oldProps.put(key, newProps.get(key));
+				}//TODO other cases...
+			}else{ //oldProps did not contain this, so just add it.
+				oldProps.put(key, newProps.get(key));
+			}
+		}
+		updateVert(vertID, oldProps);
     }
     
-    public boolean removeAllVertices(){
+    //TODO only public for testing, make private later.
+    //TODO hmm... maybe not the best way
+    /*
+    public Map mergeMethodsFromVertSchema(JSONObject vertSchema){
+		// TODO probably should use an enum type for this.
+    	HashMap<String, String> mergeMethods = new HashMap<String, String>();
+    	try {
+			FileUtils.readFileToString(new File("vert_schema_test.json"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return mergeMethods;
+	}
+	*/
+
+	public boolean removeAllVertices(){
 		return execute("g.V.each{g.removeVertex(it)};g.commit()");
     }
     
