@@ -84,13 +84,12 @@ public class AlignTest
     	a.load(test_graphson_verts);
     	
 		try {
-			//TODO: warnings everywhere here, should clean those up.
 			Object query_ret;
 			//find this node, check some properties.
 			String id = a.findVertId("CVE-1999-0002");
 			query_ret = a.getClient().execute("g.v("+id+").map();");
-			List query_ret_list = (List)query_ret;
-			Map query_ret_map = (Map)query_ret_list.get(0);
+			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
+			Map<String, Object> query_ret_map = query_ret_list.get(0);
 			assertEquals("Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.", query_ret_map.get("description"));
 			String[] expectedRefs = {"CERT:CA-98.12.mountd","http://www.ciac.org/ciac/bulletins/j-006.shtml","http://www.securityfocus.com/bid/121","XF:linux-mountd-bo"};
 			String[] actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
@@ -98,16 +97,16 @@ public class AlignTest
 			//find the other node, check its properties.
 			String id2 = a.findVertId("CVE-1999-nnnn");
 			query_ret = a.getClient().execute("g.v("+id2+").map();");
-			query_ret_list = (List)query_ret;
-			query_ret_map = (Map)query_ret_list.get(0);
+			query_ret_list = (List<Map<String, Object>>)query_ret;
+			query_ret_map = query_ret_list.get(0);
 			assertEquals("test description asdf.", query_ret_map.get("description"));
 			expectedRefs = new String[]{"http://www.google.com"};
 			actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
 			assertTrue(Arrays.equals(expectedRefs, actualRefs));
 			//and now test the edge between them
 			query_ret = a.getClient().execute("g.v("+id2+").outE().inV();");
-			query_ret_list = (List)query_ret;
-			query_ret_map = (Map)query_ret_list.get(0);
+			query_ret_list = (List<Map<String, Object>>)query_ret;
+			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 		} catch (RexProException e) {
 			fail("RexProException");
@@ -131,15 +130,13 @@ public class AlignTest
     	a.removeAllEdges();
     	
 		try {
-			//TODO: also should clean up these warnings.
 			a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
 	    	
 			Object query_ret;
 			String id = a.findVertId("testvert_55");
 			query_ret = a.getClient().execute("g.v("+id+").map();");
-			List query_ret_list = (List)query_ret;
-			Map query_ret_map = (Map)query_ret_list.get(0);
-			Object t = query_ret_map.get("z");
+			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
+			Map<String, Object> query_ret_map = query_ret_list.get(0);
 			assertEquals( "55", query_ret_map.get("z").toString());
 			
 			Map<String, Object> newProps = new HashMap<String, Object>();
@@ -148,8 +145,8 @@ public class AlignTest
 			a.updateVert(id, newProps);
 			
 			query_ret = a.getClient().execute("g.v("+id+").map();");
-			query_ret_list = (List)query_ret;
-			query_ret_map = (Map)query_ret_list.get(0);
+			query_ret_list = (List<Map<String, Object>>)query_ret;
+			query_ret_map = query_ret_list.get(0);
 			assertEquals("33", query_ret_map.get("y").toString());
 			assertEquals("44", query_ret_map.get("z").toString());
 			

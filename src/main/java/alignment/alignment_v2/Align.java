@@ -15,7 +15,6 @@ import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.client.RexsterClientTokens;
-import com.tinkerpop.rexster.protocol.msg.RexProMessage;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
 /**
@@ -181,8 +180,8 @@ public class Align
     public Map<String, Object> getVertByID(String id){
 		try {
 			Object query_ret = client.execute("g.v("+id+").map();");
-			List query_ret_list = (List)query_ret;
-	    	Map<String, Object> query_ret_map = (Map)query_ret_list.get(0);
+			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
+	    	Map<String, Object> query_ret_map = query_ret_list.get(0);
 	    	return query_ret_map;
 		} catch (RexProException e) {
 			// TODO Auto-generated catch block
@@ -199,22 +198,27 @@ public class Align
 		}
     }
     
-    //TODO inconsistent with above: returning Map v List
-    public List findVert(String name) throws IOException, RexProException{
+    public Map<String,Object> findVert(String name) throws IOException, RexProException{
     	if(name == null || name == "")
     		return null;
     	Map<String, Object> param = new HashMap<String, Object>();
     	param.put("NAME", name);
     	Object query_ret = client.execute("g.query().has(\"name\",NAME).vertices().toList();", param);
-    	List query_ret_list = (List)query_ret;
+    	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
     	//System.out.println("query returned: " + query_ret_list);
-    	return query_ret_list;
+    	if(query_ret_list.size() == 0){
+    		System.out.println("Warning: findVert found 0 matching verts.");
+    		return null;
+    	}else if(query_ret_list.size() > 1){
+    		System.out.println("Warning: findVert found more than 1 matching verts.");
+    		return null;
+    	}
+    	return query_ret_list.get(0);
     }
     
     public String findVertId(String name){
     	try{
-    		Map query_ret = (Map)(findVert(name).get(0));
-    		return (String)query_ret.get("_id");
+    		return (String)findVert(name).get("_id");
     	}catch(Exception e){
     		System.err.println("Warn: could not find id for name: " + name + ", returning null");
     		return null;
