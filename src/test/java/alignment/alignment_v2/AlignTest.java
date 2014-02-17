@@ -46,8 +46,6 @@ public class AlignTest
     	a.removeAllVertices();
     	a.removeAllEdges();
     	
-    	a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
-    	
     	String test_graphson_verts = " {\"vertices\":[" +
 			      "{" +
 			      "\"_id\":\"CVE-1999-0002\"," +
@@ -84,28 +82,26 @@ public class AlignTest
     	a.load(test_graphson_verts);
     	
 		try {
-			Object query_ret;
 			//find this node, check some properties.
 			String id = a.findVertId("CVE-1999-0002");
-			query_ret = a.getClient().execute("g.v("+id+").map();");
-			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
-			Map<String, Object> query_ret_map = query_ret_list.get(0);
+			Map<String, Object> query_ret_map = a.getVertByID(id);
 			assertEquals("Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.", query_ret_map.get("description"));
 			String[] expectedRefs = {"CERT:CA-98.12.mountd","http://www.ciac.org/ciac/bulletins/j-006.shtml","http://www.securityfocus.com/bid/121","XF:linux-mountd-bo"};
 			String[] actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
 			assertTrue(Arrays.equals(expectedRefs, actualRefs));
+			
 			//find the other node, check its properties.
 			String id2 = a.findVertId("CVE-1999-nnnn");
-			query_ret = a.getClient().execute("g.v("+id2+").map();");
-			query_ret_list = (List<Map<String, Object>>)query_ret;
-			query_ret_map = query_ret_list.get(0);
+			query_ret_map = a.getVertByID(id2);
 			assertEquals("test description asdf.", query_ret_map.get("description"));
 			expectedRefs = new String[]{"http://www.google.com"};
 			actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
 			assertTrue(Arrays.equals(expectedRefs, actualRefs));
+			
 			//and now test the edge between them
+			Object query_ret;
 			query_ret = a.getClient().execute("g.v("+id2+").outE().inV();");
-			query_ret_list = (List<Map<String, Object>>)query_ret;
+			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 		} catch (RexProException e) {
@@ -115,8 +111,6 @@ public class AlignTest
 			fail("IOException");
 			e.printStackTrace();
 		}
-    	
-    	//System.out.println("CVE-1999-0002 has id of " + id);
 
     }
     
@@ -129,35 +123,20 @@ public class AlignTest
     	a.removeAllVertices();
     	a.removeAllEdges();
     	
-		try {
-			a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
-	    	
-			Object query_ret;
-			String id = a.findVertId("testvert_55");
-			query_ret = a.getClient().execute("g.v("+id+").map();");
-			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
-			Map<String, Object> query_ret_map = query_ret_list.get(0);
-			assertEquals( "55", query_ret_map.get("z").toString());
-			
-			Map<String, Object> newProps = new HashMap<String, Object>();
-			newProps.put("y", "33");
-			newProps.put("z", "44");
-			a.updateVert(id, newProps);
-			
-			query_ret = a.getClient().execute("g.v("+id+").map();");
-			query_ret_list = (List<Map<String, Object>>)query_ret;
-			query_ret_map = query_ret_list.get(0);
-			assertEquals("33", query_ret_map.get("y").toString());
-			assertEquals("44", query_ret_map.get("z").toString());
-			
-		} catch (RexProException e) {
-			fail("RexProException");
-			e.printStackTrace();
-		} catch (IOException e) {
-			fail("IOException");
-			e.printStackTrace();
-		}
-    	
+		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
+
+		String id = a.findVertId("testvert_55");
+		Map<String, Object> query_ret_map = a.getVertByID(id);
+		assertEquals( "55", query_ret_map.get("z").toString());
+		
+		Map<String, Object> newProps = new HashMap<String, Object>();
+		newProps.put("y", "33");
+		newProps.put("z", "44");
+		a.updateVert(id, newProps);
+		
+		query_ret_map = a.getVertByID(id);
+		assertEquals("33", query_ret_map.get("y").toString());
+		assertEquals("44", query_ret_map.get("z").toString());
     }
     
     /**
@@ -191,7 +170,6 @@ public class AlignTest
     	a.alignVertProps(id, newProps, mergeMethods);
     	testProp = (String)a.getVertByID(id).get("testprop");
     	assertEquals(testVal, testProp);
-    	
     }
     
     /**
@@ -274,7 +252,6 @@ public class AlignTest
     	testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
     	testArrayVal = new String[]{"aaa", "bbb"};
     	assertTrue(Arrays.equals(testArrayVal, testproparray));
-    	
     }
     
     /**
