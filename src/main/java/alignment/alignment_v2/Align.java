@@ -268,41 +268,40 @@ public class Align
 				}else if(mergeMethod == null || mergeMethod == "keepNew"){
 					oldProps.put(key, newProps.get(key));
 				}else if(mergeMethod == "appendList"){ 
-					//TODO names wat?
-					Object o = oldProps.get(key);
-					List<Object> l;
-					if(o instanceof List ){
-						l = (List<Object>)o;
+					Object oldVal = oldProps.get(key);
+					List<Object> oldList;
+					if(oldVal instanceof List ){
+						oldList = (List<Object>)oldVal;
 					}else{
-						l = new ArrayList<Object>();
-						l.add(o);
+						oldList = new ArrayList<Object>();
+						oldList.add(oldVal);
 					}
 					Object n = newProps.get(key);
 					if(n instanceof List){
-						l.addAll((List<Object>)n);
+						oldList.addAll((List<Object>)n);
 					}else{
-						l.add(n);
+						oldList.add(n);
 					}
-					oldProps.put(key, l);
+					oldProps.put(key, oldList);
 				}else if(mergeMethod == "keepUpdates"){
-					Object o = oldProps.get("timestamp");
+					Object oldVal = oldProps.get("timestamp");
 					long oldTime = -1;
-					if(o instanceof String)
+					if(oldVal instanceof String)
 						oldTime = Integer.parseInt((String)oldProps.get("timestamp"));
-					else if(o instanceof Long)
-						oldTime = (Long)o;
+					else if(oldVal instanceof Long)
+						oldTime = (Long)oldVal;
 					//TODO else warn?
 					long newTime = (Long)newProps.get("timestamp");
 					if(newTime >= oldTime){
 						oldProps.put(key, newProps.get(key));
 					}
 				}else if(mergeMethod == "keepConfidence"){
-					Object o = oldProps.get("score");
+					Object oldVal = oldProps.get("score");
 					double oldScore = 0.0;
-					if(o instanceof String)
+					if(oldVal instanceof String)
 						oldScore = Double.parseDouble((String)oldProps.get("score"));
-					else if(o instanceof Double)
-						oldScore = (Double)o;
+					else if(oldVal instanceof Double)
+						oldScore = (Double)oldVal;
 					//TODO else warn?
 					double newScore = (Long)newProps.get("score");
 					if(newScore >= oldScore){
