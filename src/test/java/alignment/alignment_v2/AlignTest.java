@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import com.tinkerpop.rexster.client.RexProException;
 
 import junit.framework.Test;
@@ -329,4 +331,107 @@ public class AlignTest
     	mergeMethods.put("testprop", "keepConfidence");
     	
     }
+    
+    /**
+     * Testing the keepConfidence option for AlignVertProps
+     */
+    public void testMergeMethodsFromSchema()
+    {
+    	Align a = new Align();
+    	
+    	String ontologyStrTest = "{"+
+    			"  \"description\":\"The top level of the graph\","+
+    			"  \"type\":\"object\","+
+    			"  \"$schema\": \"http://json-schema.org/draft-03/schema\","+
+    			"  \"id\": \"gov.ornl.sava.stucco/graph\","+
+    			"  \"required\":false,"+
+    			"  \"properties\":{"+
+    			"    \"mode\": {"+
+    			"      \"type\": \"gov.ornl.sava.graphson.normal/graph/mode\""+
+    			"    },"+
+    			"    \"edges\": {"+
+    			"      \"title\":\"edges\","+
+    			"      \"description\":\"The list of edges in this graph\","+
+    			"      \"type\":\"array\","+
+    			"      \"id\": \"gov.ornl.sava.stucco/graph/edges\","+
+    			"      \"required\":false,"+
+    			"      \"items\":[ "+
+    			"        {"+
+    			"          \"id\": \"gov.ornl.sava.stucco/graph/edges/logsInTo\","+
+    			"          \"extends\": \"gov.ornl.sava.graphson.normal/graph/edges/base\","+
+    			"          \"title\":\"logsInTo\","+
+    			"          \"description\":\"'account' -'logsInTo'-> 'host'\","+
+    			"          \"properties\":{"+
+    			"            \"inVType\":{"+
+    			"              \"required\":true,"+
+    			"              \"enum\":[\"host\"]"+
+    			"            },"+
+    			"            \"outVType\":{"+
+    			"              \"required\":true,"+
+    			"              \"enum\":[\"account\"]"+
+    			"            }"+
+    			"          }"+
+    			"        }"+
+    			"      ]"+
+    			"    },"+
+    			"    \"vertices\": {"+
+    			"      \"title\":\"vertices\","+
+    			"      \"description\":\"The list of vertices in this graph\","+
+    			"      \"type\":\"array\","+
+    			"      \"id\": \"gov.ornl.sava.stucco/graph/vertices\","+
+    			"      \"required\":false,"+
+    			"      \"items\":["+
+    			"        {"+
+    			"          \"id\": \"gov.ornl.sava.stucco/graph/vertices/software\","+
+    			"          \"extends\": \"gov.ornl.sava.graphson.normal/graph/vertices/base\","+
+    			"          \"title\":\"software\","+
+    			"          \"description\":\"Any software components on a system, including OSes, applications, services, and libraries.\","+
+    			"          \"properties\":{"+
+    			"            \"vertexType\":{"+
+    			"              \"required\":true,"+
+    			"              \"enum\":[\"software\"]"+
+    			"            },"+
+    			//merge fields here are all arbitrary, will not match the real ontology...
+    			"            \"source\":{"+
+    			"              \"merge\":\"timestamp\","+
+    			"              \"required\":false"+
+    			"            },"+
+    			"            \"description\":{"+
+    			"              \"merge\":\"keepNew\","+
+    			"              \"required\":false"+
+    			"            },"+
+    			"            \"modifiedDate\":{"+
+    			"              \"merge\":\"keepUpdates\","+
+    			"              \"required\":false"+
+    			"            },"+
+    			"            \"vendor\":{"+
+    			"              \"merge\":\"timestamp\","+
+    			"              \"required\":false"+
+    			"            },"+
+    			"            \"product\":{"+
+    			"              \"merge\":\"appendList\","+
+    			"              \"required\":false"+
+    			"            },"+
+    			"            \"version\":{"+
+    			//"              \"merge\":\"keepNew\","+
+    			"              \"required\":false"+
+    			"            }"+
+    			"          }"+
+    			"        }"+
+    			"      ]"+
+    			"    }"+
+    			"  }"+
+    			"}";
+    	
+    	JSONObject ontology = new JSONObject(ontologyStrTest);
+    	Map<String, Map<String,String>> mergeMethods = Align.mergeMethodsFromSchema(ontology);
+    	assertEquals("timestamp", mergeMethods.get("software").get("source"));
+    	assertEquals("keepNew", mergeMethods.get("software").get("description"));
+    	assertEquals("keepUpdates", mergeMethods.get("software").get("modifiedDate"));
+    	assertEquals("timestamp", mergeMethods.get("software").get("vendor"));
+    	assertEquals("appendList", mergeMethods.get("software").get("product"));
+    	assertEquals("keepNew", mergeMethods.get("software").get("version"));
+    	
+    }
+    
 }

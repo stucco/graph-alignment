@@ -315,22 +315,30 @@ public class Align
 		updateVert(vertID, oldProps);
     }
     
-    //TODO only public for testing, make private later.
-    //TODO hmm... maybe not the best way
-    /*
-    public Map mergeMethodsFromVertSchema(JSONObject vertSchema){
+    //TODO only needs to be public for testing, will probably make private later.
+    //returns a map of prop names to merge methods, for each vert name
+    public static Map<String, Map<String, String>> mergeMethodsFromSchema(JSONObject ontology){
 		// TODO probably should use an enum type for this.
-    	HashMap<String, String> mergeMethods = new HashMap<String, String>();
-    	try {
-			FileUtils.readFileToString(new File("vert_schema_test.json"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		return mergeMethods;
+    	HashMap<String, Map<String, String>> mergeMethods = new HashMap<String, Map<String, String>>();
+    	JSONArray verts = ontology.getJSONObject("properties").getJSONObject("vertices").getJSONArray("items");
+    	HashMap<String, String> mergeMethodsCurrVert = null;
+    	for(int i=0; i<verts.length(); i++){
+    		mergeMethodsCurrVert = new HashMap<String, String>();
+    		JSONObject currVert = verts.getJSONObject(i);
+    		String vertName = currVert.getString("title");
+    		JSONObject currProps = currVert.getJSONObject("properties");
+    		Iterator<String> k = currProps.keys();
+    		while(k.hasNext()){
+    			String key = k.next();
+    			String method = currProps.getJSONObject(key).optString("merge");
+    			if(method == null || method == "")
+    				method = "keepNew";
+    			mergeMethodsCurrVert.put(key, method);
+    		}
+    		mergeMethods.put(vertName, mergeMethodsCurrVert);
+    	}
+    	return mergeMethods;
 	}
-	*/
 
 	public boolean removeAllVertices(){
 		return execute("g.V.each{g.removeVertex(it)};g.commit()");
