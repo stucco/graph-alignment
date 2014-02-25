@@ -8,6 +8,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.json.*;
@@ -26,6 +29,7 @@ public class Align
 {
 	
 	private RexsterClient client = null;
+	private Logger logger = null;
 	
 	//TODO: these timeouts seem to do nothing.  If the server is down, it seems to wait (& apparently retry) forever.
 	// should probably submit a bug report for this.
@@ -46,23 +50,23 @@ public class Align
     }};
     
     public Align(){
+    	logger = LoggerFactory.getLogger(Align.class);
     	try {
     		List<Map<String,Object>> result;
-			System.out.print("connecting to DB...");
+			logger.info("connecting to DB...");
 			client = RexsterClientFactory.open(configOpts);
 			
 			//call execute() with some stuff we don't care about, 
 			//  to make sure that the connection is actually good.
 			//  (open() method doesn't actually do anything other than make the client object)
 			result = client.execute("g.V('name','some node with a long name that should not exist')");
-			//System.out.println("got result: " + result.toString()); //don't really care...
-			System.out.println(" connection is good!");
+			//logger.info.println("got result: " + result.toString()); //don't really care...
+			logger.info(" connection is good!");
 			
 		} catch (Exception e) { //open() really just throws Exception?  really?
 			this.client = null;
-			System.err.println("problem testing Rexster connection");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("problem testing Rexster connection");
+			logger.error("Exception!",e);
 		}
     }
     
@@ -91,14 +95,12 @@ public class Align
     		query += ";g";
 			client.execute(query, params);
 		} catch (RexProException e) {
-			System.err.println("'execute' method caused a rexpro problem (again)");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("'execute' method caused a rexpro problem (again)");
+			logger.error("Exception!",e);
 			return false;
 		} catch (IOException e) {
-			System.err.println("'execute' method caused something new and unexpected to break!");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("'execute' method caused something new and unexpected to break!");
+			logger.error("Exception!",e);
 			return false;
 		}
     	return true;
@@ -138,9 +140,9 @@ public class Align
     		//we want *any* graphson problems to end up here
     		//being noisy when these fail is probably ok, we shouldn't really ever fail here except when testing, etc.
     		//TODO but really all of these errors should go to our slf4j stuff instead... 
-    		System.err.println("Error parsing GraphSON in load()!");
-    		System.err.println("The graphson was: " + newGraphSection);
-    		e.printStackTrace();
+    		logger.error("Error parsing GraphSON in load()!");
+    		logger.error("The graphson was: " + newGraphSection);
+    		logger.error("Exception!",e);
     		return false;
     	}
     	
@@ -185,16 +187,13 @@ public class Align
 	    	Map<String, Object> query_ret_map = query_ret_list.get(0);
 	    	return query_ret_map;
 		} catch (RexProException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception!",e);
 			return null;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception!",e);
 			return null;
 		} catch (ClassCastException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Exception!",e);
 			return null;
 		}
     }
@@ -206,12 +205,12 @@ public class Align
     	param.put("NAME", name);
     	Object query_ret = client.execute("g.query().has(\"name\",NAME).vertices().toList();", param);
     	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
-    	//System.out.println("query returned: " + query_ret_list);
+    	//logger.info("query returned: " + query_ret_list);
     	if(query_ret_list.size() == 0){
-    		System.out.println("Warning: findVert found 0 matching verts.");
+    		logger.warn("Warning: findVert found 0 matching verts.");
     		return null;
     	}else if(query_ret_list.size() > 1){
-    		System.out.println("Warning: findVert found more than 1 matching verts.");
+    		logger.warn("Warning: findVert found more than 1 matching verts.");
     		return null;
     	}
     	return query_ret_list.get(0);
@@ -221,7 +220,7 @@ public class Align
     	try{
     		return (String)findVert(name).get("_id");
     	}catch(Exception e){
-    		System.err.println("Warn: could not find id for name: " + name + ", returning null");
+    		logger.error("Warn: could not find id for name: " + name + ", returning null");
     		return null;
     	}
     }
@@ -249,7 +248,7 @@ public class Align
     	param.put("NAME", name);
     	Object query_ret = client.execute("g.query().has(\"name\",NAME).edges().toList();", param);
     	List query_ret_list = (List)query_ret;
-    	System.out.println("query returned: " + query_ret_list);
+    	logger.info("query returned: " + query_ret_list);
     	return query_ret_list;
     }*/
     
