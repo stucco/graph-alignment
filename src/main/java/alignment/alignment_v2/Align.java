@@ -157,6 +157,14 @@ public class Align
     	for(int i=0; i<edges.length; i++){
 			String outv_id = findVertId(edges[i].getString("_outV"));
 			String inv_id = findVertId(edges[i].getString("_inV"));
+			if(outv_id == null){
+				logger.error("Could not find out_v for edge: " + edges[i]);
+				continue;
+			}
+			if(inv_id == null){
+				logger.error("Could not find in_v for edge: " + edges[i]);
+				continue;
+			}
 			String label = edges[i].optString("_label");
 			param.put("OUTV", outv_id);
 			param.put("INV", inv_id);
@@ -220,7 +228,7 @@ public class Align
     	try{
     		return (String)findVert(name).get("_id");
     	}catch(Exception e){
-    		logger.error("Warn: could not find id for name: " + name + ", returning null");
+    		logger.warn("Could not find id for name: " + name + ", returning null");
     		return null;
     	}
     }
