@@ -455,14 +455,12 @@ extends TestCase
 			//find this node, check some properties.
 			String id = a.findVertId("CVE-2006-3459");
 			Map<String, Object> query_ret_map = a.getVertByID(id);
-			assertEquals("vertex", query_ret_map.get("_type"));
 			assertEquals("Metasploit", query_ret_map.get("source"));
 			assertEquals("vulnerability", query_ret_map.get("vertexType"));
 
 			//find this other node, check its properties.
 			String id2 = a.findVertId("exploit/apple_ios/email/mobilemail_libtiff");
 			query_ret_map = a.getVertByID(id2);
-			assertEquals("vertex", query_ret_map.get("_type"));
 			assertEquals("Metasploit", query_ret_map.get("source"));
 			assertEquals("malware", query_ret_map.get("vertexType"));
 			assertEquals("exploit", query_ret_map.get("malwareType"));
