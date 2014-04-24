@@ -215,10 +215,10 @@ public class Align
     	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
     	//logger.info("query returned: " + query_ret_list);
     	if(query_ret_list.size() == 0){
-    		logger.warn("Warning: findVert found 0 matching verts.");
+    		logger.info("findVert found 0 matching verts for name:" + name);
     		return null;
     	}else if(query_ret_list.size() > 1){
-    		logger.warn("Warning: findVert found more than 1 matching verts.");
+    		logger.warn("findVert found more than 1 matching verts for name:" + name);
     		return null;
     	}
     	return query_ret_list.get(0);
