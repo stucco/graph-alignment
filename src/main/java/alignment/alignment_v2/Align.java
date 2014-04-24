@@ -150,8 +150,23 @@ public class Align
 
     	//for *vertices*, you have a json object that you can load.
     	for(int i=0; i<verts.length; i++){
-			param.put("VERT_PROPS", verts[i]);
-			execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
+    		//System.out.println(verts[i]);
+    		String vert_name = verts[i].getString("name");
+    		boolean new_vert = false;
+    		try {
+				new_vert = (findVert(vert_name) == null);
+			} catch (IOException e) {
+				logger.error("Exception!",e);
+			} catch (RexProException e) {
+				logger.error("Exception!",e);
+			}
+    		if(new_vert){ //only add new...
+    			param.put("VERT_PROPS", verts[i]);
+				execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
+    		}else{
+    			//TODO better to merge instead of ignoring them...
+    			logger.warn("Attempted to add a duplicate vertex (within same message) ignoring...");
+    		}
     	}
     	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
     	for(int i=0; i<edges.length; i++){
@@ -215,7 +230,7 @@ public class Align
     	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
     	//logger.info("query returned: " + query_ret_list);
     	if(query_ret_list.size() == 0){
-    		logger.info("findVert found 0 matching verts for name:" + name);
+    		//logger.info("findVert found 0 matching verts for name:" + name); //this is too noisy, the invoking function can complain if it wants to...
     		return null;
     	}else if(query_ret_list.size() > 1){
     		logger.warn("findVert found more than 1 matching verts for name:" + name);
