@@ -10,11 +10,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.json.*;
 
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
@@ -59,10 +59,18 @@ public class Align
 			//call execute() with some stuff we don't care about, 
 			//  to make sure that the connection is actually good.
 			//  (open() method doesn't actually do anything other than make the client object)
-			result = client.execute("g.V('name','some node with a long name that should not exist')");
+			result = client.execute("g.V('asdf','some node that should not exist')");
 			//logger.info.println("got result: " + result.toString()); //don't really care...
 			logger.info(" connection is good!");
-			
+			//configure name index
+			try{
+				//client.execute("g.makeKey(\"name\").dataType(String.class).indexed(\"standard\",Vertex.class).unique().make();g.commit()");
+				client.execute("g.makeKey(\"vertexType\").dataType(String.class).indexed(\"standard\",Vertex.class).make();g.commit()");
+				client.execute("g.makeKey(\"name\").dataType(String.class).indexed(\"standard\",Vertex.class).make();g.commit()");
+			}catch(Exception e){
+				logger.warn("could not configure indices - this is ok if they were configured previously.");
+				logger.warn("trace was: " + e);
+			}
 		} catch (Exception e) { //open() really just throws Exception?  really?
 			this.client = null;
 			logger.error("problem testing Rexster connection");
@@ -226,7 +234,7 @@ public class Align
     		return null;
     	Map<String, Object> param = new HashMap<String, Object>();
     	param.put("NAME", name);
-    	Object query_ret = client.execute("g.query().has(\"name\",NAME).vertices().toList();", param);
+    	Object query_ret = client.execute("g.V.has(\"name\",NAME).toList();", param);
     	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
     	//logger.info("query returned: " + query_ret_list);
     	if(query_ret_list.size() == 0){
@@ -269,7 +277,7 @@ public class Align
     		return null;
     	Map<String, Object> param = new HashMap<String, Object>();
     	param.put("NAME", name);
-    	Object query_ret = client.execute("g.query().has(\"name\",NAME).edges().toList();", param);
+    	Object query_ret = client.execute("g.query().has(\"name\",EQUAL,NAME).edges().toList();", param);
     	List query_ret_list = (List)query_ret;
     	logger.info("query returned: " + query_ret_list);
     	return query_ret_list;
