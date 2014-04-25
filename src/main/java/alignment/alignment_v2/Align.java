@@ -56,24 +56,25 @@ public class Align
 			logger.info("connecting to DB...");
 			client = RexsterClientFactory.open(configOpts);
 			
-			//call execute() with some stuff we don't care about, 
-			//  to make sure that the connection is actually good.
-			//  (open() method doesn't actually do anything other than make the client object)
-			result = client.execute("g.V('asdf','some node that should not exist')");
-			//logger.info.println("got result: " + result.toString()); //don't really care...
-			logger.info(" connection is good!");
-			//configure name index
+			//configure name index if needed
+			List currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
+			logger.info( "found indices: " + currentIndices );
 			try{
-				//client.execute("g.makeKey(\"name\").dataType(String.class).indexed(\"standard\",Vertex.class).unique().make();g.commit()");
-				client.execute("g.makeKey(\"vertexType\").dataType(String.class).indexed(\"standard\",Vertex.class).make();g.commit()");
-				client.execute("g.makeKey(\"name\").dataType(String.class).indexed(\"standard\",Vertex.class).make();g.commit()");
+				if(!currentIndices.contains("name")){ //FIXME must be done earlier?!
+					logger.info("name index not found, creating...");
+					client.execute("g.makeKey(\"name\").dataType(String.class).indexed(\"standard\",Vertex.class).unique().make();g.commit();g;");
+				}
+				if(!currentIndices.contains("vertexType")){
+					logger.info("vertexType index not found, creating...");
+					client.execute("g.makeKey(\"vertexType\").dataType(String.class).indexed(\"standard\",Vertex.class).make();g.commit();g;");
+				}
 			}catch(Exception e){
-				logger.warn("could not configure indices - this is ok if they were configured previously.");
-				logger.warn("trace was: " + e);
+				logger.error("could not configure missing indices!", e);
 			}
+			logger.info(" connection is good!");
 		} catch (Exception e) { //open() really just throws Exception?  really?
 			this.client = null;
-			logger.error("problem testing Rexster connection");
+			logger.error("problem creating Rexster connection");
 			logger.error("Exception!",e);
 		}
     }
