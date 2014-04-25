@@ -60,7 +60,7 @@ public class Align
 			List currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
 			logger.info( "found indices: " + currentIndices );
 			try{
-				if(!currentIndices.contains("name")){ //FIXME must be done earlier?!
+				if(!currentIndices.contains("name")){
 					logger.info("name index not found, creating...");
 					client.execute("g.makeKey(\"name\").dataType(String.class).indexed(\"standard\",Vertex.class).unique().make();g.commit();g;");
 				}
