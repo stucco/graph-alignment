@@ -173,8 +173,8 @@ public class Align
     			param.put("VERT_PROPS", verts[i]);
 				execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
     		}else{
-    			//TODO better to merge instead of ignoring them...
-    			logger.warn("Attempted to add a duplicate vertex (within same message) ignoring...");
+    			//TODO need to call alignVertProps() for this case, which means we need to make a mergeMethods obj
+    			logger.warn("Attempted to add vertex with duplicate name.  ignoring ...");
     		}
     	}
     	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
