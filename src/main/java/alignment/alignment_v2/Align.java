@@ -235,7 +235,7 @@ public class Align
     		return null;
     	Map<String, Object> param = new HashMap<String, Object>();
     	param.put("NAME", name);
-    	Object query_ret = client.execute("g.V.has(\"name\",NAME).toList();", param);
+    	Object query_ret = client.execute("g.query().has(\"name\",EQUAL,NAME).vertices().toList();", param);
     	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
     	//logger.info("query returned: " + query_ret_list);
     	if(query_ret_list.size() == 0){
