@@ -22,7 +22,7 @@ import com.tinkerpop.rexster.client.RexsterClientTokens;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
 /**
- * Hello world!
+ * Connects to Graph DB, aligns and adds new incoming graph data, provides some misc. utility functions.
  *
  */
 public class Align 
@@ -162,13 +162,7 @@ public class Align
     		//System.out.println(verts[i]);
     		String vert_name = verts[i].getString("name");
     		boolean new_vert = false;
-    		try {
-				new_vert = (findVert(vert_name) == null);
-			} catch (IOException e) {
-				logger.error("Exception!",e);
-			} catch (RexProException e) {
-				logger.error("Exception!",e);
-			}
+			new_vert = (findVertId(vert_name) == null);
     		if(new_vert){ //only add new...
     			param.put("VERT_PROPS", verts[i]);
 				execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
@@ -251,8 +245,14 @@ public class Align
     public String findVertId(String name){
     	try{
     		return (String)findVert(name).get("_id");
-    	}catch(Exception e){
-    		logger.warn("Could not find id for name: " + name + ", returning null");
+    	}catch(NullPointerException e){
+    		//this is expected when there is no vert with this name.
+    		return null;
+    	}catch(RexProException e){
+    		logger.warn("RexProException in findVertID (with name: " + name + " )", e);
+    		return null;
+    	}catch(IOException e){
+    		logger.error("IO Exception in findVertID (with name: " + name + " )", e);
     		return null;
     	}
     }
