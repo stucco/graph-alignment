@@ -30,6 +30,7 @@ public class Align
 	
 	private RexsterClient client = null;
 	private Logger logger = null;
+	private Map<String, String> IDCache = null;
 	
 	//TODO: these timeouts seem to do nothing.  If the server is down, it seems to wait (& apparently retry) forever.
 	// should probably submit a bug report for this.
@@ -51,6 +52,7 @@ public class Align
     
     public Align(){
     	logger = LoggerFactory.getLogger(Align.class);
+    	IDCache = new HashMap<String, String>(10000);
     	try {
     		List<Map<String,Object>> result;
 			logger.info("connecting to DB...");
@@ -243,18 +245,29 @@ public class Align
     }
     
     public String findVertId(String name){
-    	try{
-    		return (String)findVert(name).get("_id");
-    	}catch(NullPointerException e){
-    		//this is expected when there is no vert with this name.
-    		return null;
-    	}catch(RexProException e){
-    		logger.warn("RexProException in findVertID (with name: " + name + " )", e);
-    		return null;
-    	}catch(IOException e){
-    		logger.error("IO Exception in findVertID (with name: " + name + " )", e);
-    		return null;
+    	String id = IDCache.get(name);
+    	if(id != null){
+    		return id;
+    	}else{
+	    	try{
+	    		id = (String)findVert(name).get("_id");
+	    		if(id != null){
+	    			//TODO cache eviction, and/or limit caching by vert type.  But until vertex count gets higher, it won't matter much.
+	    			IDCache.put(name, id);
+	    		}
+	    		return id;
+	    	}catch(NullPointerException e){
+	    		//this is expected when there is no vert with this name.
+	    		return null;
+	    	}catch(RexProException e){
+	    		logger.warn("RexProException in findVertID (with name: " + name + " )", e);
+	    		return null;
+	    	}catch(IOException e){
+	    		logger.error("IO Exception in findVertID (with name: " + name + " )", e);
+	    		return null;
+	    	}
     	}
+    	
     }
     
     public void updateVert(String id, Map<String, Object> props){
