@@ -250,20 +250,24 @@ public class Align
     		return id;
     	}else{
 	    	try{
-	    		id = (String)findVert(name).get("_id");
+	    		Map vert = findVert(name);
+	    		if(vert == null) 
+	    			id = null;
+	    		else 
+	    			id = (String)vert.get("_id");
 	    		if(id != null){
 	    			//TODO cache eviction, and/or limit caching by vert type.  But until vertex count gets higher, it won't matter much.
 	    			IDCache.put(name, id);
 	    		}
 	    		return id;
-	    	}catch(NullPointerException e){
-	    		//this is expected when there is no vert with this name.
-	    		return null;
 	    	}catch(RexProException e){
 	    		logger.warn("RexProException in findVertID (with name: " + name + " )", e);
 	    		return null;
+	    	}catch(NullPointerException e){
+	    		logger.error("NullPointerException in findVertID (with name: " + name + " )", e);
+	    		return null;
 	    	}catch(IOException e){
-	    		logger.error("IO Exception in findVertID (with name: " + name + " )", e);
+	    		logger.error("IOException in findVertID (with name: " + name + " )", e);
 	    		return null;
 	    	}
     	}
