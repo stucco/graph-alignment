@@ -47,7 +47,7 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		String test_graphson_verts = " {\"vertices\":[" +
 				"{" +
@@ -124,7 +124,7 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
 
@@ -149,7 +149,7 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = a.findVertId("testvert_align_props");
@@ -182,7 +182,7 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = a.findVertId("testvert_align_props");
@@ -264,7 +264,7 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		a.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = a.findVertId("testvert_align_props");
@@ -308,7 +308,7 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		a.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = a.findVertId("testvert_align_props");
@@ -445,11 +445,14 @@ extends TestCase
 	{
 		Align a = new Align();
 		a.removeAllVertices();
-		a.removeAllEdges();
+		//a.removeAllEdges();
 
 		String test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/metasploit.json"), "UTF8");
 		//System.out.println(test_graphson_verts);
 		a.load(test_graphson_verts);
+		//test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/nvdcve-2.0-2002.json"), "UTF8");
+		//System.out.println(test_graphson_verts);
+		//a.load(test_graphson_verts);
 
 		try {
 			//find this node, check some properties.

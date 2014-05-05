@@ -207,8 +207,8 @@ public class Align
 				logger.warn("Attempted to add edge with duplicate name.  ignoring ...");
 				continue;
 			}
-			param.put("OUTV", outv_id);
-			param.put("INV", inv_id);
+			param.put("OUTV", Integer.parseInt(outv_id));
+			param.put("INV", Integer.parseInt(inv_id));
 			param.put("LABEL", label);
 			//build your param map obj
 			Map<String, Object> props = new HashMap<String, Object>();
@@ -231,7 +231,9 @@ public class Align
 
 	public Map<String, Object> getVertByID(String id){
 		try {
-			Object query_ret = client.execute("g.v("+id+").map();");
+			Map<String, Object> param = new HashMap<String, Object>();
+	    	param.put("ID", Integer.parseInt(id));
+			Object query_ret = client.execute("g.v(ID).map();", param);
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 	    	Map<String, Object> query_ret_map = query_ret_list.get(0);
 	    	return query_ret_map;
@@ -341,14 +343,14 @@ public class Align
     	if(inv_id == null || inv_id == "" || outv_id == null || outv_id == "" || label == null || label == "")
     		return false;
     	Map<String, Object> param = new HashMap<String, Object>();
-    	param.put("IN", inv_id);
-    	param.put("OUT", outv_id);
+    	param.put("IN", Integer.parseInt(inv_id));
+    	param.put("OUT", Integer.parseInt(outv_id));
     	param.put("LABEL", label);
     	Object query_ret;
 		try {
 			query_ret = client.execute("g.v("+outv_id+").outE(\""+label+"\").inV().filter{it.id == "+inv_id+"}.id;");
 			//TODO why does below not work?  It should be the faster/better way to do this
-			//query_ret = client.execute("g.v(OUT).outE(LABEL).inV().filter{it.id == IN}.id;", param);
+			//query_ret = client.execute("g.v("+outv_id+").outE(LABEL).inV().filter{it.id == IN}.id;", param);
 		} catch (RexProException e) {
 			logger.error("findEdge RexProException for args:" + outv_id + ", " + label + ", " + inv_id);
 			e.printStackTrace();
@@ -380,7 +382,7 @@ public class Align
     
     public boolean updateVertProperty(String id, String key, Object val){
     	HashMap<String, Object> param = new HashMap<String, Object>();
-    	param.put("ID", id);
+    	param.put("ID", Integer.parseInt(id));
     	param.put("KEY", key);
     	param.put("VAL", val);
     	return execute("g.v(ID)[KEY]=VAL;g.commit()", param);
@@ -479,11 +481,12 @@ public class Align
      * This *should* be the only place that will generate these.  If not, something is wrong.
      */
 	public boolean removeAllVertices(){
-		return execute("g.V.each{g.removeVertex(it)};g.commit()");
+		return execute("g.V.remove();g.commit()");
+		//return execute("g.V.each{g.removeVertex(it)};g.commit()");
     }
-    
+    /*
     public boolean removeAllEdges(){
 		return execute("g.E.each{g.removeVertex(it)};g.commit()");
-    }
+    }*/
 
 }
