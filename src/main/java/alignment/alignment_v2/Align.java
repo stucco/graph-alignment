@@ -37,7 +37,7 @@ public class Align
     private static final BaseConfiguration configOpts = new BaseConfiguration() {{
         addProperty(RexsterClientTokens.CONFIG_HOSTNAME, "localhost");
         addProperty(RexsterClientTokens.CONFIG_PORT, 8184);
-        addProperty(RexsterClientTokens.CONFIG_TIMEOUT_CONNECTION_MS, 8000);
+        addProperty(RexsterClientTokens.CONFIG_TIMEOUT_CONNECTION_MS, 18000);
         addProperty(RexsterClientTokens.CONFIG_TIMEOUT_WRITE_MS, 4000);
         addProperty(RexsterClientTokens.CONFIG_TIMEOUT_READ_MS, 16000);
         addProperty(RexsterClientTokens.CONFIG_MAX_ASYNC_WRITE_QUEUE_BYTES, 512000);
@@ -58,9 +58,9 @@ public class Align
 			logger.info("connecting to DB...");
 			client = RexsterClientFactory.open(configOpts);
 			
-			//configure name index if needed
+			//configure vert indices needed
 			List currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
-			logger.info( "found indices: " + currentIndices );
+			logger.info( "found vertex indices: " + currentIndices );
 			try{
 				if(!currentIndices.contains("name")){
 					logger.info("name index not found, creating...");
@@ -71,8 +71,20 @@ public class Align
 					client.execute("g.makeKey(\"vertexType\").dataType(String.class).indexed(\"standard\",Vertex.class).make();g.commit();g;");
 				}
 			}catch(Exception e){
+				logger.error("could not configure missing vertex indices!", e);
+			}
+			/*
+			currentIndices = client.execute("g.getIndexedKeys(Edge.class)");
+			logger.info( "found edge indices: " + currentIndices );
+			try{
+				if(!currentIndices.contains("name")){
+					logger.info("name index not found, creating...");
+					client.execute("g.makeKey(\"edgeName\").dataType(String.class).indexed(\"standard\",Edge.class).unique().make();g.commit();g;");
+				}
+			}catch(Exception e){
 				logger.error("could not configure missing indices!", e);
 			}
+			*/
 			logger.info(" connection is good!");
 		} catch (Exception e) { //open() really just throws Exception?  really?
 			this.client = null;
@@ -107,10 +119,12 @@ public class Align
 			client.execute(query, params);
 		} catch (RexProException e) {
 			logger.error("'execute' method caused a rexpro problem (again)");
+			logger.error("this query was: " + query);
 			logger.error("Exception!",e);
 			return false;
 		} catch (IOException e) {
 			logger.error("'execute' method caused something new and unexpected to break!");
+			logger.error("this query was: " + query);
 			logger.error("Exception!",e);
 			return false;
 		}
@@ -177,6 +191,8 @@ public class Align
     	for(int i=0; i<edges.length; i++){
 			String outv_id = findVertId(edges[i].getString("_outV"));
 			String inv_id = findVertId(edges[i].getString("_inV"));
+			String edgeName = edges[i].getString("_id");
+			//String edgeID = findEdgeId(edgeName);
 			if(outv_id == null){
 				logger.error("Could not find out_v for edge: " + edges[i]);
 				continue;
@@ -186,12 +202,17 @@ public class Align
 				continue;
 			}
 			String label = edges[i].optString("_label");
+			if(edgeExists(inv_id, outv_id, label)){
+				//TODO need to merge edge props for this case, like verts above...
+				logger.warn("Attempted to add edge with duplicate name.  ignoring ...");
+				continue;
+			}
 			param.put("OUTV", outv_id);
 			param.put("INV", inv_id);
 			param.put("LABEL", label);
 			//build your param map obj
 			Map<String, Object> props = new HashMap<String, Object>();
-			props.put("name", edges[i].get("_id"));
+			props.put("edgeName", edgeName);
 			edges[i].remove("_inv");
 			edges[i].remove("_outv");
 			edges[i].remove("_id");
@@ -207,8 +228,8 @@ public class Align
     	}
     	return true;//TODO what if some execute()s pass and some fail?
     }
-    
-    public Map<String, Object> getVertByID(String id){
+
+	public Map<String, Object> getVertByID(String id){
 		try {
 			Object query_ret = client.execute("g.v("+id+").map();");
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
@@ -244,13 +265,33 @@ public class Align
     	return query_ret_list.get(0);
     }
     
+    /*
+    public Map<String,Object> findEdge(String edgeName) throws IOException, RexProException{
+    	if(edgeName == null || edgeName == "")
+    		return null;
+    	Map<String, Object> param = new HashMap<String, Object>();
+    	param.put("NAME", edgeName);
+    	Object query_ret = client.execute("g.query().has(\"name\",EQUAL,NAME).edges().toList();", param);
+    	List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
+    	//logger.info("query returned: " + query_ret_list);
+    	if(query_ret_list.size() == 0){
+    		//logger.info("findEdge found 0 matching edges for name:" + name); //this is too noisy, the invoking function can complain if it wants to...
+    		return null;
+    	}else if(query_ret_list.size() > 1){
+    		logger.warn("findEdge found more than 1 matching edges for name:" + edgeName);
+    		return null;
+    	}
+    	return query_ret_list.get(0);
+    }
+    */
+
     public String findVertId(String name){
     	String id = vertIDCache.get(name);
     	if(id != null){
     		return id;
     	}else{
 	    	try{
-	    		Map vert = findVert(name);
+	    		Map<String, Object> vert = findVert(name);
 	    		if(vert == null) 
 	    			id = null;
 	    		else 
@@ -271,8 +312,64 @@ public class Align
 	    		return null;
 	    	}
     	}
-    	
     }
+    
+    /*
+    public String findEdgeId(String edgeName){
+    	String id = null;
+    	try{
+    		Map<String, Object> edge = findEdge(edgeName);
+    		if(edge == null) 
+    			id = null;
+    		else 
+    			id = (String)edge.get("_id");
+    		return id;
+    	}catch(RexProException e){
+    		logger.warn("RexProException in findEdgeId (with name: " + edgeName + " )", e);
+    		return null;
+    	}catch(NullPointerException e){
+    		logger.error("NullPointerException in findEdgeId (with name: " + edgeName + " )", e);
+    		return null;
+    	}catch(IOException e){
+    		logger.error("IOException in findEdgeId (with name: " + edgeName + " )", e);
+    		return null;
+    	}
+    }
+    */
+    
+    private boolean edgeExists(String inv_id, String outv_id, String label) {
+    	if(inv_id == null || inv_id == "" || outv_id == null || outv_id == "" || label == null || label == "")
+    		return false;
+    	Map<String, Object> param = new HashMap<String, Object>();
+    	param.put("IN", inv_id);
+    	param.put("OUT", outv_id);
+    	param.put("LABEL", label);
+    	Object query_ret;
+		try {
+			query_ret = client.execute("g.v("+outv_id+").outE(\""+label+"\").inV().filter{it.id == "+inv_id+"}.id;");
+			//TODO why does below not work?  It should be the faster/better way to do this
+			//query_ret = client.execute("g.v(OUT).outE(LABEL).inV().filter{it.id == IN}.id;", param);
+		} catch (RexProException e) {
+			logger.error("findEdge RexProException for args:" + outv_id + ", " + label + ", " + inv_id);
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			logger.error("findEdge IOException for args:" + outv_id + ", " + label + ", " + inv_id);
+			e.printStackTrace();
+			return false;
+		}
+    	List query_ret_list = (List)query_ret;
+    	//logger.info("query returned: " + query_ret_list);
+    	if(query_ret_list.size() == 0){
+    		//logger.info("findEdge found 0 matching edges for name:" + name); //this is too noisy, the invoking function can complain if it wants to...
+    		return false;
+    	}else if(query_ret_list.size() > 1){
+    		logger.warn("findEdge found more than 1 matching edges for args:" + outv_id + ", " + label + ", " + inv_id);
+    		return true;
+    	}else{
+    		return true;
+    	}
+	}
     
     public void updateVert(String id, Map<String, Object> props){
     	String[] keys = props.keySet().toArray(new String[0]);
@@ -288,18 +385,6 @@ public class Align
     	param.put("VAL", val);
     	return execute("g.v(ID)[KEY]=VAL;g.commit()", param);
     }
-    
-    /* unused
-    public List findEdge(String name) throws IOException, RexProException{
-    	if(name == null || name == "")
-    		return null;
-    	Map<String, Object> param = new HashMap<String, Object>();
-    	param.put("NAME", name);
-    	Object query_ret = client.execute("g.query().has(\"name\",EQUAL,NAME).edges().toList();", param);
-    	List query_ret_list = (List)query_ret;
-    	logger.info("query returned: " + query_ret_list);
-    	return query_ret_list;
-    }*/
     
     //mergeMethods are derived from ontology definition
     public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, String> mergeMethods){
@@ -388,6 +473,11 @@ public class Align
     	return mergeMethods;
 	}
 
+    /*
+     * These two methods will generate the following warning in your rexstitan.log (or similar):
+     *  WARN  com.thinkaurelius.titan.graphdb.transaction.StandardTitanTx  - Query requires iterating over all vertices [()]. For better performance, use indexes
+     * This *should* be the only place that will generate these.  If not, something is wrong.
+     */
 	public boolean removeAllVertices(){
 		return execute("g.V.each{g.removeVertex(it)};g.commit()");
     }
