@@ -181,12 +181,16 @@ public class Align
 			new_vert = (findVertId(vert_name) == null);
     		if(new_vert){ //only add new...
     			param.put("VERT_PROPS", verts[i]);
-				execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);g.commit()", param);
+				execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null)", param);
     		}else{
     			//TODO need to call alignVertProps() for this case, which means we need to make a mergeMethods obj
     			logger.warn("Attempted to add vertex with duplicate name.  ignoring ...");
     		}
+    		if(i%150 == 0){
+    			execute("g.commit()");//only commit periodically, so that operations can be combined by Titan.
+    		}
     	}
+    	execute("g.commit()"); //make sure all verts are committed before proceeding.
     	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
     	for(int i=0; i<edges.length; i++){
 			String outv_id = findVertId(edges[i].getString("_outV"));
@@ -207,8 +211,8 @@ public class Align
 				logger.warn("Attempted to add edge with duplicate name.  ignoring ...");
 				continue;
 			}
-			param.put("OUTV", Integer.parseInt(outv_id));
-			param.put("INV", Integer.parseInt(inv_id));
+			param.put("ID_OUT", Integer.parseInt(outv_id));
+			param.put("ID_IN", Integer.parseInt(inv_id));
 			param.put("LABEL", label);
 			//build your param map obj
 			Map<String, Object> props = new HashMap<String, Object>();
@@ -224,8 +228,12 @@ public class Align
 			}
 			param.put("EDGE_PROPS", props);
 			//and now finally add edge to graph
-			execute("outv = g.v(OUTV); inv = g.v(INV);g.addEdge(outv,inv,LABEL,EDGE_PROPS);g.commit()", param);
+			execute("g.addEdge(g.v(ID_OUT),g.v(ID_IN),LABEL,EDGE_PROPS)", param);
+    		if(i%150 == 0){
+    			execute("g.commit()");//only commit periodically, so that operations can be combined by Titan.
+    		}
     	}
+    	execute("g.commit()"); //make sure all edges are committed also.
     	return true;//TODO what if some execute()s pass and some fail?
     }
 
@@ -343,14 +351,13 @@ public class Align
     	if(inv_id == null || inv_id == "" || outv_id == null || outv_id == "" || label == null || label == "")
     		return false;
     	Map<String, Object> param = new HashMap<String, Object>();
-    	param.put("IN", Integer.parseInt(inv_id));
-    	param.put("OUT", Integer.parseInt(outv_id));
+    	param.put("ID_IN", Integer.parseInt(inv_id));
+    	param.put("ID_OUT", Integer.parseInt(outv_id));
     	param.put("LABEL", label);
     	Object query_ret;
 		try {
-			query_ret = client.execute("g.v("+outv_id+").outE(\""+label+"\").inV().filter{it.id == "+inv_id+"}.id;");
-			//TODO why does below not work?  It should be the faster/better way to do this
-			//query_ret = client.execute("g.v("+outv_id+").outE(LABEL).inV().filter{it.id == IN}.id;", param);
+			//TODO: renaming parameter ID_OUT to OUT results in things failing badly.  This is very strange.  I should probably file a bug report for this.
+			query_ret = client.execute("g.v(ID_OUT).outE(LABEL).inV().filter{it.id == ID_IN}.id;", param);
 		} catch (RexProException e) {
 			logger.error("findEdge RexProException for args:" + outv_id + ", " + label + ", " + inv_id);
 			e.printStackTrace();
