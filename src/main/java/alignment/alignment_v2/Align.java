@@ -488,6 +488,8 @@ public class Align
      * This *should* be the only place that will generate these.  If not, something is wrong.
      */
 	public boolean removeAllVertices(){
+		vertIDCache = new HashMap<String, String>(10000);
+		//TODO this query is slow enough that connection can time out if the DB starts with many vertices.
 		return execute("g.V.remove();g.commit()");
 		//return execute("g.V.each{g.removeVertex(it)};g.commit()");
     }
