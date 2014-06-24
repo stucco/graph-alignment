@@ -25,6 +25,12 @@
     	<groupId>com.tinkerpop.rexster</groupId>
     	<artifactId>rexster-protocol</artifactId>
     	<version>2.4.0</version>
+      <exclusions> <!-- Rexter includes two conflicting versions of stax-api, which now floods the logs with warnings... -->
+        <exclusion>
+          <groupId>javax.xml.stream</groupId> 
+          <artifactId>stax-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
     	<groupId>org.json</groupId>
