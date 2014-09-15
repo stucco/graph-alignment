@@ -7,7 +7,7 @@ services:
 install:
   - wget https://raw.githubusercontent.com/stucco/test/master/scripts/install-titan.sh
   - chmod a+x ./install-titan.sh
-  - sudo ./install-titan.sh 0.4.4 localhost
+  - sudo ./install-titan.sh 0.5.0 localhost
 after_success:
   - wget https://raw.githubusercontent.com/stucco/test/master/rerun-test.sh
   - chmod a+x ./rerun-test.sh
