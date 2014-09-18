@@ -3,6 +3,7 @@ package alignment.alignment_v2;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -505,9 +506,30 @@ public class Align
      */
 	public boolean removeAllVertices(){
 		vertIDCache = new HashMap<String, String>(10000);
-		//TODO this query is slow enough that connection can time out if the DB starts with many vertices.
-		return execute("g.V.remove();g.commit()");
-		//return execute("g.V.each{g.removeVertex(it)};g.commit()");
+		//NB: this query is slow enough that connection can time out if the DB starts with many vertices.
+		boolean ret = true;
+		//delete the known nodes first, to help prevent timeouts.
+		Map<String,Object> param;
+		Collection<String> ids = vertIDCache.values();
+		for(String id : ids){
+			param = new HashMap<String,Object>();
+			param.put("ID", Integer.parseInt(id));
+			try{
+				client.execute("g.v(ID).delete();", param);
+			}catch(Exception e){
+				ret = false;
+			}
+		}
+		try{
+			client.execute("g.commit();");
+		}catch(Exception e){
+			ret = false;
+		}
+		
+		//TODO break this up further, into smaller operations?  (See if timeouts ever still occur.)
+		ret = execute("g.V.remove();g.commit()") && ret;
+		
+		return ret;
     }
     /*
     public boolean removeAllEdges(){
