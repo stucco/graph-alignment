@@ -464,7 +464,7 @@ extends TestCase
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
-		String test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/metasploit.json"), "UTF8");
+		String test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/metasploit_short.json"), "UTF8");
 		//System.out.println(test_graphson_verts);
 		a.load(test_graphson_verts);
 		//test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/nvdcve-2.0-2002.json"), "UTF8");
