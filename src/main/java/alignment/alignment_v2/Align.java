@@ -526,7 +526,21 @@ public class Align
 		}
 		
 		//TODO break this up further, into smaller operations?  (See if timeouts ever still occur.)
-		ret = execute("g.V.remove();g.commit()") && ret;
+		try{
+			client.execute("g.V.remove();g.commit();");
+		}catch(IOException e){
+			logger.warn("connection timeout in removeAllVertices - going to sleep for a while and hope it resolves itself.");
+			try {
+				Thread.sleep(90000); //in ms.
+	         }
+	         catch (InterruptedException ie) { 
+	             // Restore the interrupted status
+	             Thread.currentThread().interrupt();
+	         }
+			ret = false;
+		}catch(Exception e){
+			ret = false;
+		}
 		
 		//clear the cache now.
 		vertIDCache = new HashMap<String, String>(10000);
