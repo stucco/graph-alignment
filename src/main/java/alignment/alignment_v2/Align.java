@@ -505,7 +505,6 @@ public class Align
      * This *should* be the only place that will generate these.  If not, something is wrong.
      */
 	public boolean removeAllVertices(){
-		vertIDCache = new HashMap<String, String>(10000);
 		//NB: this query is slow enough that connection can time out if the DB starts with many vertices.
 		boolean ret = true;
 		//delete the known nodes first, to help prevent timeouts.
@@ -528,6 +527,9 @@ public class Align
 		
 		//TODO break this up further, into smaller operations?  (See if timeouts ever still occur.)
 		ret = execute("g.V.remove();g.commit()") && ret;
+		
+		//clear the cache now.
+		vertIDCache = new HashMap<String, String>(10000);
 		
 		return ret;
     }
