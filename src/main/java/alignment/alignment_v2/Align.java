@@ -200,7 +200,7 @@ public class Align
 				execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null)", param);
     		}else{
     			//TODO need to call alignVertProps() for this case, which means we need to make a mergeMethods obj
-    			logger.warn("Attempted to add vertex with duplicate name.  ignoring ...");
+    			logger.debug("Attempted to add vertex with duplicate name.  ignoring ...");
     		}
     		if(i%150 == 0){
     			execute("g.commit()");//only commit periodically, so that operations can be combined by Titan.
@@ -224,7 +224,7 @@ public class Align
 			String label = edges[i].optString("_label");
 			if(edgeExists(inv_id, outv_id, label)){
 				//TODO need to merge edge props for this case, like verts above...
-				logger.warn("Attempted to add edge with duplicate name.  ignoring ...");
+				logger.debug("Attempted to add edge with duplicate name.  ignoring ...");
 				continue;
 			}
 			param.put("ID_OUT", Integer.parseInt(outv_id));
