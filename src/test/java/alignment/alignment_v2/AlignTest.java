@@ -107,6 +107,9 @@ extends TestCase
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
+			
+			a.removeAllVertices();
+			
 		} catch (RexProException e) {
 			fail("RexProException");
 			e.printStackTrace();
@@ -140,6 +143,8 @@ extends TestCase
 		query_ret_map = a.getVertByID(id);
 		assertEquals("33", query_ret_map.get("y").toString());
 		assertEquals("44", query_ret_map.get("z").toString());
+		
+		a.removeAllVertices();
 	}
 
 	/**
@@ -173,6 +178,8 @@ extends TestCase
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)a.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
+		
+		a.removeAllVertices();
 	}
 
 	/**
@@ -255,6 +262,8 @@ extends TestCase
 		testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
+		
+		a.removeAllVertices();
 	}
 
 	/**
@@ -299,6 +308,8 @@ extends TestCase
 		testProp = (String)a.getVertByID(id).get("testprop");
 		testVal = "bbbb";
 		assertEquals(testVal, testProp);
+		
+		a.removeAllVertices();
 	}
 
 	/**
@@ -330,6 +341,10 @@ extends TestCase
 
 		//update a prop (keepConfidence) (no update case)
 		mergeMethods.put("testprop", "keepConfidence");
+		
+		//TODO: this test seems unfinished??
+		
+		a.removeAllVertices();
 
 	}
 
@@ -433,6 +448,8 @@ extends TestCase
 		assertEquals("appendList", mergeMethods.get("software").get("product"));
 		assertEquals("keepNew", mergeMethods.get("software").get("version"));
 
+		a.removeAllVertices();
+		
 	}
 
 
@@ -477,6 +494,9 @@ extends TestCase
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
+			
+			a.removeAllVertices();
+			
 		} catch (RexProException e) {
 			fail("RexProException");
 			e.printStackTrace();
