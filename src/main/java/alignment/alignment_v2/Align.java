@@ -181,7 +181,6 @@ public class Align
     	}catch(Exception e){ 
     		//we want *any* graphson problems to end up here
     		//being noisy when these fail is probably ok, we shouldn't really ever fail here except when testing, etc.
-    		//TODO but really all of these errors should go to our slf4j stuff instead... 
     		logger.error("Error parsing GraphSON in load()!");
     		logger.error("The graphson was: " + newGraphSection);
     		logger.error("Exception!",e);
@@ -373,7 +372,6 @@ public class Align
     	param.put("LABEL", label);
     	Object query_ret;
 		try {
-			//TODO: renaming parameter ID_OUT to OUT results in things failing badly.  This is very strange.  I should probably file a bug report for this.
 			query_ret = client.execute("g.v(ID_OUT).outE(LABEL).inV().filter{it.id == ID_IN}.id;", param);
 		} catch (RexProException e) {
 			logger.error("findEdge RexProException for args:" + outv_id + ", " + label + ", " + inv_id);
