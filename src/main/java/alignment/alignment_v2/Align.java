@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.tools.ant.types.Path;
 import org.json.*;
 
 import com.tinkerpop.blueprints.Vertex;
@@ -21,6 +22,8 @@ import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.client.RexsterClientTokens;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
+
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Connects to Graph DB, aligns and adds new incoming graph data, provides some misc. utility functions.
@@ -32,6 +35,7 @@ public class Align
 	private RexsterClient client = null;
 	private Logger logger = null;
 	private Map<String, String> vertIDCache = null;
+	
 	
 	//TODO: these timeouts seem to do nothing.  If the server is down, it seems to wait (& apparently retry) forever.
 	// should probably submit a bug report for this.
@@ -51,20 +55,25 @@ public class Align
         addProperty(RexsterClientTokens.CONFIG_SERIALIZER, MsgPackSerializer.SERIALIZER_ID);
     }};
     
-    public Align(){
+    public Align() {
+    	
+    	ConfigFileLoader configFile = new ConfigFileLoader();
+    	ArrayList<Object> configArray = (ArrayList<Object>) configFile.getConfig("vulnerability");
+
     	logger = LoggerFactory.getLogger(Align.class);
     	vertIDCache = new HashMap<String, String>(10000);
     	try {
     		List<Map<String,Object>> result;
 			logger.info("connecting to DB...");
-			client = RexsterClientFactory.open(configOpts);
-			
+			client = RexsterClientFactory.open(configOpts);		//created at the beginning of the file
+	//		System.out.println("client" + client);
 			//configure vert indices needed
 			//List currentIndices = client.execute("g.getManagementSystem().getGraphIndexes(Vertex.class)");
 			List currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
+		
 			logger.info( "found vertex indices: " + currentIndices );
 			try{
-				
+		//		System.out.println("currentIndices = " + currentIndices +  " " + "name");
 				if(!currentIndices.contains("name")){
 					logger.info("name index not found, creating...");
 					client.execute("mgmt = g.getManagementSystem();"
@@ -153,6 +162,7 @@ public class Align
     }
 	
     public boolean load(String newGraphSection){
+    	
     	//do all the json obj parsing up front, in case you need to panic & leave early.
     	int vertCount = 0;
     	JSONObject[] verts = new JSONObject[0];
@@ -160,14 +170,19 @@ public class Align
     	JSONObject[] edges = new JSONObject[0];
     	try{
 	    	JSONObject graphson = new JSONObject(newGraphSection);
+	    //	System.out.println(graphson);
 	    	//make array of verts...
 	    	JSONArray json_verts = graphson.optJSONArray("vertices");
-	    	if(json_verts != null){
-	    		vertCount = json_verts.length();
-	    		verts = new JSONObject[vertCount];
-	    		for(int i=0; i<vertCount; i++){
-	    			verts[i] = (JSONObject)json_verts.get(i);
-	    			verts[i].put("name", verts[i].get("_id"));
+	    	
+	    //	System.out.println(json_verts);
+	    	
+	    	if(json_verts != null){			//if there are vertices
+	    		vertCount = json_verts.length(); //count how many of them
+	    		verts = new JSONObject[vertCount];	//create an array of JSONObjects[how many vertexes]
+	    		for(int i=0; i<vertCount; i++){		//in every vertex 
+	    			verts[i] = (JSONObject)json_verts.get(i);	//place vertex json object
+	    			verts[i].put("name", verts[i].get("_id"));	//add "name" field equals its ID
+	    	//		System.out.println("vertex of i = " + verts[i]);
 	    		}
 	    	}
 	    	//...and likewise for edges
@@ -241,6 +256,7 @@ public class Align
 			while(k.hasNext()){
 				key = k.next();
 				props.put(key, edges[i].get(key));
+			//	System.out.println(key);
 			}
 			param.put("EDGE_PROPS", props);
 			//and now finally add edge to graph
@@ -311,8 +327,10 @@ public class Align
     }
     */
 
+    //function is searching vertIDCache first, if id is not in there, then it is calling the findVert funciton
     public String findVertId(String name){
     	String id = vertIDCache.get(name);
+    	
     	if(id != null){
     		return id;
     	}else{
@@ -366,6 +384,7 @@ public class Align
     private boolean edgeExists(String inv_id, String outv_id, String label) {
     	if(inv_id == null || inv_id == "" || outv_id == null || outv_id == "" || label == null || label == "")
     		return false;
+  
     	Map<String, Object> param = new HashMap<String, Object>();
     	param.put("ID_IN", Integer.parseInt(inv_id));
     	param.put("ID_OUT", Integer.parseInt(outv_id));
@@ -412,6 +431,11 @@ public class Align
     
     //mergeMethods are derived from ontology definition
     public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, String> mergeMethods){
+    	
+    //	System.out.println("vertID = " + vertID);
+    //	System.out.println("newProps = " + newProps);
+    //	System.out.println("mergeMethods = " + mergeMethods);
+    	
     	Map<String, Object> oldProps = getVertByID(vertID);
     	Iterator<String> k = newProps.keySet().iterator();
 		String key;
