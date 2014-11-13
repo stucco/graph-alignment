@@ -145,12 +145,12 @@ public class Align
 			client.execute(query, params);
 		} catch (RexProException e) {
 			logger.error("'execute' method caused a rexpro problem (again)");
-			logger.error("this query was: " + query);
+			logger.error("this query was: " + query + " params were: " + params);
 			logger.error("Exception!",e);
 			return false;
 		} catch (IOException e) {
 			logger.error("'execute' method caused something new and unexpected to break!");
-			logger.error("this query was: " + query);
+			logger.error("this query was: " + query + " params were: " + params);
 			logger.error("Exception!",e);
 			return false;
 		}
