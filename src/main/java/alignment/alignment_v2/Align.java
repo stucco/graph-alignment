@@ -207,6 +207,8 @@ public class Align
     		}
     	}
     	execute("g.commit()"); //make sure all verts are committed before proceeding.
+    	
+    	param = new HashMap<String, Object>();
     	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
     	for(int i=0; i<edges.length; i++){
 			String outv_id = findVertId(edges[i].getString("_outV"));
