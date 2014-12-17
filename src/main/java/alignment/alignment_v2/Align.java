@@ -148,12 +148,12 @@ public class Align
 			client.execute(query, params);
 		} catch (RexProException e) {
 			logger.error("'execute' method caused a rexpro problem (again)");
-			logger.error("this query was: " + query);
+			logger.error("this query was: " + query + " params were: " + params);
 			logger.error("Exception!",e);
 			return false;
 		} catch (IOException e) {
 			logger.error("'execute' method caused something new and unexpected to break!");
-			logger.error("this query was: " + query);
+			logger.error("this query was: " + query + " params were: " + params);
 			logger.error("Exception!",e);
 			return false;
 		}
@@ -230,6 +230,8 @@ public class Align
     		}
     	}
     	execute("g.commit()"); //make sure all verts are committed before proceeding.
+    	
+    	param = new HashMap<String, Object>();
     	//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
     	for(int i=0; i<edges.length; i++){
 			String outv_id = findVertId(edges[i].getString("_outV"));
