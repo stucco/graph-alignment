@@ -10,6 +10,8 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import org.json.JSONArray;
+
 import com.tinkerpop.rexster.client.RexProException;
 
 import junit.framework.Test;
@@ -82,16 +84,13 @@ extends TestCase
 				"\"some_property\":\"some_value\""+
 				"}"+
 				"]}";
-		
-		System.out.println(test_graphson_verts);
-		
-		a.load(test_graphson_verts);
 
+		a.load(test_graphson_verts);
+	
 		try {
 			//find this node, check some properties.
 			String id = a.findVertId("CVE-1999-0002");
 			Map<String, Object> query_ret_map = a.getVertByID(id);
-			assertEquals("Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.", query_ret_map.get("description"));
 			String[] expectedRefs = {"CERT:CA-98.12.mountd","http://www.ciac.org/ciac/bulletins/j-006.shtml","http://www.securityfocus.com/bid/121","XF:linux-mountd-bo"};
 			String[] actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
 			assertTrue(Arrays.equals(expectedRefs, actualRefs));
@@ -121,14 +120,101 @@ extends TestCase
 			e.printStackTrace();
 		}
 	}
-}
+
+
+	public void testLoadDuplicate()
+	{
+		Align a = new Align();
+		a.removeAllVertices();
+		//a.removeAllEdges();
+
+		String test_graphson_verts = "{\"vertices\":[" +
+				"{" +
+				"\"_id\":\"CVE-1999-0002\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"CVE\","+
+				"\"description\":\"Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.\","+
+				"\"references\":["+
+				"\"CERT:CA-98.12.mountd\","+
+				"\"http://www.ciac.org/ciac/bulletins/j-006.shtml\","+
+				"\"http://www.securityfocus.com/bid/121\","+
+				"\"XF:linux-mountd-bo\"],"+
+				"\"status\":\"Entry\","+
+				"\"score\":1.0"+
+				"}," + 
+				"{" +
+				"\"availabilityImpact\": \"PARTIAL\"," +
+				"\"accessVector\": \"NETWORK\"," +
+				"\"cvssDate\": \"2004-01-01T00:00:00.000-05:00\"," +
+				"\"integrityImpact\": \"NONE\"," +
+				"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
+				"\"accessComplexity\": \"LOW\"," +
+				"\"modifiedDate\": \"2008-09-05T16:19:47.303-04:00\"," +
+				"\"vertexType\": \"vulnerability\"," +
+				"\"_type\": \"vertex\"," +
+				"\"references\":   [" +
+					"\"http://razor.bindview.com/publish/advisories/adv_Cabletron.html\"," +
+					"\"http://www.securityfocus.com/bid/841\"]," +
+				"\"_id\": \"CVE-1999-1548\"," +
+				"\"source\": \"NVD\"," +
+				"\"description\": \"Cabletron SmartSwitch Router (SSR) 8000 firmware 2.x can only handle 200 ARP requests per second allowing a denial of service attack to succeed with a flood of ARP requests exceeding that limit.\"," +
+				"\"cvssScore\": 5," +
+				"\"publishedDate\": \"1999-11-24T00:00:00.000-05:00\"," +
+				"\"confidentialityImpact\": \"NONE\"," +
+				"\"accessAuthentication\": \"NONE\"" +
+				"}," +	
+				"{\"_id\":\"CVE-1999-nnnn\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"CVE\","+
+				"\"description\":\"test description asdf.\","+
+				"\"references\":[\"http://www.google.com\"],"+
+				"\"status\":\"Entry\","+
+				"\"score\":1.0"+
+				"}],"+
+				"\"edges\":[{"+ 
+				"\"_id\":\"asdf\"," +
+				"\"_inV\":\"CVE-1999-0002\"," +
+				"\"_outV\":\"CVE-1999-nnnn\"," +
+				"\"_label\":\"some_label_asdf\","+
+				"\"some_property\":\"some_value\""+
+				"}," +
+				"{" +
+				"\"_id\":\"asdfAgain\"," +
+				"\"_inV\":\"CVE-1999-0002\"," +
+				"\"_outV\":\"CVE-1999-1548\"," +
+				"\"_label\":\"some_label_asdfAgain\","+
+				"\"some_property\":\"some_valueAgain\""+
+				"}]}";
+
+		a.load(test_graphson_verts);
+		
+		test_graphson_verts = "{" +
+			"\"accessVector\": \"Remote\"," +
+			"\"Credit\": \"Publicized in a Bindview Security Advisory released November 24,1999. Contact is Scott Blake <blake@bos.bindview.com>.\"," +
+			"\"_id\": \"CVE-1999-1548\"," +
+			"\"solution\": \"Solution:Firmware revisions 3.x are not vulnerable to this attack. The latest firmware can be obtained at:http://www.cabletron.com/download/download.cgi?lib=ssr\"," +
+			"\"exploit\": \"see discussion\"," +
+			"\"modifiedDate\": \"Jul 11 2009 12:56AM\"," +
+			"\"vertexType\": \"vulnerability\"," +
+			"\"references\": []," +
+			"\"source\": \"bugtraq\"," +
+			"\"shortDescription\": \"Cabletron SSR ARP Flood DoS Vulnerability\"," +
+			"\"description\": \"The Cabletron SmartSwitch Router 8000 with firmware revision 2.x has been shown to susceptible to a denial of service attack. The SSR can only handle approximately 200 ARP requests per second. If an attacker can get ICMP traffic to the router, they can flood it with ARP requests, effectively shutting the router down for the duration of the attack.\"," +
+			"\"Vulnerable\": [\"Cabletron SmartSwitch Router 8000 2.0\"]," +
+			"\"name\": \"bugtraq_821\"," +
+			"\"Not_Vulnerable\": [\"\"]," +
+			"\"publishedDate\": \"Nov 24 1999 12:00AM\"}";
+										
+		AddNode addNode = new AddNode(a);
+		addNode.findDuplicateVertex(test_graphson_verts);
+		
+		a.removeAllVertices();
+	}
 	
-
-
 	/**
 	 * Tests updating vertex properties
 	 */
-/*	public void testUpdate()
+	public void testUpdate()
 	{
 		Align a = new Align();
 		a.removeAllVertices();
@@ -153,9 +239,67 @@ extends TestCase
 	}
 
 	/**
+	 * Test AlignVertProps method with different methods
+	*/
+	 
+	public void testAlignVertPropsMergeMethods()
+	{
+		Align a = new Align();
+		a.removeAllVertices();
+		//a.removeAllEdges();
+		
+		String testVertex = "g.commit(); v = g.addVertex();" + 
+							"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
+							"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
+							"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
+							"v.setProperty(\"_type\", \"vertex\");" +
+							"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
+							"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
+							"v.setProperty(\"source\", \"NVD\");" + 
+							"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
+							"v.setProperty(\"vertexType\", \"vulnerability\");" + 
+							"v.setProperty(\"accessComplexity\", \"LOW\");" + 
+							"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
+							"v.setProperty(\"cvssScore\", 10);" +
+							"v.setProperty(\"accessAuthentication\", \"NONE\");" +
+							"v.setProperty(\"modifiedDate\", \"2008-09-09T08:33:31.180-04:00\");" +
+							"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
+							"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
+							"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
+							"v.setProperty(\"accessVector\", \"NETWORK\");" +
+							"g.commit()";
+		
+		a.execute(testVertex);
+		
+		String id = a.findVertId("CVE-1999-0006");
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+
+		String testVal, testProp;
+
+		//add a new prop
+		testVal = "aaaa";
+		newProps.put("testprop", testVal);
+		a.alignVertProps(id, newProps, mergeMethods);	//id, new properties and how to merge 
+		
+		testProp = (String)a.getVertByID(id).get("testprop");
+		assertEquals(testVal, testProp);
+
+		mergeMethods.put("testprop", "SmithWaterman");
+		testVal = "bbbb";
+		newProps.put("testprop", testVal);
+		
+		a.alignVertProps(id, newProps, mergeMethods);
+		testProp = (String)a.getVertByID(id).get("testprop");
+		assertEquals(testVal, testProp);
+		
+		a.removeAllVertices();
+	}
+	
+	/**
 	 * Testing the keepNew option for AlignVertProps
 	 */
-/*	public void testAlignVertPropsKeepNew()
+	public void testAlignVertPropsKeepNew()
 	{
 		Align a = new Align();
 		a.removeAllVertices();
@@ -180,6 +324,7 @@ extends TestCase
 		mergeMethods.put("testprop", "keepNew");
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
+		
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)a.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
@@ -190,7 +335,7 @@ extends TestCase
 	/**
 	 * Testing the appendList option for AlignVertProps
 	 */
-/*	public void testAlignVertPropsAppendList()
+	public void testAlignVertPropsAppendList()
 	{
 		Align a = new Align();
 		a.removeAllVertices();
@@ -274,7 +419,7 @@ extends TestCase
 	/**
 	 * Testing the keepUpdates option for AlignVertProps
 	 */
-/*	public void testAlignVertPropsKeepUpdates()
+	public void testAlignVertPropsKeepUpdates()
 	{
 		Align a = new Align();
 		a.removeAllVertices();
@@ -320,7 +465,7 @@ extends TestCase
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
-/*	public void testAlignVertPropsKeepConfidence()
+	public void testAlignVertPropsKeepConfidence()
 	{
 		Align a = new Align();
 		a.removeAllVertices();
@@ -356,7 +501,7 @@ extends TestCase
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
-/*	public void testMergeMethodsFromSchema()
+	public void testMergeMethodsFromSchema()
 	{
 		Align a = new Align();
 
@@ -457,24 +602,19 @@ extends TestCase
 		
 	}
 
-
-
 	/**
 	 * Tests loading & querying from realistic graphson file (~2M file)
 	 * @throws IOException 
 	 */
-/*	public void testGraphsonFile() throws IOException
+
+	public void testGraphsonFile() throws IOException
 	{
 		Align a = new Align();
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
 		String test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/metasploit_short.json"), "UTF8");
-		//System.out.println(test_graphson_verts);
 		a.load(test_graphson_verts);
-		//test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/nvdcve-2.0-2002.json"), "UTF8");
-		//System.out.println(test_graphson_verts);
-		//a.load(test_graphson_verts);
 
 		try {
 			//find this node, check some properties.
@@ -510,6 +650,22 @@ extends TestCase
 			e.printStackTrace();
 		}
 	}
+				
+	public void testAddNodeFile() throws IOException
+	{
+		Align a = new Align();
+																												
+		String test_graphson_verts_one = org.apache.commons.io.FileUtils.readFileToString(new File("resources/NVD.json"), "UTF8");
+		String test_graphson_verts_two = org.apache.commons.io.FileUtils.readFileToString(new File("resources/bugtraq.json"), "UTF8");
+		
+		a.load(test_graphson_verts_one);
+			
+		AddNode an = new AddNode(a);
+		an.findDuplicateVertex(test_graphson_verts_two);
+		
+		a.removeAllVertices();
+	}
 
 }
-*/
+
+
