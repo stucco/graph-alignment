@@ -650,7 +650,8 @@ extends TestCase
 			e.printStackTrace();
 		}
 	}
-				
+	
+	/*
 	public void testAddNodeFile() throws IOException
 	{
 		Align a = new Align();
@@ -665,7 +666,7 @@ extends TestCase
 		
 		a.removeAllVertices();
 	}
-
+	*/
 }
 
 
