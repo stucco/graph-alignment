@@ -285,7 +285,7 @@ extends TestCase
 		testProp = (String)a.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
-		mergeMethods.put("testprop", "SmithWaterman");
+		mergeMethods.put("testprop", "keepNew");
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
 		
