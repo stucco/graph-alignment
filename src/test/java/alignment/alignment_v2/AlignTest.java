@@ -111,6 +111,7 @@ extends TestCase
 			assertEquals(id, query_ret_map.get("_id"));
 			
 			a.removeAllVertices();
+			a.closeClient(); //can close now, instead of waiting for finalize() to do it
 			
 		} catch (RexProException e) {
 			fail("RexProException");
@@ -209,6 +210,7 @@ extends TestCase
 		addNode.findDuplicateVertex(test_graphson_verts);
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 	
 	/**
@@ -236,6 +238,7 @@ extends TestCase
 		assertEquals("44", query_ret_map.get("z").toString());
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -294,6 +297,7 @@ extends TestCase
 		assertEquals(testVal, testProp);
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 	
 	/**
@@ -330,6 +334,7 @@ extends TestCase
 		assertEquals(testVal, testProp);
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -414,6 +419,7 @@ extends TestCase
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -460,6 +466,7 @@ extends TestCase
 		assertEquals(testVal, testProp);
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -495,7 +502,7 @@ extends TestCase
 		//TODO: this test seems unfinished??
 		
 		a.removeAllVertices();
-
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -599,7 +606,7 @@ extends TestCase
 		assertEquals("keepNew", mergeMethods.get("software").get("version"));
 
 		a.removeAllVertices();
-		
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -641,6 +648,7 @@ extends TestCase
 			assertEquals(id, query_ret_map.get("_id"));
 			
 			a.removeAllVertices();
+			a.closeClient(); //can close now, instead of waiting for finalize() to do it
 			
 		} catch (RexProException e) {
 			fail("RexProException");
@@ -665,6 +673,7 @@ extends TestCase
 		an.findDuplicateVertex(test_graphson_verts_two);
 		
 		a.removeAllVertices();
+		a.closeClient(); //can close now, instead of waiting for finalize() to do it
 	}
 	*/
 }

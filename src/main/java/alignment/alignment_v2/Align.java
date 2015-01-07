@@ -124,8 +124,7 @@ public class Align
     
 	@Override
 	protected void finalize() throws Throwable {
-		client.close();
-		client = null;
+		closeClient();
 		super.finalize();
 	}
     
@@ -133,6 +132,19 @@ public class Align
 	public RexsterClient getClient(){
 		return client;
 	}
+	
+	//only public for tests
+	public void closeClient(){
+		if(client != null){
+			try {
+				client.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			client = null;
+		}
+    }
 	
     //wrapper to reduce boilerplate
 	//TODO wrapper throws away any return value, 
