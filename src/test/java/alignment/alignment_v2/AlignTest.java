@@ -8,11 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.BaseConfiguration;
 import org.json.JSONObject;
-
 import org.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.client.RexsterClient;
+import com.tinkerpop.rexster.client.RexsterClientFactory;
+import com.tinkerpop.rexster.client.RexsterClientTokens;
+import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -24,6 +31,7 @@ import junit.framework.TestSuite;
 public class AlignTest 
 extends TestCase
 {
+	RexsterClient client = null;
 	/**
 	 * Create the test case
 	 *
@@ -32,6 +40,7 @@ extends TestCase
 	public AlignTest( String testName )
 	{
 		super( testName );
+		this.client = getTestClient();
 	}
 
 	/**
@@ -41,13 +50,43 @@ extends TestCase
 	{
 		return new TestSuite( AlignTest.class );
 	}
+	
+	private static RexsterClient getTestClient(){
+    	RexsterClient client = null;
+    	TitanGraph g = null;
+    	Logger logger = LoggerFactory.getLogger(Align.class);
+        
+    	BaseConfiguration configOpts = new BaseConfiguration() {{
+    		addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT, 1);
+    		addProperty(RexsterClientTokens.CONFIG_PORT, 7184);
+            addProperty(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME, "g");
+            addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "graph"); //not rename-able?  Seems like a Titan thing?
+            addProperty(RexsterClientTokens.CONFIG_TRANSACTION, true);
+            addProperty(RexsterClientTokens.CONFIG_SERIALIZER, MsgPackSerializer.SERIALIZER_ID);
+        }};
+    	
+        logger.info("connecting to Test DB...");
+        try{
+        	client = RexsterClientFactory.open(configOpts);		//this just throws "Exception."  bummer.
+        }catch(Exception e){
+        	//don't care.
+        }
+		
+    	return client;
+    }
 
 	/**
 	 * Tests loading, querying, and other basic operations for vertices, edges, properties.
 	 */
 	public void testLoad()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -122,10 +161,15 @@ extends TestCase
 		}
 	}
 
-
 	public void testLoadDuplicate()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -216,9 +260,16 @@ extends TestCase
 	/**
 	 * Tests updating vertex properties
 	 */
+	
 	public void testUpdate()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -247,7 +298,13 @@ extends TestCase
 	 
 	public void testAlignVertPropsMergeMethods()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 		
@@ -303,9 +360,16 @@ extends TestCase
 	/**
 	 * Testing the keepNew option for AlignVertProps
 	 */
+	
 	public void testAlignVertPropsKeepNew()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -340,9 +404,16 @@ extends TestCase
 	/**
 	 * Testing the appendList option for AlignVertProps
 	 */
+	
 	public void testAlignVertPropsAppendList()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -425,9 +496,16 @@ extends TestCase
 	/**
 	 * Testing the keepUpdates option for AlignVertProps
 	 */
+	
 	public void testAlignVertPropsKeepUpdates()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -472,9 +550,16 @@ extends TestCase
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
+	
 	public void testAlignVertPropsKeepConfidence()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
@@ -508,9 +593,15 @@ extends TestCase
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
+	
 	public void testMergeMethodsFromSchema()
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
 
 		String ontologyStrTest = "{"+
 				"  \"description\":\"The top level of the graph\","+
@@ -616,7 +707,13 @@ extends TestCase
 
 	public void testGraphsonFile() throws IOException
 	{
-		Align a = new Align();
+		Align a = null;
+		try{
+			a = new Align( this.client );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+		
 		a.removeAllVertices();
 		//a.removeAllEdges();
 
