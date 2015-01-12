@@ -704,7 +704,7 @@ extends TestCase
 	 * Tests loading & querying from realistic graphson file (~2M file)
 	 * @throws IOException 
 	 */
-
+	/*
 	public void testGraphsonFile() throws IOException
 	{
 		Align a = null;
@@ -755,6 +755,7 @@ extends TestCase
 			e.printStackTrace();
 		}
 	}
+	*/
 	
 	/*
 	public void testAddNodeFile() throws IOException
