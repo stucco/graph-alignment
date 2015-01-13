@@ -40,7 +40,7 @@ extends TestCase
 	public AlignTest( String testName )
 	{
 		super( testName );
-		this.client = getTestClient();
+		this.client = DBConnection.getTestClient();
 	}
 
 	/**
@@ -51,29 +51,7 @@ extends TestCase
 		return new TestSuite( AlignTest.class );
 	}
 	
-	private static RexsterClient getTestClient(){
-    	RexsterClient client = null;
-    	TitanGraph g = null;
-    	Logger logger = LoggerFactory.getLogger(Align.class);
-        
-    	BaseConfiguration configOpts = new BaseConfiguration() {{
-    		addProperty(RexsterClientTokens.CONFIG_MESSAGE_RETRY_COUNT, 1);
-    		addProperty(RexsterClientTokens.CONFIG_PORT, 7184);
-            addProperty(RexsterClientTokens.CONFIG_GRAPH_OBJECT_NAME, "g");
-            addProperty(RexsterClientTokens.CONFIG_GRAPH_NAME, "graph"); //not rename-able?  Seems like a Titan thing?
-            addProperty(RexsterClientTokens.CONFIG_TRANSACTION, true);
-            addProperty(RexsterClientTokens.CONFIG_SERIALIZER, MsgPackSerializer.SERIALIZER_ID);
-        }};
-    	
-        logger.info("connecting to Test DB...");
-        try{
-        	client = RexsterClientFactory.open(configOpts);		//this just throws "Exception."  bummer.
-        }catch(Exception e){
-        	//don't care.
-        }
-		
-    	return client;
-    }
+	
 
 	/**
 	 * Tests loading, querying, and other basic operations for vertices, edges, properties.
@@ -144,13 +122,13 @@ extends TestCase
 
 			//and now test the edge between them
 			Object query_ret;
-			query_ret = a.getClient().execute("g.v("+id2+").outE().inV();");
+			query_ret = this.client.execute("g.v("+id2+").outE().inV();");
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 			
 			a.removeAllVertices();
-			a.closeClient(); //can close now, instead of waiting for finalize() to do it
+			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 			
 		} catch (RexProException e) {
 			fail("RexProException");
@@ -254,7 +232,7 @@ extends TestCase
 		addNode.findDuplicateVertex(test_graphson_verts);
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 	
 	/**
@@ -289,7 +267,7 @@ extends TestCase
 		assertEquals("44", query_ret_map.get("z").toString());
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -354,7 +332,7 @@ extends TestCase
 		assertEquals(testVal, testProp);
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 	
 	/**
@@ -398,7 +376,7 @@ extends TestCase
 		assertEquals(testVal, testProp);
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -490,7 +468,7 @@ extends TestCase
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -544,7 +522,7 @@ extends TestCase
 		assertEquals(testVal, testProp);
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -587,7 +565,7 @@ extends TestCase
 		//TODO: this test seems unfinished??
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -697,7 +675,7 @@ extends TestCase
 		assertEquals("keepNew", mergeMethods.get("software").get("version"));
 
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
@@ -739,13 +717,13 @@ extends TestCase
 
 			//and now test the edge between them
 			Object query_ret;
-			query_ret = a.getClient().execute("g.v("+id2+").outE().inV();");
+			query_ret = this.client.execute("g.v("+id2+").outE().inV();");
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 			
 			a.removeAllVertices();
-			a.closeClient(); //can close now, instead of waiting for finalize() to do it
+			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 			
 		} catch (RexProException e) {
 			fail("RexProException");
@@ -771,7 +749,7 @@ extends TestCase
 		an.findDuplicateVertex(test_graphson_verts_two);
 		
 		a.removeAllVertices();
-		a.closeClient(); //can close now, instead of waiting for finalize() to do it
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 	*/
 }
