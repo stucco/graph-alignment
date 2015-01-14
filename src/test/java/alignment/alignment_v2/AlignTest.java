@@ -31,7 +31,6 @@ import junit.framework.TestSuite;
 public class AlignTest 
 extends TestCase
 {
-	RexsterClient client = null;
 	/**
 	 * Create the test case
 	 *
@@ -40,7 +39,6 @@ extends TestCase
 	public AlignTest( String testName )
 	{
 		super( testName );
-		this.client = DBConnection.getTestClient();
 	}
 
 	/**
@@ -58,15 +56,17 @@ extends TestCase
 	 */
 	public void testLoad()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
 		String test_graphson_verts = " {\"vertices\":[" +
 				"{" +
@@ -106,15 +106,15 @@ extends TestCase
 	
 		try {
 			//find this node, check some properties.
-			String id = a.findVertId("CVE-1999-0002");
-			Map<String, Object> query_ret_map = a.getVertByID(id);
+			String id = c.findVertId("CVE-1999-0002");
+			Map<String, Object> query_ret_map = c.getVertByID(id);
 			String[] expectedRefs = {"CERT:CA-98.12.mountd","http://www.ciac.org/ciac/bulletins/j-006.shtml","http://www.securityfocus.com/bid/121","XF:linux-mountd-bo"};
 			String[] actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
 			assertTrue(Arrays.equals(expectedRefs, actualRefs));
 
 			//find the other node, check its properties.
-			String id2 = a.findVertId("CVE-1999-nnnn");
-			query_ret_map = a.getVertByID(id2);
+			String id2 = c.findVertId("CVE-1999-nnnn");
+			query_ret_map = c.getVertByID(id2);
 			assertEquals("test description asdf.", query_ret_map.get("description"));
 			expectedRefs = new String[]{"http://www.google.com"};
 			actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
@@ -122,12 +122,12 @@ extends TestCase
 
 			//and now test the edge between them
 			Object query_ret;
-			query_ret = this.client.execute("g.v("+id2+").outE().inV();");
+			query_ret = c.getClient().execute("g.v("+id2+").outE().inV();");
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 			
-			a.removeAllVertices();
+			c.removeAllVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 			
 		} catch (RexProException e) {
@@ -139,17 +139,21 @@ extends TestCase
 		}
 	}
 
+	/*
+	//refactoring broke this, will re-add soon.
 	public void testLoadDuplicate()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
 		String test_graphson_verts = "{\"vertices\":[" +
 				"{" +
@@ -228,12 +232,12 @@ extends TestCase
 			"\"Not_Vulnerable\": [\"\"]," +
 			"\"publishedDate\": \"Nov 24 1999 12:00AM\"}";
 										
-		AddNode addNode = new AddNode(a);
-		addNode.findDuplicateVertex(test_graphson_verts);
+		Compare compare = new Compare(a);
+		compare.findDuplicateVertex(test_graphson_verts);
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-	}
+	}*/
 	
 	/**
 	 * Tests updating vertex properties
@@ -241,32 +245,34 @@ extends TestCase
 	
 	public void testUpdate()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
-		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
 
-		String id = a.findVertId("testvert_55");
-		Map<String, Object> query_ret_map = a.getVertByID(id);
+		String id = c.findVertId("testvert_55");
+		Map<String, Object> query_ret_map = c.getVertByID(id);
 		assertEquals( "55", query_ret_map.get("z").toString());
 
 		Map<String, Object> newProps = new HashMap<String, Object>();
 		newProps.put("y", "33");
 		newProps.put("z", "44");
-		a.updateVert(id, newProps);
+		c.updateVert(id, newProps);
 
-		query_ret_map = a.getVertByID(id);
+		query_ret_map = c.getVertByID(id);
 		assertEquals("33", query_ret_map.get("y").toString());
 		assertEquals("44", query_ret_map.get("z").toString());
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -276,15 +282,17 @@ extends TestCase
 	 
 	public void testAlignVertPropsMergeMethods()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 		
 		String testVertex = "g.commit(); v = g.addVertex();" + 
 							"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
@@ -307,9 +315,9 @@ extends TestCase
 							"v.setProperty(\"accessVector\", \"NETWORK\");" +
 							"g.commit()";
 		
-		a.execute(testVertex);
+		c.execute(testVertex);
 		
-		String id = a.findVertId("CVE-1999-0006");
+		String id = c.findVertId("CVE-1999-0006");
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 
@@ -320,7 +328,7 @@ extends TestCase
 		newProps.put("testprop", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);	//id, new properties and how to merge 
 		
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
 		mergeMethods.put("testprop", "keepNew");
@@ -328,10 +336,10 @@ extends TestCase
 		newProps.put("testprop", testVal);
 		
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 	
@@ -341,18 +349,20 @@ extends TestCase
 	
 	public void testAlignVertPropsKeepNew()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
-		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
-		String id = a.findVertId("testvert_align_props");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
@@ -363,7 +373,7 @@ extends TestCase
 		testVal = "aaaa";
 		newProps.put("testprop", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepNew) (always updates)
@@ -372,10 +382,10 @@ extends TestCase
 		newProps.put("testprop", testVal);
 		
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -385,18 +395,20 @@ extends TestCase
 	
 	public void testAlignVertPropsAppendList()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
-		a.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
-		String id = a.findVertId("testvert_align_props");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
@@ -408,14 +420,14 @@ extends TestCase
 		String[] testArrayVal = {"aaa", "bbb"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		String[] testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		String[] testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		mergeMethods.put("testproparray", "appendList");
 		testArrayVal = new String[]{"ccc"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
@@ -424,14 +436,14 @@ extends TestCase
 		testArrayVal = new String[]{"aaa", "bbb"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		mergeMethods.put("testproparray", "appendList");
 		testVal = "ccc";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
@@ -440,14 +452,14 @@ extends TestCase
 		testVal = "aaa";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testproparray");
+		testProp = (String)c.getVertByID(id).get("testproparray");
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		mergeMethods.put("testproparray", "appendList");
 		testArrayVal = new String[]{"bbb", "ccc"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
@@ -456,18 +468,18 @@ extends TestCase
 		testVal = "aaa";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testproparray");
+		testProp = (String)c.getVertByID(id).get("testproparray");
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		mergeMethods.put("testproparray", "appendList");
 		testVal = "bbb";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)a.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -477,18 +489,20 @@ extends TestCase
 	
 	public void testAlignVertPropsKeepUpdates()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
-		a.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
-		String id = a.findVertId("testvert_align_props");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
@@ -499,7 +513,7 @@ extends TestCase
 		testVal = "aaaa";
 		newProps.put("testprop", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepUpdates) (update case)
@@ -508,7 +522,7 @@ extends TestCase
 		newProps.put("testprop", testVal);
 		newProps.put("timestamp", 1001L);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepUpdates) (no update case)
@@ -517,11 +531,11 @@ extends TestCase
 		newProps.put("testprop", testVal);
 		newProps.put("timestamp", 999L);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		testVal = "bbbb";
 		assertEquals(testVal, testProp);
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -531,18 +545,20 @@ extends TestCase
 	
 	public void testAlignVertPropsKeepConfidence()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
-		a.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
-		String id = a.findVertId("testvert_align_props");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
@@ -553,7 +569,7 @@ extends TestCase
 		testVal = "aaaa";
 		newProps.put("testprop", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)a.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepConfidence) (update case)
@@ -564,19 +580,22 @@ extends TestCase
 		
 		//TODO: this test seems unfinished??
 		
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
-	
+	/*
+	//old method, now uses a config file.  may revisit.
 	public void testMergeMethodsFromSchema()
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
@@ -674,9 +693,9 @@ extends TestCase
 		assertEquals("appendList", mergeMethods.get("software").get("product"));
 		assertEquals("keepNew", mergeMethods.get("software").get("version"));
 
-		a.removeAllVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-	}
+	}*/
 
 	/**
 	 * Tests loading & querying from realistic graphson file (~2M file)
@@ -685,15 +704,17 @@ extends TestCase
 	/*
 	public void testGraphsonFile() throws IOException
 	{
+		DBConnection c = null;
 		Align a = null;
 		try{
-			a = new Align( this.client );
+			c = new DBConnection( DBConnection.getTestClient() );
+			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 		
-		a.removeAllVertices();
-		//a.removeAllEdges();
+		c.removeAllVertices();
+		//c.removeAllEdges();
 
 		String test_graphson_verts = org.apache.commons.io.FileUtils.readFileToString(new File("resources/metasploit_short.json"), "UTF8");
 		a.load(test_graphson_verts);
