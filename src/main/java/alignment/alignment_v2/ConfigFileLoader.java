@@ -7,32 +7,37 @@ import org.yaml.snakeyaml.Yaml;
 
 public class ConfigFileLoader {
 
-		private static final String CONFIG_FILE = "alignment.yaml";
+	private static final String CONFIG_FILE = "alignment.yaml";
+	String path = null;
+	
+	public ConfigFileLoader(){
+		this.path = CONFIG_FILE;
+	}
+	
+	public ConfigFileLoader(String path){
+		this.path = path;
+	}
+	
+	public Map<String, Map<String, Object>> getVertexConfig(String configHeading) {
+			
+		ArrayList<Object> array = null;
 		
-		public Map<String, Map<String, Object>> getConfig(String configHeading) {
-				
-			ArrayList<Object> array = null;
-			
-			Yaml yamlReader = new Yaml();
-			Map<String, Map<String, Object>> configMap = (Map<String, Map<String, Object>>) yamlReader.load(ConfigFileLoader.class.getClassLoader().getResourceAsStream(CONFIG_FILE));
-			Map<String, Map<String, Object>> innerMap = new HashMap<String, Map<String, Object>>();
-			
-			for (String key : configMap.keySet())	{ 
-				Map<String, Object> map = (Map<String, Object>) configMap.get(key);
-				if (map.get(configHeading) != null)	{
-					array = (ArrayList<Object>) map.get(configHeading);
-					
-					for (int i = 0; i < array.size(); i++){
-						Map<String, Object> subMap = (Map<String, Object>) array.get(i);
-						for (String s1 : subMap.keySet())	{
-							innerMap.put(s1, (HashMap<String, Object>)subMap.get(s1));
-						}
-					}
-
-				}
-			}
-			return innerMap;
+		Yaml yamlReader = new Yaml();
+		InputStream stream = ConfigFileLoader.class.getClassLoader().getResourceAsStream(path);
+		Map<String, Map<String, Object>> configMap = (Map<String, Map<String, Object>>) yamlReader.load(stream);
+		Map<String, Map<String, Object>> vertexConfigMap = new HashMap<String, Map<String, Object>>();
+		
+		Map<String, Object> map = (Map<String, Object>) configMap.get("vertices");
+		
+		Map<String, Object> vertMap = (Map<String, Object>) map.get(configHeading);
+		Map<String, Object> propMap = null;
+		for (String s1 : vertMap.keySet())	{
+			propMap = (HashMap<String, Object>)vertMap.get(s1);
+			vertexConfigMap.put(s1, propMap);
 		}
+
+		return vertexConfigMap;
+	}
 }
 
 

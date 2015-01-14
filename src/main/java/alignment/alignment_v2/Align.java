@@ -315,8 +315,12 @@ public class Align
 	}
 
 	//Unused
-	public Map<String, Map<String, Object>> getConfig (JSONObject vertex)	{
-		Map<String, Map<String, Object>> property = config.getConfig(vertex.getString("vertexType"));
+	public Map<String, Map<String, Object>> getVertexConfig (JSONObject vertex)	{
+		return getVertexConfig(vertex.getString("vertexType"));
+	}
+	
+	public Map<String, Map<String, Object>> getVertexConfig (String vertexType)	{
+		Map<String, Map<String, Object>> property = config.getVertexConfig(vertexType);
 		return property;
 	}
 
