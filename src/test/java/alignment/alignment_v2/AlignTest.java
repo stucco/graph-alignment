@@ -48,8 +48,8 @@ extends TestCase
 	{
 		return new TestSuite( AlignTest.class );
 	}
-	
-	
+
+
 
 	/**
 	 * Tests loading, querying, and other basic operations for vertices, edges, properties.
@@ -64,7 +64,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -103,7 +103,7 @@ extends TestCase
 				"]}";
 
 		a.load(test_graphson_verts);
-	
+
 		try {
 			//find this node, check some properties.
 			String id = c.findVertId("CVE-1999-0002");
@@ -126,10 +126,10 @@ extends TestCase
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
-			
+
 			c.removeAllVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-			
+
 		} catch (RexProException e) {
 			fail("RexProException");
 			e.printStackTrace();
@@ -151,7 +151,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -214,7 +214,7 @@ extends TestCase
 				"}]}";
 
 		a.load(test_graphson_verts);
-		
+
 		test_graphson_verts = "{" +
 			"\"accessVector\": \"Remote\"," +
 			"\"Credit\": \"Publicized in a Bindview Security Advisory released November 24,1999. Contact is Scott Blake <blake@bos.bindview.com>.\"," +
@@ -231,18 +231,18 @@ extends TestCase
 			"\"name\": \"bugtraq_821\"," +
 			"\"Not_Vulnerable\": [\"\"]," +
 			"\"publishedDate\": \"Nov 24 1999 12:00AM\"}";
-										
+
 		Compare compare = new Compare(a);
 		compare.findDuplicateVertex(test_graphson_verts);
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}*/
-	
+
 	/**
 	 * Tests updating vertex properties
 	 */
-	
+
 	public void testUpdate()
 	{
 		DBConnection c = null;
@@ -253,7 +253,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -271,15 +271,15 @@ extends TestCase
 		query_ret_map = c.getVertByID(id);
 		assertEquals("33", query_ret_map.get("y").toString());
 		assertEquals("44", query_ret_map.get("z").toString());
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
 	/**
 	 * Test AlignVertProps method with different methods
-	*/
-	 
+	 */
+
 	public void testAlignVertPropsMergeMethods()
 	{
 		DBConnection c = null;
@@ -290,33 +290,33 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
-		
+
 		String testVertex = "g.commit(); v = g.addVertex();" + 
-							"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
-							"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
-							"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
-							"v.setProperty(\"_type\", \"vertex\");" +
-							"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
-							"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
-							"v.setProperty(\"source\", \"NVD\");" + 
-							"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
-							"v.setProperty(\"vertexType\", \"vulnerability\");" + 
-							"v.setProperty(\"accessComplexity\", \"LOW\");" + 
-							"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
-							"v.setProperty(\"cvssScore\", 10);" +
-							"v.setProperty(\"accessAuthentication\", \"NONE\");" +
-							"v.setProperty(\"modifiedDate\", \"2008-09-09T08:33:31.180-04:00\");" +
-							"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
-							"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
-							"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
-							"v.setProperty(\"accessVector\", \"NETWORK\");" +
-							"g.commit()";
-		
+				"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
+				"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
+				"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
+				"v.setProperty(\"_type\", \"vertex\");" +
+				"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
+				"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
+				"v.setProperty(\"source\", \"NVD\");" + 
+				"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
+				"v.setProperty(\"vertexType\", \"vulnerability\");" + 
+				"v.setProperty(\"accessComplexity\", \"LOW\");" + 
+				"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
+				"v.setProperty(\"cvssScore\", 10);" +
+				"v.setProperty(\"accessAuthentication\", \"NONE\");" +
+				"v.setProperty(\"modifiedDate\", \"2008-09-09T08:33:31.180-04:00\");" +
+				"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
+				"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
+				"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
+				"v.setProperty(\"accessVector\", \"NETWORK\");" +
+				"g.commit()";
+
 		c.execute(testVertex);
-		
+
 		String id = c.findVertId("CVE-1999-0006");
 		Map<String, String> mergeMethods = new HashMap<String,String>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
@@ -327,26 +327,26 @@ extends TestCase
 		testVal = "aaaa";
 		newProps.put("testprop", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);	//id, new properties and how to merge 
-		
+
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
 		mergeMethods.put("testprop", "keepNew");
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
-		
+
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
-	
+
 	/**
 	 * Testing the keepNew option for AlignVertProps
 	 */
-	
+
 	public void testAlignVertPropsKeepNew()
 	{
 		DBConnection c = null;
@@ -357,7 +357,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -380,11 +380,11 @@ extends TestCase
 		mergeMethods.put("testprop", "keepNew");
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
-		
+
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
@@ -392,7 +392,7 @@ extends TestCase
 	/**
 	 * Testing the appendList option for AlignVertProps
 	 */
-	
+
 	public void testAlignVertPropsAppendList()
 	{
 		DBConnection c = null;
@@ -403,7 +403,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -478,7 +478,7 @@ extends TestCase
 		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
@@ -486,7 +486,7 @@ extends TestCase
 	/**
 	 * Testing the keepUpdates option for AlignVertProps
 	 */
-	
+
 	public void testAlignVertPropsKeepUpdates()
 	{
 		DBConnection c = null;
@@ -497,7 +497,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -534,7 +534,7 @@ extends TestCase
 		testProp = (String)c.getVertByID(id).get("testprop");
 		testVal = "bbbb";
 		assertEquals(testVal, testProp);
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
@@ -542,7 +542,7 @@ extends TestCase
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
-	
+
 	public void testAlignVertPropsKeepConfidence()
 	{
 		DBConnection c = null;
@@ -553,7 +553,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -577,9 +577,9 @@ extends TestCase
 
 		//update a prop (keepConfidence) (no update case)
 		mergeMethods.put("testprop", "keepConfidence");
-		
+
 		//TODO: this test seems unfinished??
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
@@ -712,7 +712,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -742,10 +742,10 @@ extends TestCase
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
-			
+
 			a.removeAllVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-			
+
 		} catch (RexProException e) {
 			fail("RexProException");
 			e.printStackTrace();
@@ -754,25 +754,25 @@ extends TestCase
 			e.printStackTrace();
 		}
 	}
-	*/
-	
+	 */
+
 	/*
 	public void testAddNodeFile() throws IOException
 	{
 		Align a = new Align();
-																												
+
 		String test_graphson_verts_one = org.apache.commons.io.FileUtils.readFileToString(new File("resources/NVD.json"), "UTF8");
 		String test_graphson_verts_two = org.apache.commons.io.FileUtils.readFileToString(new File("resources/bugtraq.json"), "UTF8");
-		
+
 		a.load(test_graphson_verts_one);
-			
+
 		AddNode an = new AddNode(a);
 		an.findDuplicateVertex(test_graphson_verts_two);
-		
+
 		a.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
-	*/
+	 */
 }
 
 

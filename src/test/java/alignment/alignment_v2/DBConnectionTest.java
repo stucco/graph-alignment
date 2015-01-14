@@ -48,8 +48,8 @@ extends TestCase
 	{
 		return new TestSuite( DBConnectionTest.class );
 	}
-	
-	
+
+
 
 	/**
 	 * Tests loading, querying, and other basic operations for vertices, edges, properties.
@@ -62,7 +62,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -101,7 +101,7 @@ extends TestCase
 		c.commit();
 		c.addEdgeFromJSON(new JSONObject(edge));
 		c.commit();
-	
+
 		try {
 			//find this node, check some properties.
 			String id = c.findVertId("CVE-1999-0002");
@@ -117,7 +117,7 @@ extends TestCase
 			expectedRefs = new String[]{"http://www.google.com"};
 			actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
 			assertTrue(Arrays.equals(expectedRefs, actualRefs));
-			
+
 			//and now test the edge between them
 			Object query_ret;
 			query_ret = c.getClient().execute("g.v("+id2+").outE().inV();");
@@ -125,10 +125,10 @@ extends TestCase
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
-			
+
 			c.removeAllVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-			
+
 		} catch (RexProException e) {
 			fail("RexProException");
 			e.printStackTrace();
@@ -138,11 +138,11 @@ extends TestCase
 		}
 	}
 
-	
+
 	/**
 	 * Tests updating vertex properties
 	 */
-	
+
 	public void testUpdate()
 	{
 		DBConnection c = null;
@@ -151,7 +151,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -169,7 +169,7 @@ extends TestCase
 		query_ret_map = c.getVertByID(id);
 		assertEquals("33", query_ret_map.get("y").toString());
 		assertEquals("44", query_ret_map.get("z").toString());
-		
+
 		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
@@ -190,7 +190,7 @@ extends TestCase
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
-		
+
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
@@ -220,10 +220,10 @@ extends TestCase
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
-			
+
 			a.removeAllVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-			
+
 		} catch (RexProException e) {
 			fail("RexProException");
 			e.printStackTrace();
@@ -232,25 +232,25 @@ extends TestCase
 			e.printStackTrace();
 		}
 	}
-	*/
-	
+	 */
+
 	/*
 	public void testAddNodeFile() throws IOException
 	{
 		Align a = new Align();
-																												
+
 		String test_graphson_verts_one = org.apache.commons.io.FileUtils.readFileToString(new File("resources/NVD.json"), "UTF8");
 		String test_graphson_verts_two = org.apache.commons.io.FileUtils.readFileToString(new File("resources/bugtraq.json"), "UTF8");
-		
+
 		a.load(test_graphson_verts_one);
-			
+
 		AddNode an = new AddNode(a);
 		an.findDuplicateVertex(test_graphson_verts_two);
-		
+
 		a.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
-	*/
+	 */
 }
 
 

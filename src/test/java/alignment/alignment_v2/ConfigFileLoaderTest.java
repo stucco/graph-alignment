@@ -29,8 +29,8 @@ extends TestCase
 	{
 		return new TestSuite( ConfigFileLoaderTest.class );
 	}
-	
-	
+
+
 
 	/**
 	 * Tests loading a simple config
@@ -47,7 +47,7 @@ extends TestCase
 		assertEquals("none", vt.get("comparisonFunction"));
 		assertEquals(0, vt.get("comparisonWeight"));
 		assertEquals("none", vt.get("resolutionFunction"));
-		
+
 		Map<String, Object> src = property.get("source");
 		assertEquals("none", src.get("comparisonFunction"));
 		assertEquals(0, src.get("comparisonWeight"));
