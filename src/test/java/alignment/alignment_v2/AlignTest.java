@@ -1,6 +1,5 @@
 package alignment.alignment_v2;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,18 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.configuration.BaseConfiguration;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.rexster.client.RexProException;
-import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.client.RexsterClientFactory;
-import com.tinkerpop.rexster.client.RexsterClientTokens;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

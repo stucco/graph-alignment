@@ -1,9 +1,7 @@
 package alignment.alignment_v2;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -11,22 +9,11 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.configuration.AbstractConfiguration;
-import org.apache.commons.configuration.BaseConfiguration;
-import org.apache.tools.ant.types.Path;
 import org.json.*;
 
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
-import com.tinkerpop.rexster.client.RexsterClientFactory;
-import com.tinkerpop.rexster.client.RexsterClientTokens;
-import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
-import org.yaml.snakeyaml.Yaml;
-
-import alignmentStudy.*;
 /**
  * Connects to Graph DB, aligns and adds new incoming graph data, provides some misc. utility functions.
  *
