@@ -41,13 +41,13 @@ public class Compare {
 				score = score + 1 * comparisonWeight;
 		}
 		//time should be standardized  
-		if (comparisonFunction.equals("timeComparisonFunction"))	{
-			score = score + compareDate(property1, property2) * comparisonWeight;
+		if (comparisonFunction.equals("compareTimestamps"))	{
+			score = score + compareDate((Integer)property1, (Integer)property2) * comparisonWeight;
 			//	score = score + compareDate(property1, property2) * comparisonWeight;
 		}
 		//complaining that it is the array list, but function is working with jsonarray
 		if (comparisonFunction.equals("compareReferences"))	{
-			score = score + comparison.compareReferences(property1, property2) * comparisonWeight;	
+			score = score + compareReferences(property1, property2) * comparisonWeight;	
 		}
 		if (comparisonFunction.equals("SmithWaterman"))	{
 			SmithWaterman sw = new SmithWaterman();

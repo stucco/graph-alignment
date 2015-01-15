@@ -48,7 +48,7 @@ vertices:
       comparisonWeight: 0
       resolutionFunction: keepNew
     modifiedDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.5591876410631913
       resolutionFunction: keepNew
     part:
@@ -68,7 +68,7 @@ vertices:
       comparisonWeight: 8.713991
       resolutionFunction: appendList
     update:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.1007229
       resolutionFunction: keepNew
     edition:
@@ -125,7 +125,7 @@ vertices:
       comparisonWeight: 0.3578151
       resolutionFunction: keepNew
     phaseDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 7.249643
       resolutionFunction: keepNew
     references:
@@ -137,11 +137,11 @@ vertices:
       comparisonWeight: 0.17141086
       resolutionFunction: keepNew
     publishedDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.3734639237615631
       resolutionFunction: keepNew
     modifiedDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.5591876410631913
       resolutionFunction: keepNew
     cweNumber:
@@ -153,7 +153,7 @@ vertices:
       comparisonWeight: 0.7038249561307638
       resolutionFunction: keepConfidence
     cvssDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.0207108892653767
       resolutionFunction: keepNew
     accessVector:
@@ -340,15 +340,15 @@ vertices:
       comparisonWeight: 1.4822443
       resolutionFunction: appendList
     discoveryDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 3.5570278
       resolutionFunction: keepNew
     signatureDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: TBD
       resolutionFunction: keepNew
     modifiedDate:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.5591876410631913
       resolutionFunction: keepNew
     overview:
@@ -417,7 +417,7 @@ vertices:
       comparisonWeight: TBD
       resolutionFunction: keepNew
     startTime:
-      comparisonFunction: timeComparisonFunction
+      comparisonFunction: compareTimestamps
       comparisonWeight: 1.5362262
       resolutionFunction: keepNew
     appByteRatio:
