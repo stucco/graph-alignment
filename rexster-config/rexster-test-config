@@ -1,0 +1,6 @@
+message-retry-count : 1
+port : 7184
+graph-obj-name : g
+graph-name : graph
+transaction : true
+serializer : 0

@@ -3,6 +3,9 @@ package alignment.alignment_v2;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.yaml.snakeyaml.Yaml;
 
 public class ConfigFileLoader {
@@ -37,6 +40,24 @@ public class ConfigFileLoader {
 		}
 
 		return vertexConfigMap;
+	}
+	
+	public static Configuration configFromFile(String configFilePath){
+		File configFile = new File(configFilePath);
+		return configFromFile(configFile);
+	}
+	
+	public static Configuration configFromFile(File configFile){
+		//Properties props = new Properties();
+		//props.load(reader);
+		PropertiesConfiguration config = new PropertiesConfiguration();
+		try {
+			config.load(configFile);
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return config;
 	}
 }
 

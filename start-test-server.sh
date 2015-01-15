@@ -12,4 +12,4 @@ while [ -h "$SOURCE" ]; do
 done
 CURRENT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-$TITAN_DIR/rexster.sh -s -c $CURRENT/rexster-inmemory.xml &
+$TITAN_DIR/rexster.sh -s -c $CURRENT/rexster-config/rexster-inmemory.xml &
