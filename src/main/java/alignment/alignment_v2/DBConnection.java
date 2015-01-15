@@ -22,7 +22,7 @@ import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
 public class DBConnection {
 
-	RexsterClient client = null;
+	private RexsterClient client = null;
 	private Logger logger = null;
 	private Map<String, String> vertIDCache = null;
 
@@ -146,11 +146,22 @@ public class DBConnection {
 		String id = vert.optString("_id");
 		//System.out.println("vertex id is: " + id);
 		if(name == null || name == ""){ 
-			vert.put("name", id);
+			name = id;
+			vert.put("name", name);
 		}
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("VERT_PROPS", vert);
-		execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null)", param);
+		try {
+			Long newID = (Long)client.execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);v.getId()", param).get(0);
+			//System.out.println("new ID is: " + newID);
+			vertIDCache.put(name, newID.toString());
+		} catch (RexProException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void addEdgeFromJSON(JSONObject edge){
@@ -266,7 +277,7 @@ public class DBConnection {
 		List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
 		//logger.info("query returned: " + query_ret_list);
 		if(query_ret_list.size() == 0){
-			logger.info("findVert found 0 matching verts for name:" + name); //this is too noisy, the invoking function can complain if it wants to...
+			//logger.info("findVert found 0 matching verts for name:" + name); //this is too noisy, the invoking function can complain if it wants to...
 			return null;
 		}else if(query_ret_list.size() > 1){
 			logger.warn("findVert found more than 1 matching verts for name:" + name);

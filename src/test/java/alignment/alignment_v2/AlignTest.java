@@ -1,5 +1,6 @@
 package alignment.alignment_v2;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -709,14 +710,14 @@ extends TestCase
 
 		try {
 			//find this node, check some properties.
-			String id = a.findVertId("CVE-2006-3459");
-			Map<String, Object> query_ret_map = a.getVertByID(id);
+			String id = c.findVertId("CVE-2006-3459");
+			Map<String, Object> query_ret_map = c.getVertByID(id);
 			assertEquals("Metasploit", query_ret_map.get("source"));
 			assertEquals("vulnerability", query_ret_map.get("vertexType"));
 
 			//find this other node, check its properties.
-			String id2 = a.findVertId("exploit/apple_ios/email/mobilemail_libtiff");
-			query_ret_map = a.getVertByID(id2);
+			String id2 = c.findVertId("exploit/apple_ios/email/mobilemail_libtiff");
+			query_ret_map = c.getVertByID(id2);
 			assertEquals("Metasploit", query_ret_map.get("source"));
 			assertEquals("malware", query_ret_map.get("vertexType"));
 			assertEquals("exploit", query_ret_map.get("malwareType"));
@@ -726,12 +727,12 @@ extends TestCase
 
 			//and now test the edge between them
 			Object query_ret;
-			query_ret = this.client.execute("g.v("+id2+").outE().inV();");
+			query_ret = c.getClient().execute("g.v("+id2+").outE().inV();");
 			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 
-			a.removeAllVertices();
+			c.removeAllVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 
 		} catch (RexProException e) {
