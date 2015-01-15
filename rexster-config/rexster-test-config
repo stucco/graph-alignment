@@ -1,5 +1,10 @@
-message-retry-count : 1
 port : 7184
+timeout-connection-ms : 18000
+timeout-write-ms : 400
+timeout-read-ms : 800
+max-async-write-queue-size : 512000
+message-retry-count : 4
+message-retry-wait-ms : 100
 graph-obj-name : g
 graph-name : graph
 transaction : true
