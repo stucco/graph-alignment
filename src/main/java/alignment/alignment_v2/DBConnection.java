@@ -331,7 +331,7 @@ public class DBConnection {
 		}
 	}
 
-	public List findAllVertsByType(String vertexType) throws IOException, RexProException{
+	public List<Map<String,Object>> findAllVertsByType(String vertexType) throws IOException, RexProException{
 		if(vertexType == null || vertexType == "")
 			return null;
 
