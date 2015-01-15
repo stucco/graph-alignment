@@ -59,23 +59,9 @@
         	<artifactId>snakeyaml</artifactId>
         	<version>1.14</version>
         </dependency>
-        <dependency>
-        	<groupId>gov.ornl.stucco</groupId>
-  			<artifactId>alignmentStudy</artifactId>
-  			<version>0.0.1</version>
-        </dependency>
  	</dependencies>
   	<build>
   		<plugins>
-  			<plugin>
-        		<groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-scm-plugin</artifactId>
-        		<version>1.9</version>
-        		<configuration>
-          			<connectionUrl>scm:git:https://github.com/stucco/alignment-study.git</connectionUrl>
-          			<checkoutDirectory>alignment-study</checkoutDirectory>
-        		</configuration>
-      		</plugin>
          	<plugin>
               	<artifactId>maven-compiler-plugin</artifactId>
               	<version>2.3.2</version>

@@ -2,10 +2,12 @@ package alignment.alignment_v2;
 
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alignmentStudy.*;
+import alignment.comparisons.SmithWaterman;
+import alignment.comparisons.WHIRL;
 
 public class Compare {
 
@@ -20,13 +22,13 @@ public class Compare {
 		return 0.0; //TODO
 	}
 
-	public static double comparisonScore (String propertyName, String idOne, String idTwo, Object property1, Object property2, Map<String, Object> configProperties) {
+	public static double compareProperties (String propertyName, Object property1, Object property2, Map<String, Object> configProperties) {
 
-		Comparison comparison;
+		//Comparison comparison;
 		WHIRL whirl;
 
 		Logger logger = LoggerFactory.getLogger(Align.class);
-		comparison = new Comparison();
+		//comparison = new Comparison();
 		whirl = new WHIRL();
 
 		Double score = 0.0;
@@ -56,7 +58,7 @@ public class Compare {
 		}
 
 		if (comparisonFunction.equals("WHIRL"))	{
-			double w = whirl.getSimilarityScore(idOne, idTwo);
+			double w = whirl.compareObjects(property1.toString(), property2.toString());
 			score = score + w * comparisonWeight;
 		}
 
@@ -64,12 +66,29 @@ public class Compare {
 		return score;
 	}
 
-	public static double compareDate (Object time1, Object time2)	{
-		DateFormat dateTime = null;
-		dateTime = new DateFormat();
-		long timeOne = dateTime.formatNVDDate(time1.toString());				
-		long timeTwo = dateTime.formatBugtraqDate(time2.toString()); //change for different time format
+	//return is between 0.0 (nothing in common) and 1.0
+	static double compareReferences (Object o1, Object o2)	{
 
+		if (o1 == null | o2 == null)	return 0.0;
+		int match = 0, total = 0;
+
+		//TODO: These objects won't be JSONArrays, they'll be List (I think?  need to confirm.)
+		JSONArray a1 = (JSONArray) o1;
+		JSONArray a2 = (JSONArray) o2;
+		total = a1.length() + a2.length();
+
+		for (int i = 0; i < a1.length(); i ++)	{
+			for (int j = 0; j < a2.length(); j++)	{
+				if (a1.get(i).toString().equals(a2.get(j).toString()))	{
+					match++;
+					total--;
+				}
+			}
+		}
+		return (double)(match)/(double)total;
+	}
+	
+	public static double compareDate (long timeOne, long timeTwo)	{
 		if (timeOne == timeTwo) return 1.0;
 		else return 1.0/(double)Math.abs(timeOne - timeTwo);
 	}
