@@ -96,19 +96,40 @@ public class DBConnection {
 			try{
 				//		System.out.println("currentIndices = " + currentIndices +  " " + "name");
 				if(!currentIndices.contains("name")){
-					logger.info("name index not found, creating...");
-					client.execute("mgmt = g.getManagementSystem();"
-							+ "name = mgmt.makePropertyKey(\"name\").dataType(String.class).make();"
-							+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
-							+ "mgmt.commit();g;");
+					List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"name\");");
+					//logger.info("name found: ", names.get(0));
+					if(names.get(0) == null){
+						logger.info("'name' variable and index not found, creating var and index...");
+						client.execute("mgmt = g.getManagementSystem();"
+								+ "name = mgmt.makePropertyKey(\"name\").dataType(String.class).make();"
+								+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
+								+ "mgmt.commit();g;");
+					}else{
+						logger.info("'name' was found, but not indexed.  creating index...");
+						client.execute("mgmt = g.getManagementSystem();"
+								+ "name = mgmt.getPropertyKey(\"name\");"
+								+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
+								+ "mgmt.commit();g;");
+					}
 				}
 				if(!currentIndices.contains("vertexType")){
-					logger.info("vertexType index not found, creating...");
-					client.execute("mgmt = g.getManagementSystem();"
-							+ "vertexType = mgmt.makePropertyKey(\"vertexType\").dataType(String.class).make();"
-							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).buildCompositeIndex();"
-							+ "mgmt.commit();g;");
+					List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"vertexType\");");
+					//logger.info("vertexType found: ", names.get(0));
+					if(names.get(0) == null){
+						logger.info("'vertexType' variable and index not found, creating var and index...");
+						client.execute("mgmt = g.getManagementSystem();"
+								+ "vertexType = mgmt.makePropertyKey(\"vertexType\").dataType(String.class).make();"
+								+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
+								+ "mgmt.commit();g;");
+					}else{
+						logger.info("'vertexType' was found, but not indexed.  creating index...");
+						client.execute("mgmt = g.getManagementSystem();"
+								+ "vertexType = mgmt.getPropertyKey(\"vertexType\");"
+								+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
+								+ "mgmt.commit();g;");
+					}
 				}
+				/*
 				if(!currentIndices.contains("name") || !currentIndices.contains("vertexType")){
 					logger.info("name or vertexType index not found, creating combined index...");
 					client.execute("mgmt = g.getManagementSystem();"
@@ -116,7 +137,7 @@ public class DBConnection {
 							+ "vertexType = mgmt.getPropertyKey(\"vertexType\");"
 							+ "mgmt.buildIndex(\"byNameAndVertexType\",Vertex.class).addKey(name).addKey(vertexType).unique().buildCompositeIndex();"
 							+ "mgmt.commit();g;"); //TODO: not convinced that this (new) index really works, need to test further.  but it's currently unused, so leaving as-is for now.
-				}
+				}*/
 			}catch(Exception e){
 				logger.error("could not configure missing vertex indices!", e);
 			}
