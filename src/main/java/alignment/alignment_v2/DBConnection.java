@@ -83,6 +83,16 @@ public class DBConnection {
 		logger = LoggerFactory.getLogger(Align.class);
 		vertIDCache = new HashMap<String, String>(10000);
 		client = c;
+		//wait a few seconds, for the connection to set up.  (Mostly needed for travis-ci tests)
+		try {
+			int connectionWaitTime = 30;
+			logger.info( "waiting for " + connectionWaitTime + " seconds for connection to establish..." );
+			Thread.sleep(connectionWaitTime*1000); //in ms.
+		}
+		catch (InterruptedException ie) { 
+			// Restore the interrupted status
+			Thread.currentThread().interrupt();
+		}
 	}
 
 	public void createIndices(){
@@ -153,7 +163,7 @@ public class DBConnection {
 				logger.error("could not configure missing indices!", e);
 			}
 			 */
-			logger.info(" connection is good!");
+			logger.info("Connection is good!");
 		} catch (Exception e) { //open() really just throws Exception?  really?
 			this.client = null;
 			logger.error("problem creating Rexster connection");
