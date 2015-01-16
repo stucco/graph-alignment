@@ -39,7 +39,7 @@ public class Align
 		//loading configuration file into HashMap
 		config = new ConfigFileLoader();
 
-		c.createIndices();
+		connection.createIndices();
 	}
 
 	@Override
