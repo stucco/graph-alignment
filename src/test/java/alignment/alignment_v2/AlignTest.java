@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.client.RexsterClient;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -48,13 +49,14 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		String test_graphson_verts = " {\"vertices\":[" +
@@ -116,7 +118,7 @@ extends TestCase
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 
-			c.removeAllVertices();
+			c.removeCachedVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 
 		} catch (RexProException e) {
@@ -135,7 +137,8 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
@@ -237,13 +240,14 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
@@ -261,7 +265,7 @@ extends TestCase
 		assertEquals("33", query_ret_map.get("y").toString());
 		assertEquals("44", query_ret_map.get("z").toString());
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -274,13 +278,14 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		String testVertex = "g.commit(); v = g.addVertex();" + 
@@ -328,7 +333,7 @@ extends TestCase
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -341,13 +346,14 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
@@ -374,7 +380,7 @@ extends TestCase
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -387,16 +393,19 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		Map<String, Object> props = new HashMap<String,Object>();
+		props.put("NAME", "testvert_align_props");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME);g.commit()", props);
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
@@ -468,7 +477,7 @@ extends TestCase
 		testArrayVal = new String[]{"aaa", "bbb"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -481,13 +490,14 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		c.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
@@ -524,7 +534,7 @@ extends TestCase
 		testVal = "bbbb";
 		assertEquals(testVal, testProp);
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -537,13 +547,14 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		c.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
@@ -569,7 +580,7 @@ extends TestCase
 
 		//TODO: this test seems unfinished??
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -583,7 +594,8 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
@@ -696,7 +708,8 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO

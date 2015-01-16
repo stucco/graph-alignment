@@ -26,11 +26,9 @@ public class DBConnection {
 	private Logger logger = null;
 	private Map<String, String> vertIDCache = null;
 
-	public static RexsterClient getDefaultClient(){
+	public static RexsterClient createClient(Configuration configOpts){
 		RexsterClient client = null;
 		Logger logger = LoggerFactory.getLogger(Align.class);
-		
-		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-config/rexster-default-config");
 		
 		logger.info("connecting to DB...");
 		
@@ -43,23 +41,19 @@ public class DBConnection {
 
 		return client;
 	}
-
-	public static RexsterClient getTestClient(){
-		RexsterClient client = null;
+	
+	public static Configuration getDefaultConfig(){
 		Logger logger = LoggerFactory.getLogger(Align.class);
-		
+		logger.info("Loading default DB Config...");
+		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-config/rexster-default-config");
+		return configOpts;
+	}
+
+	public static Configuration getTestConfig(){
+		Logger logger = LoggerFactory.getLogger(Align.class);
+		logger.info("Loading default DB Config...");
 		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-config/rexster-test-config");
-
-		logger.info("connecting to Test DB...");
-		
-		try{
-			client = RexsterClientFactory.open(configOpts); //this just throws "Exception."  bummer.
-		}catch(Exception e){
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return client;
+		return configOpts;
 	}
 
 	public static void closeClient(RexsterClient client){
@@ -75,7 +69,7 @@ public class DBConnection {
 	}
 
 	public DBConnection(){
-		this(getDefaultClient());
+		this(createClient(getDefaultConfig()));
 	}
 
 	public DBConnection(RexsterClient c){
@@ -461,12 +455,14 @@ public class DBConnection {
 	}
 
 	/*
-	 * These two methods will generate the following warning in your rexstitan.log (or similar):
-	 *  WARN  com.thinkaurelius.titan.graphdb.transaction.StandardTitanTx  - Query requires iterating over all vertices [()]. For better performance, use indexes
-	 * This *should* be the only place that will generate these.  If not, something is wrong.
+	 * Only use in tests.
 	 */
-	public boolean removeAllVertices(){
+	public boolean removeCachedVertices(){
 		//NB: this query is slow enough that connection can time out if the DB starts with many vertices.
+		
+		if(vertIDCache.isEmpty())
+			return true;
+		
 		boolean ret = true;
 		//delete the known nodes first, to help prevent timeouts.
 		Map<String,Object> param;
@@ -475,31 +471,16 @@ public class DBConnection {
 			param = new HashMap<String,Object>();
 			param.put("ID", Integer.parseInt(id));
 			try{
-				client.execute("g.v(ID).delete();", param);
+				client.execute("g.v(ID).remove();g", param);
 			}catch(Exception e){
+				e.printStackTrace();
 				ret = false;
 			}
 		}
 		try{
 			client.execute("g.commit();");
 		}catch(Exception e){
-			ret = false;
-		}
-
-		//TODO break this up further, into smaller operations?  (See if timeouts ever still occur.)
-		try{
-			client.execute("g.V.remove();g.commit();");
-		}catch(IOException e){
-			logger.warn("connection timeout in removeAllVertices - going to sleep for a while and hope it resolves itself.");
-			try {
-				Thread.sleep(90000); //in ms.
-			}
-			catch (InterruptedException ie) { 
-				// Restore the interrupted status
-				Thread.currentThread().interrupt();
-			}
-			ret = false;
-		}catch(Exception e){
+			e.printStackTrace();
 			ret = false;
 		}
 
@@ -507,6 +488,7 @@ public class DBConnection {
 		vertIDCache = new HashMap<String, String>(10000);
 
 		return ret;
+		
 	}
 	/*
     public boolean removeAllEdges(RexsterClient client){

@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.Configuration;
 import org.json.JSONObject;
 
 import com.tinkerpop.rexster.client.RexProException;
+import com.tinkerpop.rexster.client.RexsterClient;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -48,12 +50,14 @@ extends TestCase
 	{
 		DBConnection c = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			Configuration config = DBConnection.getTestConfig();
+			RexsterClient client = DBConnection.createClient(config);
+			c = new DBConnection( client );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
 
 		String vert1 = "{" +
@@ -116,7 +120,7 @@ extends TestCase
 			query_ret_map = query_ret_list.get(0);
 			assertEquals(id, query_ret_map.get("_id"));
 
-			c.removeAllVertices();
+			c.removeCachedVertices();
 			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 
 		} catch (RexProException e) {
@@ -137,15 +141,20 @@ extends TestCase
 	{
 		DBConnection c = null;
 		try{
-			c = new DBConnection( DBConnection.getTestClient() );
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//c.removeAllEdges();
-
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
+		
+		Map<String, Object> props = new HashMap<String,Object>();
+		props.put("NAME", "testvert_55");
+		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME);g.commit()", props);
+		
+		//c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
 
 		String id = c.findVertId("testvert_55");
 		Map<String, Object> query_ret_map = c.getVertByID(id);
@@ -160,7 +169,7 @@ extends TestCase
 		assertEquals("33", query_ret_map.get("y").toString());
 		assertEquals("44", query_ret_map.get("z").toString());
 
-		c.removeAllVertices();
+		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
