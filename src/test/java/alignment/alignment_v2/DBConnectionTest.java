@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 
+import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -38,7 +39,25 @@ extends TestCase
 	 */
 	public static Test suite()
 	{
-		return new TestSuite( DBConnectionTest.class );
+		//return new TestSuite( DBConnectionTest.class );
+		return new TestSetup(new TestSuite(DBConnectionTest.class)) {
+
+	        protected void setUp() throws Exception {
+	            System.out.println(" Global setUp started");
+	            DBConnection c = null;
+	    		try{
+	    			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+	    			c = new DBConnection( client );
+	    			c.createIndices();
+	    		}catch(Exception e){
+	    			e.printStackTrace(); //TODO
+	    		} //don't really care
+	    		System.out.println(" Global setUp done");
+	        }
+	        protected void tearDown() throws Exception {
+	            //System.out.println(" Global tearDown ");
+	        }
+	    };
 	}
 
 
@@ -53,6 +72,7 @@ extends TestCase
 			Configuration config = DBConnection.getTestConfig();
 			RexsterClient client = DBConnection.createClient(config);
 			c = new DBConnection( client );
+			c.createIndices();
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
@@ -143,6 +163,7 @@ extends TestCase
 		try{
 			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
 			c = new DBConnection( client );
+			c.createIndices();
 		}catch(Exception e){
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
