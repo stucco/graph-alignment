@@ -9,7 +9,8 @@ install:
   - chmod a+x ./install-titan.sh
   - sudo ./install-titan.sh 0.5.2 localhost
   - sudo ./start-test-server.sh
-  - sleep 90
+  - sleep 300
+  - echo "done waiting for server to start"
 after_success:
   - wget https://raw.githubusercontent.com/stucco/test/master/rerun-test.sh
   - chmod a+x ./rerun-test.sh
