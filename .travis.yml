@@ -7,7 +7,7 @@ services:
 install:
   - wget https://raw.githubusercontent.com/stucco/test/master/scripts/install-titan.sh
   - chmod a+x ./install-titan.sh
-  - sudo ./install-titan.sh 0.5.2 localhost
+  - sudo ./install-titan.sh 0.5.3 localhost
   - sudo ./start-test-server.sh
   - sleep 300
   - echo "done waiting for server to start"
