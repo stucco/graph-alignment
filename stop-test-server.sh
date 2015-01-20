@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TITAN_DIR="/usr/local/titan-0.5.2-hadoop2/bin"
+TITAN_DIR="/usr/local/titan-0.5.3-hadoop2/bin"
 cd $TITAN_DIR
 
 #This is based on rexster.sh, included in the titan bin dir
