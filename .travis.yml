@@ -7,6 +7,7 @@ services:
 install:
   - cat /proc/meminfo
   - cat /proc/cpuinfo
+  - dpkg --get-selections
   - wget https://raw.githubusercontent.com/stucco/test/master/scripts/install-titan.sh
   - chmod a+x ./install-titan.sh
   - sudo ./install-titan.sh 0.5.3 localhost
