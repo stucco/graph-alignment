@@ -8,14 +8,12 @@ install:
   - cat /proc/meminfo
   - cat /proc/cpuinfo
   - dpkg --get-selections
-  - wget https://raw.githubusercontent.com/stucco/test/master/scripts/install-titan.sh
-  - chmod a+x ./install-titan.sh
-  - sudo ./install-titan.sh 0.5.3 localhost
-  - sudo ./start-test-server.sh
+  - ./install-tinkergraph-test-server.sh
+  - ./start-test-server.sh
   - sleep 300
   - echo "done waiting for server to start"
 after_success:
   - wget https://raw.githubusercontent.com/stucco/test/master/rerun-test.sh
   - chmod a+x ./rerun-test.sh
   - ./rerun-test.sh
-  - sudo ./stop-test-server.sh
+  - ./stop-test-server.sh
