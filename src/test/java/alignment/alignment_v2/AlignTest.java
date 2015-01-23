@@ -250,8 +250,10 @@ extends TestCase
 		c.removeCachedVertices();
 		//c.removeAllEdges();
 
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
-
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\")");
+		c.commit();
+		
 		String id = c.findVertId("testvert_55");
 		Map<String, Object> query_ret_map = c.getVertByID(id);
 		assertEquals( "55", query_ret_map.get("z").toString());
@@ -288,7 +290,7 @@ extends TestCase
 		c.removeCachedVertices();
 		//c.removeAllEdges();
 
-		String testVertex = "g.commit(); v = g.addVertex();" + 
+		String testVertex = "v = g.addVertex();" + 
 				"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
 				"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
 				"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
@@ -306,10 +308,11 @@ extends TestCase
 				"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
 				"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
 				"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
-				"v.setProperty(\"accessVector\", \"NETWORK\");" +
-				"g.commit()";
+				"v.setProperty(\"accessVector\", \"NETWORK\")";
 
+		c.commit();
 		c.execute(testVertex);
+		c.commit();
 
 		String id = c.findVertId("CVE-1999-0006");
 		Map<String, String> mergeMethods = new HashMap<String,String>();
@@ -356,7 +359,9 @@ extends TestCase
 		c.removeCachedVertices();
 		//c.removeAllEdges();
 
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
@@ -405,7 +410,9 @@ extends TestCase
 
 		Map<String, Object> props = new HashMap<String,Object>();
 		props.put("NAME", "testvert_align_props");
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME);g.commit()", props);
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME)", props);
+		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
@@ -500,7 +507,9 @@ extends TestCase
 		c.removeCachedVertices();
 		//c.removeAllEdges();
 
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();
@@ -557,7 +566,9 @@ extends TestCase
 		c.removeCachedVertices();
 		//c.removeAllEdges();
 
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, String> mergeMethods = new HashMap<String,String>();

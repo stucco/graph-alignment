@@ -1,6 +1,7 @@
 package alignment.alignment_v2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,11 +21,14 @@ import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.client.RexsterClientTokens;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
 
+import com.tinkerpop.blueprints.*;
+
 public class DBConnection {
 
 	private RexsterClient client = null;
 	private Logger logger = null;
 	private Map<String, String> vertIDCache = null;
+	private String dbType = null;
 
 	public static RexsterClient createClient(Configuration configOpts){
 		RexsterClient client = null;
@@ -51,7 +55,7 @@ public class DBConnection {
 
 	public static Configuration getTestConfig(){
 		Logger logger = LoggerFactory.getLogger(Align.class);
-		logger.info("Loading default DB Config...");
+		logger.info("Loading test DB Config...");
 		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-config/rexster-test-config");
 		return configOpts;
 	}
@@ -79,7 +83,7 @@ public class DBConnection {
 		client = c;
 		//wait a few seconds, for the connection to set up.  (Mostly needed for travis-ci tests)
 		try {
-			int connectionWaitTime = 30;
+			int connectionWaitTime = 1;
 			logger.info( "waiting for " + connectionWaitTime + " seconds for connection to establish..." );
 			Thread.sleep(connectionWaitTime*1000); //in ms.
 		}
@@ -88,84 +92,143 @@ public class DBConnection {
 			Thread.currentThread().interrupt();
 		}
 	}
+	
+	private String getDBType(){
+		if(this.dbType == null){
+			String type = null;
+			try{
+				type = client.execute("g.getClass()").get(0).toString();
+			}catch(Exception e){
+				logger.error("Could not find graph type!",e);
+			}
+			if( type.equals("class com.tinkerpop.blueprints.impls.tg.TinkerGraph") ){
+				this.dbType = "TinkerGraph";
+			}else if( type.equals("class com.thinkaurelius.titan.graphdb.database.StandardTitanGraph") ){
+				this.dbType = "TitanGraph";
+			}else{
+				logger.warn("Could not find graph type, or unknown type!  Assuming it is Titan...");
+				this.dbType = "TitanGraph";
+			}
+		}
+		return this.dbType;
+	}
+	
 
 	public void createIndices(){
+		String graphType = getDBType();
+		if( graphType.equals("TinkerGraph") ){
+			createTinkerGraphIndices();
+		}else if( graphType.equals("TitanGraph") ){
+			createTitanIndices();
+		}else{
+			logger.warn("unknown graph type!  Assuming it is Titan...");
+			createTitanIndices();
+		}
+	}
+	
+	
+	private void createTinkerGraphIndices(){
+		List currentRawIndices = null;
 		try {
-
 			//configure vert indices needed
 			//List currentIndices = client.execute("g.getManagementSystem().getGraphIndexes(Vertex.class)");
-			List currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
-
-			logger.info( "found vertex indices: " + currentIndices );
-			try{
-				//		System.out.println("currentIndices = " + currentIndices +  " " + "name");
-				if(!currentIndices.contains("name")){
-					List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"name\");");
-					//logger.info("name found: ", names.get(0));
-					if(names.get(0) == null){
-						logger.info("'name' variable and index not found, creating var and index...");
-						client.execute("mgmt = g.getManagementSystem();"
-								+ "name = mgmt.makePropertyKey(\"name\").dataType(String.class).make();"
-								+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
-								+ "mgmt.commit();g;");
-					}else{
-						logger.info("'name' was found, but not indexed.  creating index...");
-						client.execute("mgmt = g.getManagementSystem();"
-								+ "name = mgmt.getPropertyKey(\"name\");"
-								+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
-								+ "mgmt.commit();g;");
-					}
-				}
-				if(!currentIndices.contains("vertexType")){
-					List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"vertexType\");");
-					//logger.info("vertexType found: ", names.get(0));
-					if(names.get(0) == null){
-						logger.info("'vertexType' variable and index not found, creating var and index...");
-						client.execute("mgmt = g.getManagementSystem();"
-								+ "vertexType = mgmt.makePropertyKey(\"vertexType\").dataType(String.class).make();"
-								+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
-								+ "mgmt.commit();g;");
-					}else{
-						logger.info("'vertexType' was found, but not indexed.  creating index...");
-						client.execute("mgmt = g.getManagementSystem();"
-								+ "vertexType = mgmt.getPropertyKey(\"vertexType\");"
-								+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
-								+ "mgmt.commit();g;");
-					}
-				}
-				/*
-				if(!currentIndices.contains("name") || !currentIndices.contains("vertexType")){
-					logger.info("name or vertexType index not found, creating combined index...");
+			currentRawIndices = client.execute("g.getIndices()");
+		} catch (Exception e) { 
+			//this.client = null;
+			logger.error("problem getting indexed keys, assuming there were none...");
+			logger.error("Exception was: ",e);
+		}
+		List<String> currentIndices = new ArrayList<String>();
+		for(int i=0; i<currentRawIndices.size(); i++){
+			String current = ((Index) currentRawIndices.get(i)).getIndexName();
+			currentIndices.add( current );
+		}
+		logger.info( "found vertex indices: " + currentIndices );
+		//TODO: actually create the indices (although for current unit tests, it doesn't matter)
+	}
+	
+	private void createTitanIndices(){
+		List currentIndices = null;
+		try {
+			//configure vert indices needed
+			//List currentIndices = client.execute("g.getManagementSystem().getGraphIndexes(Vertex.class)");
+			currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
+		} catch (Exception e) { 
+			//this.client = null;
+			logger.error("problem getting indexed keys, assuming there were none...");
+			logger.error("Exception was: ",e);
+		}
+		logger.info( "found vertex indices: " + currentIndices );
+		try{
+			//		System.out.println("currentIndices = " + currentIndices +  " " + "name");
+			if(currentIndices == null || !currentIndices.contains("name")){
+				List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"name\");");
+				//logger.info("name found: ", names.get(0));
+				if(names.get(0) == null){
+					logger.info("'name' variable and index not found, creating var and index...");
+					client.execute("mgmt = g.getManagementSystem();"
+							+ "name = mgmt.makePropertyKey(\"name\").dataType(String.class).make();"
+							+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
+							+ "mgmt.commit();g;");
+				}else{
+					logger.info("'name' was found, but not indexed.  creating index...");
 					client.execute("mgmt = g.getManagementSystem();"
 							+ "name = mgmt.getPropertyKey(\"name\");"
+							+ "mgmt.buildIndex(\"byName\",Vertex.class).addKey(name).unique().buildCompositeIndex();"
+							+ "mgmt.commit();g;");
+				}
+			}
+			if(currentIndices == null || !currentIndices.contains("vertexType")){
+				List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"vertexType\");");
+				//logger.info("vertexType found: ", names.get(0));
+				if(names.get(0) == null){
+					logger.info("'vertexType' variable and index not found, creating var and index...");
+					client.execute("mgmt = g.getManagementSystem();"
+							+ "vertexType = mgmt.makePropertyKey(\"vertexType\").dataType(String.class).make();"
+							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
+							+ "mgmt.commit();g;");
+				}else{
+					logger.info("'vertexType' was found, but not indexed.  creating index...");
+					client.execute("mgmt = g.getManagementSystem();"
 							+ "vertexType = mgmt.getPropertyKey(\"vertexType\");"
-							+ "mgmt.buildIndex(\"byNameAndVertexType\",Vertex.class).addKey(name).addKey(vertexType).unique().buildCompositeIndex();"
-							+ "mgmt.commit();g;"); //TODO: not convinced that this (new) index really works, need to test further.  but it's currently unused, so leaving as-is for now.
-				}*/
-			}catch(Exception e){
-				logger.error("could not configure missing vertex indices!", e);
+							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
+							+ "mgmt.commit();g;");
+				}
 			}
 			/*
-			currentIndices = client.execute("g.getIndexedKeys(Edge.class)");
-			logger.info( "found edge indices: " + currentIndices );
-			try{
-				if(!currentIndices.contains("name")){
-					logger.info("name index not found, creating...");
-					client.execute("g.makeKey(\"edgeName\").dataType(String.class).indexed(\"standard\",Edge.class).unique().make();g.commit();g;");
-				}
-			}catch(Exception e){
-				logger.error("could not configure missing indices!", e);
-			}
-			 */
+			if(!currentIndices.contains("name") || !currentIndices.contains("vertexType")){
+				logger.info("name or vertexType index not found, creating combined index...");
+				client.execute("mgmt = g.getManagementSystem();"
+						+ "name = mgmt.getPropertyKey(\"name\");"
+						+ "vertexType = mgmt.getPropertyKey(\"vertexType\");"
+						+ "mgmt.buildIndex(\"byNameAndVertexType\",Vertex.class).addKey(name).addKey(vertexType).unique().buildCompositeIndex();"
+						+ "mgmt.commit();g;"); //TODO: not convinced that this (new) index really works, need to test further.  but it's currently unused, so leaving as-is for now.
+			}*/
+			commit();
 			logger.info("Connection is good!");
-		} catch (Exception e) { //open() really just throws Exception?  really?
+		}catch(Exception e){
+			logger.error("could not configure missing vertex indices!", e);
 			this.client = null;
-			logger.error("problem creating Rexster connection");
-			logger.error("Exception!",e);
+			logger.error("Connection is unusable!");
 		}
+		/*
+		currentIndices = client.execute("g.getIndexedKeys(Edge.class)");
+		logger.info( "found edge indices: " + currentIndices );
+		try{
+			if(!currentIndices.contains("name")){
+				logger.info("name index not found, creating...");
+				client.execute("g.makeKey(\"edgeName\").dataType(String.class).indexed(\"standard\",Edge.class).unique().make();g.commit();g;");
+			}
+		}catch(Exception e){
+			logger.error("could not configure missing indices!", e);
+		}
+		 */
+		
+		
 	}
 
 	public void addVertexFromJSON(JSONObject vert){
+		String graphType = getDBType();
 		String name = vert.optString("name");
 		//System.out.println("vertex name is: " + name);
 		String id = vert.optString("_id");
@@ -174,10 +237,15 @@ public class DBConnection {
 			name = id;
 			vert.put("name", name);
 		}
+		vert.remove("_id"); //Some graph servers will ignore this ID, some won't.  Just remove them so it's consistent.
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("VERT_PROPS", vert);
 		try {
-			Long newID = (Long)client.execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);v.getId()", param).get(0);
+			Long newID = null;
+			if(graphType == "TitanGraph")
+				newID = (Long)client.execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);v.getId()", param).get(0);
+			if(graphType == "TinkerGraph")
+				newID = Long.parseLong((String)client.execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);v.getId()", param).get(0));
 			//System.out.println("new ID is: " + newID);
 			vertIDCache.put(name, newID.toString());
 		} catch (RexProException e) {
@@ -234,7 +302,9 @@ public class DBConnection {
 	}
 
 	public void commit(){
-		execute("g.commit()");
+		String graphType = getDBType();
+		if(graphType != "TinkerGraph")
+			execute("g.commit()");
 	}
 
 	//TODO make private
@@ -451,7 +521,9 @@ public class DBConnection {
 		param.put("ID", Integer.parseInt(id));
 		param.put("KEY", key);
 		param.put("VAL", val);
-		return execute("g.v(ID)[KEY]=VAL;g.commit()", param);
+		boolean ret = execute("g.v(ID)[KEY]=VAL", param);
+		commit();
+		return ret;
 	}
 
 	/*
@@ -478,7 +550,7 @@ public class DBConnection {
 			}
 		}
 		try{
-			client.execute("g.commit();");
+			commit();
 		}catch(Exception e){
 			e.printStackTrace();
 			ret = false;

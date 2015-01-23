@@ -173,7 +173,9 @@ extends TestCase
 		
 		Map<String, Object> props = new HashMap<String,Object>();
 		props.put("NAME", "testvert_55");
-		c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME);g.commit()", props);
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME)", props);
+		c.commit();
 		
 		//c.execute("g.commit();v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\");g.commit()");
 
