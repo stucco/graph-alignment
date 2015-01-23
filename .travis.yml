@@ -9,7 +9,7 @@ install:
   - cat /proc/cpuinfo
   - dpkg --get-selections
   - ./install-tinkergraph-test-server.sh
-  - ./start-test-server.sh
+  - ./start-test-server.sh &
   - sleep 300
   - echo "done waiting for server to start"
 after_success:
