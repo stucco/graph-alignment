@@ -83,7 +83,7 @@ public class DBConnection {
 		client = c;
 		//wait a few seconds, for the connection to set up.  (Mostly needed for travis-ci tests)
 		try {
-			int connectionWaitTime = 1;
+			int connectionWaitTime = 30;
 			logger.info( "waiting for " + connectionWaitTime + " seconds for connection to establish..." );
 			Thread.sleep(connectionWaitTime*1000); //in ms.
 		}
