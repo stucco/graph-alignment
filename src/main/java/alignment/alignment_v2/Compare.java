@@ -1,5 +1,7 @@
 package alignment.alignment_v2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -18,8 +20,24 @@ public class Compare {
 	private WHIRL whirl;
 	 */
 
-	public static double compareVertices(Map<String, Object> vert1, Map<String, Object> vert2){
-		return 0.0; //TODO
+	public static double compareVertices(Map<String, Object> vert1, Map<String, Object> vert2, Map<String, Map<String, Object>> configProperties){
+		Map<String, Object> props1 = (Map<String, Object>)vert1.get("_properties");
+		Map<String, Object> props2 = (Map<String, Object>)vert2.get("_properties");
+		List<String> props = new ArrayList<String>(); 
+		Object props1keys[] = props1.keySet().toArray();
+		for(int i=0; i<props1keys.length; i++){
+			if(props2.containsKey((String)props1keys[i])){
+				props.add((String)props1keys[i]);
+			}
+		}
+		Double score = 0.0;
+		for(int i=0; i<props.size(); i++){
+			String p = props.get(i);
+			Map<String, Object> propConf = configProperties.get(p);
+			if(propConf != null) //eg. "name" property.
+				score += compareProperties(p, props1.get(p), props2.get(p), propConf);
+		}
+		return score;
 	}
 
 	public static double compareProperties (String propertyName, Object property1, Object property2, Map<String, Object> configProperties) {
