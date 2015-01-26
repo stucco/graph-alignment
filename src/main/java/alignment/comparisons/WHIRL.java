@@ -67,8 +67,8 @@ public class WHIRL {
 
 		double sim = 0.0; 
 
-		System.out.println(s2WordsCount);
-		System.out.println(s1WordsCount);
+		//System.out.println(s2WordsCount);
+		//System.out.println(s1WordsCount);
 
 		for (String s : T)	{
 
@@ -77,7 +77,7 @@ public class WHIRL {
 				weightOne = Math.log10(s1WordsCount.get(s) + 1.0) * Math.log10(2/count); 
 				weightTwo = Math.log10(s2WordsCount.get(s) + 1.0) * Math.log10(2/count); 
 				dotProduct = dotProduct + s1WordsCount.get(s) * s2WordsCount.get(s);
-				System.out.println("weightOne = " + weightOne);
+				//System.out.println("weightOne = " + weightOne);
 			}
 			else if (s1WordsCount.get(s) == null)	{
 				count = 1;
@@ -90,8 +90,8 @@ public class WHIRL {
 				weightTwo = 1.0; 
 			}
 			similarity = similarity + (weightOne * weightTwo); 
-			System.out.println("similarity = " + similarity);
-			System.out.println(similarity);
+			//System.out.println("similarity = " + similarity);
+			//System.out.println(similarity);
 		}		
 		similarity = similarity / dotProduct;		
 		//	System.out.println("similarity = " + similarity);
