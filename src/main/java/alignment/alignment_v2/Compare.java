@@ -47,7 +47,6 @@ public class Compare {
 
 		Logger logger = LoggerFactory.getLogger(Align.class);
 		//comparison = new Comparison();
-		whirl = new WHIRL();
 
 		Double score = 0.0;
 		Double comparisonWeight = 1.0;
@@ -62,7 +61,8 @@ public class Compare {
 		}
 		//time should be standardized  
 		if (comparisonFunction.equals("compareTimestamps"))	{
-			score = score + compareDate((Integer)property1, (Integer)property2) * comparisonWeight;
+			//TODO: timestamps need to be standardized before this can happen
+			//score = score + compareDate((Integer)property1, (Integer)property2) * comparisonWeight;
 			//	score = score + compareDate(property1, property2) * comparisonWeight;
 		}
 		//complaining that it is the array list, but function is working with jsonarray
@@ -76,6 +76,7 @@ public class Compare {
 		}
 
 		if (comparisonFunction.equals("WHIRL"))	{
+			whirl = new WHIRL();
 			double w = whirl.compareObjects(property1.toString(), property2.toString());
 			score = score + w * comparisonWeight;
 		}
@@ -87,16 +88,15 @@ public class Compare {
 	//return is between 0.0 (nothing in common) and 1.0
 	static double compareReferences (Object o1, Object o2)	{
 
-		if (o1 == null | o2 == null)	return 0.0;
+		if (o1 == null || o2 == null)	return 0.0;
 		int match = 0, total = 0;
 
-		//TODO: These objects won't be JSONArrays, they'll be List (I think?  need to confirm.)
-		JSONArray a1 = (JSONArray) o1;
-		JSONArray a2 = (JSONArray) o2;
-		total = a1.length() + a2.length();
+		ArrayList a1 = (ArrayList) o1;
+		ArrayList a2 = (ArrayList) o2;
+		total = a1.size() + a2.size();
 
-		for (int i = 0; i < a1.length(); i ++)	{
-			for (int j = 0; j < a2.length(); j++)	{
+		for (int i = 0; i < a1.size(); i ++)	{
+			for (int j = 0; j < a2.size(); j++)	{
 				if (a1.get(i).toString().equals(a2.get(j).toString()))	{
 					match++;
 					total--;
@@ -105,7 +105,7 @@ public class Compare {
 		}
 		return (double)(match)/(double)total;
 	}
-	
+
 	public static double compareDate (long timeOne, long timeTwo)	{
 		if (timeOne == timeTwo) return 1.0;
 		else return 1.0/(double)Math.abs(timeOne - timeTwo);
