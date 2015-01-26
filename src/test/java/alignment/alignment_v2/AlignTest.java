@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 
@@ -40,97 +42,6 @@ extends TestCase
 	}
 
 
-
-	/**
-	 * Tests loading, querying, and other basic operations for vertices, edges, properties.
-	 */
-	public void testLoad()
-	{
-		DBConnection c = null;
-		Align a = null;
-		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
-			c = new DBConnection( client );
-			a = new Align( c );
-		}catch(Exception e){
-			e.printStackTrace(); //TODO
-		} //the possible NPE below is fine, don't care if test errors.
-
-		c.removeCachedVertices();
-		//c.removeAllEdges();
-
-		String test_graphson_verts = " {\"vertices\":[" +
-				"{" +
-				"\"_id\":\"CVE-1999-0002\"," +
-				"\"_type\":\"vertex\","+
-				"\"source\":\"CVE\","+
-				"\"description\":\"Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.\","+
-				"\"references\":["+
-				"\"CERT:CA-98.12.mountd\","+
-				"\"http://www.ciac.org/ciac/bulletins/j-006.shtml\","+
-				"\"http://www.securityfocus.com/bid/121\","+
-				"\"XF:linux-mountd-bo\"],"+
-				"\"status\":\"Entry\","+
-				"\"score\":1.0"+
-				"},{"+
-				"\"_id\":\"CVE-1999-nnnn\"," +
-				"\"_type\":\"vertex\","+
-				"\"source\":\"CVE\","+
-				"\"description\":\"test description asdf.\","+
-				"\"references\":["+
-				"\"http://www.google.com\"],"+
-				"\"status\":\"Entry\","+
-				"\"score\":1.0"+
-				"}"+
-				"],"+
-				"\"edges\":["+
-				"{"+ 
-				"\"_id\":\"asdf\"," +
-				"\"_inV\":\"CVE-1999-0002\"," +
-				"\"_outV\":\"CVE-1999-nnnn\"," +
-				"\"_label\":\"some_label_asdf\","+
-				"\"some_property\":\"some_value\""+
-				"}"+
-				"]}";
-
-		a.load(test_graphson_verts);
-
-		try {
-			//find this node, check some properties.
-			String id = c.findVertId("CVE-1999-0002");
-			Map<String, Object> query_ret_map = c.getVertByID(id);
-			String[] expectedRefs = {"CERT:CA-98.12.mountd","http://www.ciac.org/ciac/bulletins/j-006.shtml","http://www.securityfocus.com/bid/121","XF:linux-mountd-bo"};
-			String[] actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
-			assertTrue(Arrays.equals(expectedRefs, actualRefs));
-
-			//find the other node, check its properties.
-			String id2 = c.findVertId("CVE-1999-nnnn");
-			query_ret_map = c.getVertByID(id2);
-			assertEquals("test description asdf.", query_ret_map.get("description"));
-			expectedRefs = new String[]{"http://www.google.com"};
-			actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
-			assertTrue(Arrays.equals(expectedRefs, actualRefs));
-
-			//and now test the edge between them
-			Object query_ret;
-			query_ret = c.getClient().execute("g.v("+id2+").outE().inV();");
-			List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
-			query_ret_map = query_ret_list.get(0);
-			assertEquals(id, query_ret_map.get("_id"));
-
-			c.removeCachedVertices();
-			//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-
-		} catch (RexProException e) {
-			fail("RexProException");
-			e.printStackTrace();
-		} catch (IOException e) {
-			fail("IOException");
-			e.printStackTrace();
-		}
-	}
-
-	/*
 	//refactoring broke this, will re-add soon.
 	public void testLoadDuplicate()
 	{
@@ -144,8 +55,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeAllVertices();
-		//c.removeAllEdges();
+		c.removeCachedVertices();
 
 		String test_graphson_verts = "{\"vertices\":[" +
 				"{" +
@@ -172,8 +82,8 @@ extends TestCase
 				"\"vertexType\": \"vulnerability\"," +
 				"\"_type\": \"vertex\"," +
 				"\"references\":   [" +
-					"\"http://razor.bindview.com/publish/advisories/adv_Cabletron.html\"," +
-					"\"http://www.securityfocus.com/bid/841\"]," +
+				"\"http://razor.bindview.com/publish/advisories/adv_Cabletron.html\"," +
+				"\"http://www.securityfocus.com/bid/841\"]," +
 				"\"_id\": \"CVE-1999-1548\"," +
 				"\"source\": \"NVD\"," +
 				"\"description\": \"Cabletron SmartSwitch Router (SSR) 8000 firmware 2.x can only handle 200 ARP requests per second allowing a denial of service attack to succeed with a flood of ARP requests exceeding that limit.\"," +
@@ -207,69 +117,40 @@ extends TestCase
 
 		a.load(test_graphson_verts);
 
-		test_graphson_verts = "{" +
-			"\"accessVector\": \"Remote\"," +
-			"\"Credit\": \"Publicized in a Bindview Security Advisory released November 24,1999. Contact is Scott Blake <blake@bos.bindview.com>.\"," +
-			"\"_id\": \"CVE-1999-1548\"," +
-			"\"solution\": \"Solution:Firmware revisions 3.x are not vulnerable to this attack. The latest firmware can be obtained at:http://www.cabletron.com/download/download.cgi?lib=ssr\"," +
-			"\"exploit\": \"see discussion\"," +
-			"\"modifiedDate\": \"Jul 11 2009 12:56AM\"," +
-			"\"vertexType\": \"vulnerability\"," +
-			"\"references\": []," +
-			"\"source\": \"bugtraq\"," +
-			"\"shortDescription\": \"Cabletron SSR ARP Flood DoS Vulnerability\"," +
-			"\"description\": \"The Cabletron SmartSwitch Router 8000 with firmware revision 2.x has been shown to susceptible to a denial of service attack. The SSR can only handle approximately 200 ARP requests per second. If an attacker can get ICMP traffic to the router, they can flood it with ARP requests, effectively shutting the router down for the duration of the attack.\"," +
-			"\"Vulnerable\": [\"Cabletron SmartSwitch Router 8000 2.0\"]," +
-			"\"name\": \"bugtraq_821\"," +
-			"\"Not_Vulnerable\": [\"\"]," +
-			"\"publishedDate\": \"Nov 24 1999 12:00AM\"}";
-
-		Compare compare = new Compare(a);
-		compare.findDuplicateVertex(test_graphson_verts);
-
-		c.removeAllVertices();
-		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-	}*/
-
-	/**
-	 * Tests updating vertex properties
-	 */
-
-	public void testUpdate()
-	{
-		DBConnection c = null;
-		Align a = null;
-		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
-			c = new DBConnection( client );
-			a = new Align( c );
-		}catch(Exception e){
-			e.printStackTrace(); //TODO
-		} //the possible NPE below is fine, don't care if test errors.
-
-		c.removeCachedVertices();
-		//c.removeAllEdges();
-
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_55\")");
-		c.commit();
+		Map<String, Object> vertProps = new HashMap<String, Object>();
 		
-		String id = c.findVertId("testvert_55");
-		Map<String, Object> query_ret_map = c.getVertByID(id);
-		assertEquals( "55", query_ret_map.get("z").toString());
-
-		Map<String, Object> newProps = new HashMap<String, Object>();
-		newProps.put("y", "33");
-		newProps.put("z", "44");
-		c.updateVert(id, newProps);
-
-		query_ret_map = c.getVertByID(id);
-		assertEquals("33", query_ret_map.get("y").toString());
-		assertEquals("44", query_ret_map.get("z").toString());
+		vertProps.put("accessVector", "Remote");
+		vertProps.put("Credit", "Publicized in a Bindview Security Advisory released November 24,1999. Contact is Scott Blake <blake@bos.bindview.com>.");
+		vertProps.put("name", "bugtraq_821");
+		//vertMap.put("_id", "CVE-1999-1548");
+		vertProps.put("solution", "Solution:Firmware revisions 3.x are not vulnerable to this attack. The latest firmware can be obtained at:http://www.cabletron.com/download/download.cgi?lib=ssr");
+		vertProps.put("exploit", "see discussion");
+		vertProps.put("modifiedDate", "Jul 11 2009 12:56AM");
+		vertProps.put("vertexType", "vulnerability");
+		vertProps.put("references", new ArrayList<String>());
+		vertProps.put("source", "bugtraq");
+		vertProps.put("shortDescription", "Cabletron SSR ARP Flood DoS Vulnerability");
+		vertProps.put("description", "The Cabletron SmartSwitch Router 8000 with firmware revision 2.x has been shown to susceptible to a denial of service attack. The SSR can only handle approximately 200 ARP requests per second. If an attacker can get ICMP traffic to the router, they can flood it with ARP requests, effectively shutting the router down for the duration of the attack.");
+		ArrayList<String> l = new ArrayList<String>();
+		l.add("Cabletron SmartSwitch Router 8000 2.0");
+		vertProps.put("Vulnerable", l);
+		vertProps.put("Not_Vulnerable", new ArrayList<String>());
+		vertProps.put("publishedDate", "Nov 24 1999 12:00AM");
+		
+		Map<String, Object> vertMap = new HashMap<String, Object>();
+		vertMap.put("_properties", vertProps);
+		vertMap.put("_type", "vertex");
+		//vertMap.put("_id", null);
+		
+		
+		String bestID = a.findDuplicateVertex(vertMap);
+		//System.out.println("best match was: " + bestID);
+		//TODO verify
 
 		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
+
 
 	/**
 	 * Test AlignVertProps method with different methods
