@@ -126,7 +126,7 @@ extends TestCase
 
 			//find the other node, check its properties.
 			String id2 = c.findVertId("CVE-1999-nnnn");
-			query_ret_map = c.getVertByID(id2);
+			query_ret_map = (Map<String,Object>)c.findVert("CVE-1999-nnnn").get("_properties");
 			assertEquals("test description asdf.", query_ret_map.get("description"));
 			expectedRefs = new String[]{"http://www.google.com"};
 			actualRefs = ((ArrayList<String>)query_ret_map.get("references")).toArray(new String[0]);
