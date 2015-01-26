@@ -267,11 +267,15 @@ public class Align
 
 		double bestScore = 0.0;
 		String bestID = null;
+		Map<String, Object> vertexProps = (Map<String, Object>)(vertex.get("_properties"));
+		String vertexType = (String)(vertexProps.get("vertexType"));
+
+		Map<String, Map<String, Object>> configProperties = getVertexConfig(vertexType);
 
 		for(int i = 0; i < candidateVerts.size(); i++){
 			candidateVertex = candidateVerts.get(i);
 			String id = (String)candidateVertex.get("_id");
-			double score = Compare.compareVertices(vertex, candidateVertex);
+			double score = Compare.compareVertices(vertex, candidateVertex, configProperties);
 			if(score >= threshold){
 				candidateScores.put(id, score);
 				if(score > bestScore){
@@ -288,7 +292,8 @@ public class Align
 	public List<Map<String,Object>> findCandidateMatches(Map<String, Object> vertex) {
 		List<Map<String,Object>> results = new ArrayList<Map<String,Object>>();
 
-		String vertType = (String)vertex.get("vertexType");
+		Map<String, Object> vertexProps = (Map<String, Object>)(vertex.get("_properties"));
+		String vertType = (String)(vertexProps.get("vertexType"));
 		try {
 			results = connection.findAllVertsByType(vertType);
 		} catch (IOException e) {
@@ -298,6 +303,7 @@ public class Align
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		//logger.info("candidate matches are: " + results);
 		return results;
 	}
 
