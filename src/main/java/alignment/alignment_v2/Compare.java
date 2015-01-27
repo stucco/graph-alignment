@@ -62,8 +62,30 @@ public class Compare {
 		//time should be standardized  
 		if (comparisonFunction.equals("compareTimestamps"))	{
 			//TODO: timestamps need to be standardized before this can happen
-			//score = score + compareDate((Integer)property1, (Integer)property2) * comparisonWeight;
-			//	score = score + compareDate(property1, property2) * comparisonWeight;
+			Long timestamp1 = null;
+			Long timestamp2 = null;
+			try{
+				if(property1 instanceof Long)
+					timestamp1 = (Long)property1;
+				if(property2 instanceof Long)
+					timestamp2 = (Long)property2;
+				if(property1 instanceof Integer)
+					timestamp1 = Long.valueOf((Integer)property1);
+				if(property2 instanceof Integer)
+					timestamp2 = Long.valueOf((Integer)property2);
+				if(property1 instanceof String)
+					timestamp1 = Long.valueOf((String)property1);
+				if(property2 instanceof String)
+					timestamp2 = Long.valueOf((String)property2);
+			}catch(ClassCastException e){
+				logger.warn("Could not convert timestamps: bad format?  Timestamps are: " + property1 + " " + property2);
+				logger.warn("exception is: ", e);
+			}catch(NumberFormatException e){
+				logger.warn("Could not convert timestamps: bad format?  Timestamps are: " + property1 + " " + property2);
+				logger.warn("exception is: ", e);
+			}
+			if(timestamp1 != null && timestamp2 != null)
+				score = score + compareDate(timestamp1, timestamp2) * comparisonWeight;
 		}
 		//complaining that it is the array list, but function is working with jsonarray
 		if (comparisonFunction.equals("compareReferences"))	{
