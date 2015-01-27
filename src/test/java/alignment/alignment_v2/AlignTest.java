@@ -74,11 +74,11 @@ extends TestCase
 				"{" +
 				"\"availabilityImpact\": \"PARTIAL\"," +
 				"\"accessVector\": \"NETWORK\"," +
-				"\"cvssDate\": \"2004-01-01T00:00:00.000-05:00\"," +
+				"\"cvssDate\": 1072933200," +
 				"\"integrityImpact\": \"NONE\"," +
 				"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
 				"\"accessComplexity\": \"LOW\"," +
-				"\"modifiedDate\": \"2008-09-05T16:19:47.303-04:00\"," +
+				"\"modifiedDate\": 1220587200," +
 				"\"vertexType\": \"vulnerability\"," +
 				"\"_type\": \"vertex\"," +
 				"\"references\":   [" +
@@ -88,7 +88,7 @@ extends TestCase
 				"\"source\": \"NVD\"," +
 				"\"description\": \"Cabletron SmartSwitch Router (SSR) 8000 firmware 2.x can only handle 200 ARP requests per second allowing a denial of service attack to succeed with a flood of ARP requests exceeding that limit.\"," +
 				"\"cvssScore\": 5," +
-				"\"publishedDate\": \"1999-11-24T00:00:00.000-05:00\"," +
+				"\"publishedDate\": 943419600," +
 				"\"confidentialityImpact\": \"NONE\"," +
 				"\"accessAuthentication\": \"NONE\"" +
 				"}," +	
@@ -119,23 +119,27 @@ extends TestCase
 
 		Map<String, Object> vertProps = new HashMap<String, Object>();
 		
-		vertProps.put("accessVector", "Remote");
+		vertProps.put("accessVector", "NETWORK");
+		//vertProps.put("accessVector", "Remote");
 		vertProps.put("Credit", "Publicized in a Bindview Security Advisory released November 24,1999. Contact is Scott Blake <blake@bos.bindview.com>.");
 		vertProps.put("name", "bugtraq_821");
 		//vertMap.put("_id", "CVE-1999-1548");
 		vertProps.put("solution", "Solution:Firmware revisions 3.x are not vulnerable to this attack. The latest firmware can be obtained at:http://www.cabletron.com/download/download.cgi?lib=ssr");
 		vertProps.put("exploit", "see discussion");
-		vertProps.put("modifiedDate", "Jul 11 2009 12:56AM");
+		vertProps.put("modifiedDate", 1247284800);
+		//vertProps.put("modifiedDate", "asdf");
 		vertProps.put("vertexType", "vulnerability");
-		vertProps.put("references", new ArrayList<String>());
+		ArrayList<String> l = new ArrayList<String>();
+		l.add("http://razor.bindview.com/publish/advisories/adv_Cabletron.html");
+		vertProps.put("references", l);
 		vertProps.put("source", "bugtraq");
 		vertProps.put("shortDescription", "Cabletron SSR ARP Flood DoS Vulnerability");
 		vertProps.put("description", "The Cabletron SmartSwitch Router 8000 with firmware revision 2.x has been shown to susceptible to a denial of service attack. The SSR can only handle approximately 200 ARP requests per second. If an attacker can get ICMP traffic to the router, they can flood it with ARP requests, effectively shutting the router down for the duration of the attack.");
-		ArrayList<String> l = new ArrayList<String>();
+		l = new ArrayList<String>();
 		l.add("Cabletron SmartSwitch Router 8000 2.0");
 		vertProps.put("Vulnerable", l);
 		vertProps.put("Not_Vulnerable", new ArrayList<String>());
-		vertProps.put("publishedDate", "Nov 24 1999 12:00AM");
+		vertProps.put("publishedDate", "943401600");
 		
 		Map<String, Object> vertMap = new HashMap<String, Object>();
 		vertMap.put("_properties", vertProps);
@@ -144,8 +148,10 @@ extends TestCase
 		
 		
 		String bestID = a.findDuplicateVertex(vertMap);
-		//System.out.println("best match was: " + bestID);
-		//TODO verify
+		assertNotNull(bestID);
+		Map<String, Object> foundVert = c.getVertByID(bestID);
+		//Map<String, Object> foundVertProps = (Map<String, Object>)foundVert.get("_properties");
+		assertEquals("CVE-1999-1548", (String)foundVert.get("name"));
 
 		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it

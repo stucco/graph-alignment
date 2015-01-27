@@ -276,6 +276,7 @@ public class Align
 			candidateVertex = candidateVerts.get(i);
 			String id = (String)candidateVertex.get("_id");
 			double score = Compare.compareVertices(vertex, candidateVertex, configProperties);
+			//logger.info("Found score of " + score + "for id " + id);
 			if(score >= threshold){
 				candidateScores.put(id, score);
 				if(score > bestScore){
@@ -284,7 +285,6 @@ public class Align
 				}
 			}
 		}
-
 		return bestID;
 	}
 
