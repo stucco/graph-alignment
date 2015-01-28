@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -20,7 +21,6 @@ import com.tinkerpop.rexster.client.RexsterClient;
 import com.tinkerpop.rexster.client.RexsterClientFactory;
 import com.tinkerpop.rexster.client.RexsterClientTokens;
 import com.tinkerpop.rexster.protocol.serializer.msgpack.MsgPackSerializer;
-
 import com.tinkerpop.blueprints.*;
 
 public class DBConnection {
@@ -33,9 +33,9 @@ public class DBConnection {
 	public static RexsterClient createClient(Configuration configOpts){
 		RexsterClient client = null;
 		Logger logger = LoggerFactory.getLogger(Align.class);
-		
+
 		logger.info("connecting to DB...");
-		
+
 		try {
 			client = RexsterClientFactory.open(configOpts); //this just throws "Exception."  bummer.
 		} catch (Exception e) {
@@ -45,7 +45,7 @@ public class DBConnection {
 
 		return client;
 	}
-	
+
 	public static Configuration getDefaultConfig(){
 		Logger logger = LoggerFactory.getLogger(Align.class);
 		logger.info("Loading default DB Config...");
@@ -92,7 +92,7 @@ public class DBConnection {
 			Thread.currentThread().interrupt();
 		}
 	}
-	
+
 	private String getDBType(){
 		if(this.dbType == null){
 			String type = null;
@@ -112,7 +112,7 @@ public class DBConnection {
 		}
 		return this.dbType;
 	}
-	
+
 
 	public void createIndices(){
 		String graphType = getDBType();
@@ -125,8 +125,8 @@ public class DBConnection {
 			createTitanIndices();
 		}
 	}
-	
-	
+
+
 	private void createTinkerGraphIndices(){
 		List currentRawIndices = null;
 		try {
@@ -146,7 +146,7 @@ public class DBConnection {
 		logger.info( "found vertex indices: " + currentIndices );
 		//TODO: actually create the indices (although for current unit tests, it doesn't matter)
 	}
-	
+
 	private void createTitanIndices(){
 		List currentIndices = null;
 		try {
@@ -223,8 +223,8 @@ public class DBConnection {
 			logger.error("could not configure missing indices!", e);
 		}
 		 */
-		
-		
+
+
 	}
 
 	public void addVertexFromJSON(JSONObject vert){
@@ -441,13 +441,34 @@ public class DBConnection {
 		if(vertexType == null || vertexType == "")
 			return null;
 
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("TYPE", vertexType);
-		Object query_ret = client.execute("g.query().has(\"vertexType\",TYPE).vertices().toList();", param);
-		List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("vertexType", vertexType);
+		List<Map<String,Object>> query_ret_list = findAllVertsWithProps(properties);
 
 		if(query_ret_list.size() == 0){
 			logger.warn("findAllVertsByType found 0 matching verts for type:" + vertexType);
+			return null;
+		}
+		return query_ret_list;
+	}
+
+	public List<Map<String,Object>> findAllVertsWithProps(Map<String, Object> properties) throws IOException, RexProException{
+		if(properties == null || properties.size() == 0)
+			return null;
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		String query = "g.query()";
+		Set<String> propKeys = properties.keySet();
+		for(String key : propKeys){
+			param.put(key.toUpperCase(), properties.get(key));
+			query += ".has(\"" + key + "\","+ key.toUpperCase() +")";
+		}
+		query += ".vertices().toList();";
+		Object query_ret = client.execute(query, param);
+		List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
+
+		if(query_ret_list.size() == 0){
+			logger.warn("findAllVertsWithProps found 0 matching verts for properties:" + properties);
 			return null;
 		}
 		return query_ret_list;
@@ -531,10 +552,10 @@ public class DBConnection {
 	 */
 	public boolean removeCachedVertices(){
 		//NB: this query is slow enough that connection can time out if the DB starts with many vertices.
-		
+
 		if(vertIDCache.isEmpty())
 			return true;
-		
+
 		boolean ret = true;
 		//delete the known nodes first, to help prevent timeouts.
 		Map<String,Object> param;
@@ -560,7 +581,7 @@ public class DBConnection {
 		vertIDCache = new HashMap<String, String>(10000);
 
 		return ret;
-		
+
 	}
 	/*
     public boolean removeAllEdges(RexsterClient client){
