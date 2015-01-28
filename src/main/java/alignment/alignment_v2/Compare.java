@@ -56,7 +56,7 @@ public class Compare {
 
 		//was going to use a switch statement, but switch with strings is not supported by eclipse
 		if (comparisonFunction.equals("exact"))	{
-			if (property1 == property2)	
+			if (property1.equals(property2))
 				score = score + 1 * comparisonWeight;
 		}
 		//time should be standardized  
