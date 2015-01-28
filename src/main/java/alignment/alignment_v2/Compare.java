@@ -41,6 +41,8 @@ public class Compare {
 	}
 
 	public static double compareProperties (String propertyName, Object property1, Object property2, Map<String, Object> configProperties) {
+		if(property1 == null || property2 == null)
+			return 0;
 
 		//Comparison comparison;
 		WHIRL whirl;

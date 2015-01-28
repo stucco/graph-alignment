@@ -87,7 +87,7 @@ public class WHIRL {
 			else 	{
 				count = 1;
 				weightOne = Math.log10(s1WordsCount.get(s) + 1.0) * Math.log10(2/count); 
-				weightTwo = 1.0; 
+				weightTwo = 0.0; 
 			}
 			similarity = similarity + (weightOne * weightTwo); 
 			//System.out.println("similarity = " + similarity);
