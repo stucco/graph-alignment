@@ -42,7 +42,10 @@ extends TestCase
 	}
 
 
-	//refactoring broke this, will re-add soon.
+	/**
+	 * Add a duplicate vertex, from a different source, with similar but non-identical properties.
+	 * See if the Align class can identify that they should be matched.
+	 */
 	public void testLoadDuplicate()
 	{
 		DBConnection c = null;
@@ -159,128 +162,9 @@ extends TestCase
 
 
 	/**
-	 * Test AlignVertProps method with different methods
+	 * Test AlignVertProps method with different merge methods
 	 */
-
 	public void testAlignVertPropsMergeMethods()
-	{
-		DBConnection c = null;
-		Align a = null;
-		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
-			c = new DBConnection( client );
-			a = new Align( c );
-		}catch(Exception e){
-			e.printStackTrace(); //TODO
-		} //the possible NPE below is fine, don't care if test errors.
-
-		c.removeCachedVertices();
-		//c.removeAllEdges();
-
-		String testVertex = "v = g.addVertex();" + 
-				"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
-				"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
-				"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
-				"v.setProperty(\"_type\", \"vertex\");" +
-				"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
-				"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
-				"v.setProperty(\"source\", \"NVD\");" + 
-				"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
-				"v.setProperty(\"vertexType\", \"vulnerability\");" + 
-				"v.setProperty(\"accessComplexity\", \"LOW\");" + 
-				"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
-				"v.setProperty(\"cvssScore\", 10);" +
-				"v.setProperty(\"accessAuthentication\", \"NONE\");" +
-				"v.setProperty(\"modifiedDate\", \"2008-09-09T08:33:31.180-04:00\");" +
-				"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
-				"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
-				"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
-				"v.setProperty(\"accessVector\", \"NETWORK\")";
-
-		c.commit();
-		c.execute(testVertex);
-		c.commit();
-
-		String id = c.findVertId("CVE-1999-0006");
-		Map<String, String> mergeMethods = new HashMap<String,String>();
-		Map<String, Object> newProps = new HashMap<String,Object>();
-
-		String testVal, testProp;
-
-		//add a new prop
-		testVal = "aaaa";
-		newProps.put("testprop", testVal);
-		a.alignVertProps(id, newProps, mergeMethods);	//id, new properties and how to merge 
-
-		testProp = (String)c.getVertByID(id).get("testprop");
-		assertEquals(testVal, testProp);
-
-		mergeMethods.put("testprop", "keepNew");
-		testVal = "bbbb";
-		newProps.put("testprop", testVal);
-
-		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
-		assertEquals(testVal, testProp);
-
-		c.removeCachedVertices();
-		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-	}
-
-	/**
-	 * Testing the keepNew option for AlignVertProps
-	 */
-
-	public void testAlignVertPropsKeepNew()
-	{
-		DBConnection c = null;
-		Align a = null;
-		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
-			c = new DBConnection( client );
-			a = new Align( c );
-		}catch(Exception e){
-			e.printStackTrace(); //TODO
-		} //the possible NPE below is fine, don't care if test errors.
-
-		c.removeCachedVertices();
-		//c.removeAllEdges();
-
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\")");
-		c.commit();
-		String id = c.findVertId("testvert_align_props");
-
-		Map<String, String> mergeMethods = new HashMap<String,String>();
-		Map<String, Object> newProps = new HashMap<String,Object>();
-
-		String testVal, testProp;
-
-		//add a new prop
-		testVal = "aaaa";
-		newProps.put("testprop", testVal);
-		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
-		assertEquals(testVal, testProp);
-
-		//update a prop (keepNew) (always updates)
-		mergeMethods.put("testprop", "keepNew");
-		testVal = "bbbb";
-		newProps.put("testprop", testVal);
-
-		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
-		assertEquals(testVal, testProp);
-
-		c.removeCachedVertices();
-		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-	}
-
-	/**
-	 * Testing the appendList option for AlignVertProps
-	 */
-
-	public void testAlignVertPropsAppendList()
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -374,11 +258,132 @@ extends TestCase
 		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
+	
+
+	/**
+	 * Testing the keepNew option for AlignVertProps
+	 */
+
+	public void testAlignVertPropsKeepNew()
+	{
+		DBConnection c = null;
+		Align a = null;
+		try{
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
+			a = new Align( c );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+
+		c.removeCachedVertices();
+		//c.removeAllEdges();
+
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.commit();
+		String id = c.findVertId("testvert_align_props");
+
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+
+		String testVal, testProp;
+
+		//add a new prop
+		testVal = "aaaa";
+		newProps.put("testprop", testVal);
+		a.alignVertProps(id, newProps, mergeMethods);
+		testProp = (String)c.getVertByID(id).get("testprop");
+		assertEquals(testVal, testProp);
+
+		//update a prop (keepNew) (always updates)
+		mergeMethods.put("testprop", "keepNew");
+		testVal = "bbbb";
+		newProps.put("testprop", testVal);
+
+		a.alignVertProps(id, newProps, mergeMethods);
+		testProp = (String)c.getVertByID(id).get("testprop");
+		assertEquals(testVal, testProp);
+
+		c.removeCachedVertices();
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
+	}
+
+	/**
+	 * Testing the appendList option for AlignVertProps
+	 */
+
+	public void testAlignVertPropsAppendList()
+	{
+		DBConnection c = null;
+		Align a = null;
+		try{
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			c = new DBConnection( client );
+			a = new Align( c );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+
+		c.removeCachedVertices();
+		//c.removeAllEdges();
+
+		String testVertex = "v = g.addVertex();" + 
+				"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
+				"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
+				"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
+				"v.setProperty(\"_type\", \"vertex\");" +
+				"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
+				"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
+				"v.setProperty(\"source\", \"NVD\");" + 
+				"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
+				"v.setProperty(\"vertexType\", \"vulnerability\");" + 
+				"v.setProperty(\"accessComplexity\", \"LOW\");" + 
+				"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
+				"v.setProperty(\"cvssScore\", 10);" +
+				"v.setProperty(\"accessAuthentication\", \"NONE\");" +
+				"v.setProperty(\"modifiedDate\", \"2008-09-09T08:33:31.180-04:00\");" +
+				"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
+				"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
+				"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
+				"v.setProperty(\"accessVector\", \"NETWORK\")";
+
+		c.commit();
+		c.execute(testVertex);
+		c.commit();
+
+		String id = c.findVertId("CVE-1999-0006");
+		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+
+		String testVal, testProp;
+
+		//add a new prop
+		testVal = "aaaa";
+		newProps.put("testprop", testVal);
+		a.alignVertProps(id, newProps, mergeMethods);	//id, new properties and how to merge 
+
+		testProp = (String)c.getVertByID(id).get("testprop");
+		assertEquals(testVal, testProp);
+
+		mergeMethods.put("testprop", "appendList");
+		testVal = "bbbb";
+		newProps.put("testprop", testVal);
+
+		a.alignVertProps(id, newProps, mergeMethods);
+		ArrayList<String> testList = (ArrayList<String>)c.getVertByID(id).get("testprop");
+		ArrayList<String> expectedList = new ArrayList<String>();
+		expectedList.add("aaaa");
+		expectedList.add("bbbb");
+		assertEquals(expectedList, testList);
+
+		c.removeCachedVertices();
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
+	}
 
 	/**
 	 * Testing the keepUpdates option for AlignVertProps
 	 */
-
 	public void testAlignVertPropsKeepUpdates()
 	{
 		DBConnection c = null;
@@ -437,7 +442,6 @@ extends TestCase
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
 	 */
-
 	public void testAlignVertPropsKeepConfidence()
 	{
 		DBConnection c = null;
@@ -483,7 +487,7 @@ extends TestCase
 	}
 
 	/**
-	 * Testing the keepConfidence option for AlignVertProps
+	 * Testing merging of various properties from schema/config
 	 */
 	/*
 	//old method, now uses a config file.  may revisit.
