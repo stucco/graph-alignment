@@ -125,7 +125,10 @@ public class Compare {
 				}
 			}
 		}
-		return (double)(match)/(double)total;
+		if(match == 0 ) 
+			return 0;
+		else
+			return (double)(match)/(double)total;
 	}
 
 	public static double compareDate (long timeOne, long timeTwo)	{
