@@ -65,6 +65,7 @@ extends TestCase
 				"\"_id\":\"CVE-1999-0002\"," +
 				"\"_type\":\"vertex\","+
 				"\"source\":\"CVE\","+
+				"\"vertexType\": \"vulnerability\"," +
 				"\"description\":\"Buffer overflow in NFS mountd gives root access to remote attackers, mostly in Linux systems.\","+
 				"\"references\":["+
 				"\"CERT:CA-98.12.mountd\","+
@@ -98,6 +99,7 @@ extends TestCase
 				"{\"_id\":\"CVE-1999-nnnn\"," +
 				"\"_type\":\"vertex\","+
 				"\"source\":\"CVE\","+
+				"\"vertexType\": \"vulnerability\"," +
 				"\"description\":\"test description asdf.\","+
 				"\"references\":[\"http://www.google.com\"],"+
 				"\"status\":\"Entry\","+
