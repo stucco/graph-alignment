@@ -31,6 +31,13 @@ public class DBConnection {
 	private String dbType = null;
 
 	public static RexsterClient createClient(Configuration configOpts){
+		return createClient(configOpts, 0);
+	}
+	
+	/*
+	 * Note that connectionWaitTime is in seconds
+	 */
+	public static RexsterClient createClient(Configuration configOpts, int connectionWaitTime){
 		RexsterClient client = null;
 		Logger logger = LoggerFactory.getLogger(Align.class);
 
@@ -41,6 +48,18 @@ public class DBConnection {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+		//if wait time given, then wait that long, so the connection can set up.  (Mostly needed for travis-ci tests)
+		if(connectionWaitTime > 0){
+			try {
+				logger.info( "waiting for " + connectionWaitTime + " seconds for connection to establish..." );
+				Thread.sleep(connectionWaitTime*1000); //in ms.
+			}
+			catch (InterruptedException ie) { 
+				// Restore the interrupted status
+				Thread.currentThread().interrupt();
+			}
 		}
 
 		return client;
@@ -81,16 +100,6 @@ public class DBConnection {
 		logger = LoggerFactory.getLogger(Align.class);
 		vertIDCache = new HashMap<String, String>(10000);
 		client = c;
-		//wait a few seconds, for the connection to set up.  (Mostly needed for travis-ci tests)
-		try {
-			int connectionWaitTime = 30;
-			logger.info( "waiting for " + connectionWaitTime + " seconds for connection to establish..." );
-			Thread.sleep(connectionWaitTime*1000); //in ms.
-		}
-		catch (InterruptedException ie) { 
-			// Restore the interrupted status
-			Thread.currentThread().interrupt();
-		}
 	}
 
 	private String getDBType(){

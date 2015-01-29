@@ -24,6 +24,8 @@ import junit.framework.TestSuite;
 public class DBConnectionTest 
 extends TestCase
 {
+	private static final int WAIT_TIME = 30;
+	
 	/**
 	 * Create the test case
 	 *
@@ -46,7 +48,7 @@ extends TestCase
 	            System.out.println(" Global setUp started");
 	            DBConnection c = null;
 	    		try{
-	    			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+	    			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 	    			c = new DBConnection( client );
 	    			c.createIndices();
 	    		}catch(Exception e){
@@ -70,7 +72,7 @@ extends TestCase
 		DBConnection c = null;
 		try{
 			Configuration config = DBConnection.getTestConfig();
-			RexsterClient client = DBConnection.createClient(config);
+			RexsterClient client = DBConnection.createClient(config, WAIT_TIME);
 			c = new DBConnection( client );
 			c.createIndices();
 		}catch(Exception e){
@@ -161,7 +163,7 @@ extends TestCase
 	{
 		DBConnection c = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			c.createIndices();
 		}catch(Exception e){

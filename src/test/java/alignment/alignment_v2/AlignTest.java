@@ -23,6 +23,8 @@ import junit.framework.TestSuite;
 public class AlignTest 
 extends TestCase
 {
+	private static final int WAIT_TIME = 30;
+	
 	/**
 	 * Create the test case
 	 *
@@ -51,7 +53,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -171,7 +173,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -271,7 +273,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -320,7 +322,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -391,7 +393,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -449,7 +451,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -498,7 +500,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -612,7 +614,7 @@ extends TestCase
 		DBConnection c = null;
 		Align a = null;
 		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig());
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
