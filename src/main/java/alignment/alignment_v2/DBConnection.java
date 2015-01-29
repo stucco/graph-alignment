@@ -442,7 +442,10 @@ public class DBConnection {
 			return null;
 
 		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("vertexType", vertexType);
+		List<String> l = new ArrayList<String>();
+		l.add("T.eq");
+		l.add(vertexType);
+		properties.put("vertexType", l);
 		List<Map<String,Object>> query_ret_list = findAllVertsWithProps(properties);
 
 		if(query_ret_list.size() == 0){
@@ -452,18 +455,41 @@ public class DBConnection {
 		return query_ret_list;
 	}
 
+	/*
+	 * values in the properties map can be any gremlin-friendly type, or a List of [op, value].
+	 * The op given can be any of these supported comparison operations:
+	 * T.gt - greater than
+	 * T.gte - greater than or equal to
+	 * T.eq - equal to
+	 * T.neq - not equal to
+	 * T.lte - less than or equal to
+	 * T.lt - less than
+	 * T.in - contained in a list
+	 * T.notin - not contained in a list
+	 */
 	public List<Map<String,Object>> findAllVertsWithProps(Map<String, Object> properties) throws IOException, RexProException{
 		if(properties == null || properties.size() == 0)
 			return null;
 
 		Map<String, Object> param = new HashMap<String, Object>();
-		String query = "g.query()";
+		//String query = "g.query()";
+		String query = "g.V";
 		Set<String> propKeys = properties.keySet();
 		for(String key : propKeys){
-			param.put(key.toUpperCase(), properties.get(key));
-			query += ".has(\"" + key + "\","+ key.toUpperCase() +")";
+			Object prop = properties.get(key);
+			if(prop instanceof List){
+				List p = (List)prop;
+				if(p.size() != 2) logger.warn("property " + prop + "has more elements than expected!");
+				String op = (String)p.get(0); //TODO check op
+				param.put(key.toUpperCase(), p.get(1));
+				query += ".has(\"" + key + "\"," + op + "," + key.toUpperCase() + ")";
+			}else{
+				param.put(key.toUpperCase(), prop);
+				query += ".has(\"" + key + "\"," + key.toUpperCase() + ")";
+			}
 		}
-		query += ".vertices().toList();";
+		//query += ".vertices().toList();";
+		query += ";";
 		Object query_ret = client.execute(query, param);
 		List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
 
