@@ -35,7 +35,7 @@ public class DBConnection {
 	public static RexsterClient createClient(Configuration configOpts){
 		return createClient(configOpts, 0);
 	}
-	
+
 	/*
 	 * Note that connectionWaitTime is in seconds
 	 */
@@ -51,7 +51,7 @@ public class DBConnection {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		//if wait time given, then wait that long, so the connection can set up.  (Mostly needed for travis-ci tests)
 		if(connectionWaitTime > 0){
 			try {
@@ -500,14 +500,9 @@ public class DBConnection {
 		}
 		//query += ".vertices().toList();";
 		query += ";";
-		System.out.println("query: " + query + " params: " + param);
 		Object query_ret = client.execute(query, param);
 		List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
 
-		if(query_ret_list.size() == 0){
-			logger.warn("findAllVertsWithProps found 0 matching verts with constraints:" + constraints);
-			return null;
-		}
 		return query_ret_list;
 	}
 
