@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import alignment.alignment_v2.Constraint.Condition;
+
 import com.thinkaurelius.titan.core.TitanGraph;
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
@@ -469,11 +471,10 @@ public class DBConnection {
 			return null;
 
 		Map<String, Object> properties = new HashMap<String, Object>();
-		List<String> l = new ArrayList<String>();
-		l.add("T.eq");
-		l.add(vertexType);
-		properties.put("vertexType", l);
-		List<Map<String,Object>> query_ret_list = findAllVertsWithProps(properties);
+		List<Constraint> l = new ArrayList<Constraint>();
+		Constraint c = new Constraint("vertexType", Condition.eq, vertexType);
+		l.add(c);
+		List<Map<String,Object>> query_ret_list = findAllVertsWithProps(l);
 
 		if(query_ret_list.size() == 0){
 			logger.warn("findAllVertsByType found 0 matching verts for type:" + vertexType);
@@ -482,46 +483,29 @@ public class DBConnection {
 		return query_ret_list;
 	}
 
-	/*
-	 * values in the properties map can be any gremlin-friendly type, or a List of [op, value].
-	 * The op given can be any of these supported comparison operations:
-	 * T.gt - greater than
-	 * T.gte - greater than or equal to
-	 * T.eq - equal to
-	 * T.neq - not equal to
-	 * T.lte - less than or equal to
-	 * T.lt - less than
-	 * T.in - contained in a list
-	 * T.notin - not contained in a list
-	 */
-	public List<Map<String,Object>> findAllVertsWithProps(Map<String, Object> properties) throws IOException, RexProException{
-		if(properties == null || properties.size() == 0)
+
+	public List<Map<String,Object>> findAllVertsWithProps(List<Constraint> constraints) throws IOException, RexProException{
+		if(constraints == null || constraints.size() == 0)
 			return null;
 
 		Map<String, Object> param = new HashMap<String, Object>();
 		//String query = "g.query()";
 		String query = "g.V";
-		Set<String> propKeys = properties.keySet();
-		for(String key : propKeys){
-			Object prop = properties.get(key);
-			if(prop instanceof List){
-				List p = (List)prop;
-				if(p.size() != 2) logger.warn("property " + prop + "has more elements than expected!");
-				String op = (String)p.get(0); //TODO check op
-				param.put(key.toUpperCase(), p.get(1));
-				query += ".has(\"" + key + "\"," + op + "," + key.toUpperCase() + ")";
-			}else{
-				param.put(key.toUpperCase(), prop);
-				query += ".has(\"" + key + "\"," + key.toUpperCase() + ")";
-			}
+		for(int i=0; i<constraints.size(); i++){
+			Constraint c = constraints.get(i);
+			String cond = c.condString(c.cond);
+			String key = c.prop.toUpperCase()+i;
+			param.put(key, c.val);
+			query += ".has(\"" + c.prop + "\"," + cond + "," + key + ")";
 		}
 		//query += ".vertices().toList();";
 		query += ";";
+		System.out.println("query: " + query + " params: " + param);
 		Object query_ret = client.execute(query, param);
 		List<Map<String,Object>> query_ret_list = (List<Map<String,Object>>)query_ret;
 
 		if(query_ret_list.size() == 0){
-			logger.warn("findAllVertsWithProps found 0 matching verts for properties:" + properties);
+			logger.warn("findAllVertsWithProps found 0 matching verts with constraints:" + constraints);
 			return null;
 		}
 		return query_ret_list;
