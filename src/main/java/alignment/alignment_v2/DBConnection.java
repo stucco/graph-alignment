@@ -214,13 +214,13 @@ public class DBConnection {
 					logger.info("'vertexType' variable and index not found, creating var and index...");
 					client.execute("mgmt = g.getManagementSystem();"
 							+ "vertexType = mgmt.makePropertyKey(\"vertexType\").dataType(String.class).make();"
-							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
+							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).buildCompositeIndex();"
 							+ "mgmt.commit();g;");
 				}else{
 					logger.info("'vertexType' was found, but not indexed.  creating index...");
 					client.execute("mgmt = g.getManagementSystem();"
 							+ "vertexType = mgmt.getPropertyKey(\"vertexType\");"
-							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).unique().buildCompositeIndex();"
+							+ "mgmt.buildIndex(\"byVertexType\",Vertex.class).addKey(vertexType).buildCompositeIndex();"
 							+ "mgmt.commit();g;");
 				}
 			}
