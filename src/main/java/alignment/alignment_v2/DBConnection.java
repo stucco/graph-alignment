@@ -537,32 +537,28 @@ public class DBConnection {
 			return false;
 
 		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("ID_IN", Integer.parseInt(inv_id));
 		param.put("ID_OUT", Integer.parseInt(outv_id));
 		param.put("LABEL", label);
 		Object query_ret;
 		try {
-			query_ret = client.execute("g.v(ID_OUT).outE(LABEL).inV().filter{it.id == ID_IN}.id;", param);
+			query_ret = client.execute("g.v(ID_OUT).outE(LABEL).inV();", param);
 		} catch (RexProException e) {
-			logger.error("findEdge RexProException for args:" + outv_id + ", " + label + ", " + inv_id);
+			logger.error("edgeExists RexProException for args:" + outv_id + ", " + label + ", " + inv_id);
 			e.printStackTrace();
 			return false;
 		} catch (IOException e) {
-			logger.error("findEdge IOException for args:" + outv_id + ", " + label + ", " + inv_id);
+			logger.error("edgeExists IOException for args:" + outv_id + ", " + label + ", " + inv_id);
 			e.printStackTrace();
 			return false;
 		}
-		List query_ret_list = (List)query_ret;
+		List<Map<String, Object>> query_ret_list = (List<Map<String, Object>>)query_ret;
 		//logger.info("query returned: " + query_ret_list);
-		if(query_ret_list.size() == 0){
-			//logger.info("findEdge found 0 matching edges for name:" + name); //this is too noisy, the invoking function can complain if it wants to...
-			return false;
-		}else if(query_ret_list.size() > 1){
-			logger.warn("findEdge found more than 1 matching edges for args:" + outv_id + ", " + label + ", " + inv_id);
-			return true;
-		}else{
-			return true;
+		for(Map<String, Object> item : query_ret_list){
+			if(Integer.parseInt(inv_id) == Integer.parseInt((String)item.get("_id")))
+				return true;
 		}
+		//logger.info("matching edge not found");
+		return false;
 	}
 
 	public void updateVert(String id, Map<String, Object> props){
