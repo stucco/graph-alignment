@@ -164,7 +164,116 @@ extends TestCase
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
+	public void testIPRangeHandling()
+	{
+		DBConnection c = null;
+		Align a = null;
+		try{
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			c = new DBConnection( client );
+			a = new Align( c );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
 
+		c.removeCachedVertices();
+
+		String test_graphson_verts = "{\"vertices\":[" +
+				"{\"_id\":\"69.42.215.170\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"IP\"," +
+				"\"ipInt\":1160435626" +
+				"}," +
+				"{\"_id\":\"9.42.215.170\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"IP\"," +
+				"\"ipInt\":153802666" +
+				"}," +
+				"{\"_id\":\"169.42.215.170\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"IP\"," +
+				"\"ipInt\":2838157226" +
+				"}," +
+				"]}";
+
+		a.load(test_graphson_verts);
+		
+		test_graphson_verts = "{\"vertices\":[" +
+				"{\"_id\":\"69.42.192.0_through_69.43.159.255\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"addressRange\"," +
+				"\"startIP\":\"69.42.192.0\"," +
+				"\"endIP\":\"69.43.159.255\"," +
+				"\"startIPInt\":1160429568," +
+				"\"endIPInt\":1160486911" +
+				"}," + 
+				"]}";
+		
+		a.load(test_graphson_verts);
+
+		String outv_id = c.findVertId("69.42.215.170");
+		String inv_id = c.findVertId("69.42.192.0_through_69.43.159.255");
+		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		outv_id = c.findVertId("9.42.215.170");
+		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		outv_id = c.findVertId("169.42.215.170");
+		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		test_graphson_verts = "{\"vertices\":[" +
+				"{\"_id\":\"169.42.192.0_through_169.43.159.255\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"addressRange\"," +
+				"\"startIP\":\"169.42.192.0\"," +
+				"\"endIP\":\"169.43.159.255\"," +
+				"\"startIPInt\":2838151168," +
+				"\"endIPInt\":2838208511" +
+				"}," +
+				"]}";
+		
+		a.load(test_graphson_verts);
+
+		outv_id = c.findVertId("169.42.215.170");
+		inv_id = c.findVertId("169.42.192.0_through_169.43.159.255");
+		//System.out.println("in: " + inv_id + " out: " + outv_id);
+		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		outv_id = c.findVertId("69.42.215.170");
+		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		outv_id = c.findVertId("9.42.215.170");
+		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		
+		test_graphson_verts = "{\"vertices\":[" +
+				"{\"_id\":\"69.42.215.171\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"IP\"," +
+				"\"ipInt\":1160435627" +
+				"}" + 
+				"]}";
+
+		a.load(test_graphson_verts);
+		
+		outv_id = c.findVertId("69.42.215.171");
+		inv_id = c.findVertId("69.42.192.0_through_69.43.159.255");
+		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		inv_id = c.findVertId("169.42.192.0_through_169.43.159.255");
+		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
+		
+		c.removeCachedVertices();
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
+	}
+	
+	
 	/**
 	 * Test AlignVertProps method with different merge methods
 	 */

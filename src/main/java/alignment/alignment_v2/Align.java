@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.*;
 
+import alignment.alignment_v2.Constraint.Condition;
+
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
 
@@ -62,30 +64,29 @@ public class Align
 	public boolean load(String newGraphSection){
 
 		//do all the json obj parsing up front, in case you need to panic & leave early.
-		int vertCount = 0;
-		JSONObject[] verts = new JSONObject[0];
-		int edgeCount = 0;
-		JSONObject[] edges = new JSONObject[0];
+		List<JSONObject> verts = new ArrayList<JSONObject>();
+		List<JSONObject> edges = new ArrayList<JSONObject>();
 		try{
 			JSONObject graphson = new JSONObject(newGraphSection);
 			JSONArray json_verts = graphson.optJSONArray("vertices");
 
-			if(json_verts != null){			//if there are vertices
-				vertCount = json_verts.length(); //count how many of them
-				verts = new JSONObject[vertCount];	//create an array of JSONObjects[how many vertexes]
-				for(int i=0; i<vertCount; i++){		//in every vertex 
-					verts[i] = (JSONObject)json_verts.get(i);	//place vertex json object
-					//		System.out.println("vertex id = " + verts[i].get("_id"));
-					verts[i].put("name", verts[i].get("_id"));	//add "name" field equals its ID
+			if(json_verts != null){			//if there are vertices...
+				int vertCount = json_verts.length(); 
+				for(int i=0; i<vertCount; i++){		//add each one to verts list
+					JSONObject vert = (JSONObject)json_verts.get(i);
+					if(!vert.has("name"))
+						vert.put("name", vert.get("_id"));	//add "name" field equals its ID if needed
+					verts.add(vert);	//place vertex json object
 				}
 			}
 			//...and likewise for edges
 			JSONArray json_edges = graphson.optJSONArray("edges");
 			if(json_edges != null){
-				edgeCount = json_edges.length();
-				edges = new JSONObject[edgeCount];
-				for(int i=0; i<edgeCount; i++) 
-					edges[i] = (JSONObject)json_edges.get(i);
+				int edgeCount = json_edges.length();
+				for(int i=0; i<edgeCount; i++){
+					JSONObject edge = (JSONObject)json_edges.get(i); 
+					edges.add(edge);
+				}
 			}
 		}catch(Exception e){ 
 			//we want *any* graphson problems to end up here
@@ -96,20 +97,24 @@ public class Align
 			return false;
 		}
 
-
 		//for *vertices*, you have a json object that you can load.
-		for(int i=0; i<verts.length; i++){
-			//System.out.println(verts[i]);
-			String vert_name = verts[i].getString("name");
+		int i=0;
+		for(JSONObject vert : verts){
+			String vert_name = vert.getString("name");
 			boolean new_vert = false;
 			new_vert = (connection.findVertId(vert_name) == null);
 			if(new_vert){ //only add new...
-				connection.addVertexFromJSON(verts[i]);
+				connection.addVertexFromJSON(vert);
+				List<JSONObject> newEdges = findNewEdges(vert);
+				for(JSONObject edge: newEdges){
+					edges.add(edge);
+				}
 			}else{
 				//TODO need to call alignVertProps() for this case, which means we need to make a mergeMethods obj
 				logger.debug("Attempted to add vertex with duplicate name.  ignoring ...");
 			}
-			if(i%150 == 0){
+			i++;
+			if(i%150 == 0){ //TODO revisit this 
 				connection.commit();//only commit periodically, so that operations can be combined by Titan.
 			}
 		}
@@ -117,40 +122,115 @@ public class Align
 
 		Map<String, Object> param = new HashMap<String, Object>();
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
-		for(int i=0; i<edges.length; i++){
-			String outv_id = connection.findVertId(edges[i].getString("_outV"));
-			String inv_id = connection.findVertId(edges[i].getString("_inV"));
-			String edgeName = edges[i].getString("_id");
-			//System.out.println("ID = " + edgeName);
+		i=0;
+		for(JSONObject edge : edges){
+			String outv_id = connection.findVertId(edge.getString("_outV"));
+			String inv_id = connection.findVertId(edge.getString("_inV"));
+			String edgeName = edge.getString("_id");
 			//String edgeID = findEdgeId(edgeName);
 			if(outv_id == null){
-				logger.error("Could not find out_v for edge: " + edges[i]);
+				logger.error("Could not find out_v for edge: " + edge);
 				continue;
 			}
 			if(inv_id == null){
-				logger.error("Could not find in_v for edge: " + edges[i]);
+				logger.error("Could not find in_v for edge: " + edge);
 				continue;
 			}
-			String label = edges[i].optString("_label");
+			String label = edge.optString("_label");
 			if(connection.edgeExists(inv_id, outv_id, label)){
 				//TODO need to merge edge props for this case, like verts above...
 				logger.debug("Attempted to add edge with duplicate name.  ignoring ...");
 				continue;
 			}
-			connection.addEdgeFromJSON(edges[i]);
-			if(i%150 == 0){
+			connection.addEdgeFromJSON(edge);
+			i++;
+			if(i%150 == 0){ //TODO revisit this
 				connection.commit();//only commit periodically, so that operations can be combined by Titan.
 			}
 		}
 		connection.commit(); //make sure all edges are committed also.
 
-		//System.out.println("size of cacheIDCache = " + vertIDCache.size());
-
 		return true;//TODO what if some execute()s pass and some fail?
 	}
 
 
-
+	private List<JSONObject> findNewEdges(JSONObject vert) {
+		List<JSONObject> edges = new ArrayList<JSONObject>();
+		
+		String vert_name = vert.getString("name");
+		String type = null;
+		type = (String)vert.opt("vertexType");
+		if(type == null){
+			logger.warn("no vertex type specified for vertex:" + vert.toString());
+		}else{
+			if(type.equals("addressRange")){
+				List<Constraint> constraints = new ArrayList<Constraint>();
+				Constraint c = new Constraint("vertexType", Condition.eq, "IP");
+				constraints.add(c);
+				c = new Constraint("ipInt", Condition.lte, vert.getLong("endIPInt"));
+				constraints.add(c);
+				c = new Constraint("ipInt", Condition.gte, vert.getLong("startIPInt"));
+				constraints.add(c);
+				List<Map<String,Object>> matches = null;
+				try {
+					matches = connection.findAllVertsWithProps(constraints);
+				} catch (IOException e) {
+					logger.error("Exception!",e);
+				} catch (RexProException e) {
+					logger.error("Exception!",e);
+				}
+				if(matches != null){
+					for(Map<String,Object> match : matches){
+						Map<String,Object> currMatchProps = (Map<String,Object>)match.get("_properties");
+						String inv = vert_name;
+						String outv = (String)currMatchProps.get("name");
+						JSONObject edge = new JSONObject();
+						edge.put("_type", "edge");
+						edge.put("_id", outv + "_inAddressRange_" + inv);
+						edge.put("_label", "inAddressRange");
+						edge.put("_inV", inv);
+						edge.put("_outV", outv);
+						edge.put("inVType", "addressRange");
+						edge.put("outVType", "IP");
+						edges.add(edge);
+					}
+				}
+			}else if(type.equals("IP")){
+				List<Constraint> constraints = new ArrayList<Constraint>();
+				Constraint c = new Constraint("vertexType", Condition.eq, "addressRange");
+				constraints.add(c);
+				c = new Constraint("endIPInt", Condition.gte, vert.getLong("ipInt"));
+				constraints.add(c);
+				c = new Constraint("startIPInt", Condition.lte, vert.getLong("ipInt"));
+				constraints.add(c);
+				List<Map<String,Object>> matches = null;
+				try {
+					matches = connection.findAllVertsWithProps(constraints);
+				} catch (IOException e) {
+					logger.error("Exception!",e);
+				} catch (RexProException e) {
+					logger.error("Exception!",e);
+				}
+				if(matches != null){
+					for(Map<String,Object> match : matches){
+						Map<String,Object> currMatchProps = (Map<String,Object>)match.get("_properties");
+						String inv = (String)currMatchProps.get("name");
+						String outv = vert_name;
+						JSONObject edge = new JSONObject();
+						edge.put("_type", "edge");
+						edge.put("_id", outv + "_inAddressRange_" + inv);
+						edge.put("_label", "inAddressRange");
+						edge.put("_inV", inv);
+						edge.put("_outV", outv);
+						edge.put("inVType", "addressRange");
+						edge.put("outVType", "IP");
+						edges.add(edge);
+					}
+				}
+			}
+		}
+		return edges;
+	}
 
 	//mergeMethods are derived from ontology definition
 	public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, String> mergeMethods){
@@ -276,7 +356,7 @@ public class Align
 			candidateVertex = candidateVerts.get(i);
 			String id = (String)candidateVertex.get("_id");
 			double score = Compare.compareVertices(vertex, candidateVertex, configProperties);
-			//logger.info("Found score of " + score + "for id " + id);
+			logger.info("Found score of " + score + " for id " + id);
 			if(score >= threshold){
 				candidateScores.put(id, score);
 				if(score > bestScore){
