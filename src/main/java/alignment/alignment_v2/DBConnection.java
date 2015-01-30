@@ -137,23 +137,41 @@ public class DBConnection {
 
 
 	private void createTinkerGraphIndices(){
-		List currentRawIndices = null;
+		List<String> currentIndices = new ArrayList<String>();
 		try {
-			//configure vert indices needed
-			//List currentIndices = client.execute("g.getManagementSystem().getGraphIndexes(Vertex.class)");
-			currentRawIndices = client.execute("g.getIndices()");
+			currentIndices = client.execute("g.getIndexedKeys(Vertex.class)");
 		} catch (Exception e) { 
 			//this.client = null;
 			logger.error("problem getting indexed keys, assuming there were none...");
 			logger.error("Exception was: ",e);
 		}
-		List<String> currentIndices = new ArrayList<String>();
-		for(int i=0; i<currentRawIndices.size(); i++){
-			String current = ((Index) currentRawIndices.get(i)).getIndexName();
-			currentIndices.add( current );
-		}
 		logger.info( "found vertex indices: " + currentIndices );
-		//TODO: actually create the indices (although for current unit tests, it doesn't matter)
+		try {
+			if(!currentIndices.contains("name")){
+				logger.info("'name' key index not found, creating ...");
+				client.execute("g.createKeyIndex('name', Vertex.class);g");
+			}
+			if(!currentIndices.contains("vertexType")){
+				logger.info("'vertexType' key index not found, creating ...");
+				client.execute("g.createKeyIndex('vertexType', Vertex.class);g");
+			}
+			if(!currentIndices.contains("ipInt")){
+				logger.info("'ipInt' key index not found, creating ...");
+				client.execute("g.createKeyIndex('ipInt', Vertex.class);g");
+			}
+			if(!currentIndices.contains("startIPInt")){
+				logger.info("'startIPInt' key index not found, creating ...");
+				client.execute("g.createKeyIndex('startIPInt', Vertex.class);g");
+			}
+			if(!currentIndices.contains("endIPInt")){
+				logger.info("'endIPInt' key index not found, creating ...");
+				client.execute("g.createKeyIndex('endIPInt', Vertex.class);g");
+			}
+		} catch (RexProException e) {
+			logger.error("Exception was: ",e);
+		} catch (IOException e) {
+			logger.error("Exception was: ",e);
+		}
 	}
 
 	private void createTitanIndices(){
