@@ -21,8 +21,10 @@ import com.tinkerpop.rexster.client.RexsterClient;
  *
  */
 public class Align 
-{										
+{
 
+	private static final boolean SEARCH_FOR_DUPLICATES = false;
+	private static final boolean ALIGN_VERT_PROPS = false;
 	private RexsterClient client = null;
 	private Logger logger = null;
 	private ConfigFileLoader config = null;
@@ -102,7 +104,14 @@ public class Align
 		for(JSONObject vert : verts){
 			String vert_name = vert.getString("name");
 			boolean new_vert = false;
-			new_vert = (connection.findVertId(vert_name) == null);
+			String otherVertID = connection.findVertId(vert_name);
+			new_vert = (otherVertID == null);
+			Map<String, Object> vertMap = null;
+			if(!new_vert && SEARCH_FOR_DUPLICATES){
+				vertMap = jsonVertToMap(vert);
+				otherVertID = findDuplicateVertex(vertMap);
+				new_vert = (otherVertID == null);
+			}
 			if(new_vert){ //only add new...
 				connection.addVertexFromJSON(vert);
 				List<JSONObject> newEdges = findNewEdges(vert);
@@ -110,8 +119,13 @@ public class Align
 					edges.add(edge);
 				}
 			}else{
-				//TODO need to call alignVertProps() for this case, which means we need to make a mergeMethods obj
-				logger.debug("Attempted to add vertex with duplicate name.  ignoring ...");
+				if(ALIGN_VERT_PROPS){
+					if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
+					alignVertProps(otherVertID, vertMap);
+				}
+				else{
+					logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert...");
+				}
 			}
 			i++;
 			if(i%150 == 0){ //TODO revisit this 
