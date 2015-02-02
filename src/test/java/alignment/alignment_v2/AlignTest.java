@@ -369,20 +369,24 @@ extends TestCase
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
-		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 
 		String testVal, testProp;
 
 		//update a prop (appendList) (always updates) (list/list case)
-		mergeMethods.put("testproparray", "keepNew");
+		Map<String, Object> propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepNew");
+		mergeMethods.put("testproparray", propEntry);
 		String[] testArrayVal = {"aaa", "bbb"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
 		String[] testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
-		mergeMethods.put("testproparray", "appendList");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("testproparray", propEntry);
 		testArrayVal = new String[]{"ccc"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
@@ -391,14 +395,18 @@ extends TestCase
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		//update a prop (appendList) (always updates) (list/val case)
-		mergeMethods.put("testproparray", "keepNew");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepNew");
+		mergeMethods.put("testproparray", propEntry);
 		testArrayVal = new String[]{"aaa", "bbb"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
 		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
-		mergeMethods.put("testproparray", "appendList");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("testproparray", propEntry);
 		testVal = "ccc";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
@@ -407,14 +415,18 @@ extends TestCase
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		//update a prop (appendList) (always updates) (val/list case)
-		mergeMethods.put("testproparray", "keepNew");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepNew");
+		mergeMethods.put("testproparray", propEntry);
 		testVal = "aaa";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)c.getVertByID(id).get("testproparray");
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
-		mergeMethods.put("testproparray", "appendList");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("testproparray", propEntry);
 		testArrayVal = new String[]{"bbb", "ccc"};
 		newProps.put("testproparray", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
@@ -423,14 +435,18 @@ extends TestCase
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		//update a prop (appendList) (always updates) (val/val case)
-		mergeMethods.put("testproparray", "keepNew");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepNew");
+		mergeMethods.put("testproparray", propEntry);
 		testVal = "aaa";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)c.getVertByID(id).get("testproparray");
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
-		mergeMethods.put("testproparray", "appendList");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("testproparray", propEntry);
 		testVal = "bbb";
 		newProps.put("testproparray", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
@@ -467,7 +483,7 @@ extends TestCase
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
-		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 
 		String testVal, testProp;
@@ -480,7 +496,9 @@ extends TestCase
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepNew) (always updates)
-		mergeMethods.put("testprop", "keepNew");
+		Map<String, Object> propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepNew");
+		mergeMethods.put("testprop", propEntry);
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
 
@@ -536,7 +554,7 @@ extends TestCase
 		c.commit();
 
 		String id = c.findVertId("CVE-1999-0006");
-		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 
 		String testVal, testProp;
@@ -549,7 +567,9 @@ extends TestCase
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
-		mergeMethods.put("testprop", "appendList");
+		Map<String, Object> propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("testprop", propEntry);
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
 
@@ -587,7 +607,7 @@ extends TestCase
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
-		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 
 		String testVal, testProp;
@@ -600,7 +620,9 @@ extends TestCase
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepUpdates) (update case)
-		mergeMethods.put("testprop", "keepUpdates");
+		Map<String, Object> propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepUpdates");
+		mergeMethods.put("testprop", propEntry);
 		testVal = "bbbb";
 		newProps.put("testprop", testVal);
 		newProps.put("timestamp", 1001L);
@@ -609,7 +631,9 @@ extends TestCase
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepUpdates) (no update case)
-		mergeMethods.put("testprop", "keepUpdates");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepUpdates");
+		mergeMethods.put("testprop", propEntry);
 		testVal = "cccc";
 		newProps.put("testprop", testVal);
 		newProps.put("timestamp", 999L);
@@ -645,7 +669,7 @@ extends TestCase
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
-		Map<String, String> mergeMethods = new HashMap<String,String>();
+		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
 		Map<String, Object> newProps = new HashMap<String,Object>();
 
 		String testVal, testProp;
@@ -658,10 +682,14 @@ extends TestCase
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepConfidence) (update case)
-		mergeMethods.put("testprop", "keepConfidence");
+		Map<String, Object> propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepConfidence");
+		mergeMethods.put("testprop", propEntry);
 
 		//update a prop (keepConfidence) (no update case)
-		mergeMethods.put("testprop", "keepConfidence");
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepConfidence");
+		mergeMethods.put("testprop", propEntry);
 
 		//TODO: this test seems unfinished??
 

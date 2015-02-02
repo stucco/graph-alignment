@@ -71,7 +71,7 @@ public class Align
 			JSONArray json_verts = graphson.optJSONArray("vertices");
 
 			if(json_verts != null){			//if there are vertices...
-				int vertCount = json_verts.length(); 
+				int vertCount = json_verts.length();
 				for(int i=0; i<vertCount; i++){		//add each one to verts list
 					JSONObject vert = (JSONObject)json_verts.get(i);
 					if(!vert.has("name"))
@@ -84,7 +84,7 @@ public class Align
 			if(json_edges != null){
 				int edgeCount = json_edges.length();
 				for(int i=0; i<edgeCount; i++){
-					JSONObject edge = (JSONObject)json_edges.get(i); 
+					JSONObject edge = (JSONObject)json_edges.get(i);
 					edges.add(edge);
 				}
 			}
@@ -232,8 +232,14 @@ public class Align
 		return edges;
 	}
 
+	public void alignVertProps(String vertID, Map<String, Object> newProps){
+		String type = (String)newProps.get("vertexType");
+		Map<String, Map<String, Object>> mergeMethods = getVertexConfig(type);
+		alignVertProps(vertID, newProps, mergeMethods);
+	}
+	
 	//mergeMethods are derived from ontology definition
-	public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, String> mergeMethods){
+	public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, Map<String, Object>> vertConfig){
 
 		//	System.out.println("vertID = " + vertID);
 		//	System.out.println("newProps = " + newProps);
@@ -245,7 +251,15 @@ public class Align
 		while(k.hasNext()){
 			key = k.next();
 			if(oldProps.containsKey(key)){ //both old & new have this, so check how to merge.
-				String mergeMethod = mergeMethods.get(key);
+				String mergeMethod = null;
+				try{
+					mergeMethod = (String) vertConfig.get(key).get("resolutionFunction");
+				}catch(NullPointerException e){
+					mergeMethod = null; //this will happen if 'key' isn't in the vertConfig map.
+					if(key != "timestamp" && key != "score"){
+						logger.warn("no config info found for property: " + key);
+					}
+				}
 				//			System.out.println("key = " + key + " mergeMethod = " + mergeMethod);
 				if(key == "timestamp" || key == "score"){
 					//yeah... don't try to merge those here, it breaks things.
@@ -364,14 +378,16 @@ public class Align
 		//TODO populate threshold
 		double threshold = 0.75;
 
+		Map<String, Object> vertexProps = (Map<String, Object>)(vertex.get("_properties"));
+		String vertexType = (String)(vertexProps.get("vertexType"));
+		//TODO check vertexType: for some types, we never want to search in this way (eg. flows.)
+		
 		List<Map<String,Object>> candidateVerts = findCandidateMatches(vertex);
 		Map<String, Double> candidateScores = new HashMap<String, Double>();
 		Map<String, Object> candidateVertex = null;
 
 		double bestScore = 0.0;
 		String bestID = null;
-		Map<String, Object> vertexProps = (Map<String, Object>)(vertex.get("_properties"));
-		String vertexType = (String)(vertexProps.get("vertexType"));
 
 		Map<String, Map<String, Object>> configProperties = getVertexConfig(vertexType);
 
