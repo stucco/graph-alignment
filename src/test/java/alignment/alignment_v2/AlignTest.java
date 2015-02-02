@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.tinkerpop.rexster.client.RexProException;
@@ -125,7 +126,7 @@ extends TestCase
 		a.load(test_graphson_verts);
 
 		Map<String, Object> vertProps = new HashMap<String, Object>();
-		
+
 		vertProps.put("accessVector", "NETWORK");
 		//vertProps.put("accessVector", "Remote");
 		vertProps.put("Credit", "Publicized in a Bindview Security Advisory released November 24,1999. Contact is Scott Blake <blake@bos.bindview.com>.");
@@ -147,13 +148,13 @@ extends TestCase
 		vertProps.put("Vulnerable", l);
 		vertProps.put("Not_Vulnerable", new ArrayList<String>());
 		vertProps.put("publishedDate", "943401600");
-		
+
 		Map<String, Object> vertMap = new HashMap<String, Object>();
 		vertMap.put("_properties", vertProps);
 		vertMap.put("_type", "vertex");
 		//vertMap.put("_id", null);
-		
-		
+
+
 		String bestID = a.findDuplicateVertex(vertMap);
 		assertNotNull(bestID);
 		Map<String, Object> foundVert = c.getVertByID(bestID);
@@ -200,7 +201,7 @@ extends TestCase
 				"]}";
 
 		a.load(test_graphson_verts);
-		
+
 		test_graphson_verts = "{\"vertices\":[" +
 				"{\"_id\":\"69.42.192.0_through_69.43.159.255\"," +
 				"\"_type\":\"vertex\","+
@@ -212,19 +213,19 @@ extends TestCase
 				"\"endIPInt\":1160486911" +
 				"}," + 
 				"]}";
-		
+
 		a.load(test_graphson_verts);
 
 		String outv_id = c.findVertId("69.42.215.170");
 		String inv_id = c.findVertId("69.42.192.0_through_69.43.159.255");
 		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		outv_id = c.findVertId("9.42.215.170");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		outv_id = c.findVertId("169.42.215.170");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		test_graphson_verts = "{\"vertices\":[" +
 				"{\"_id\":\"169.42.192.0_through_169.43.159.255\"," +
 				"\"_type\":\"vertex\","+
@@ -236,21 +237,21 @@ extends TestCase
 				"\"endIPInt\":2838208511" +
 				"}," +
 				"]}";
-		
+
 		a.load(test_graphson_verts);
 
 		outv_id = c.findVertId("169.42.215.170");
 		inv_id = c.findVertId("169.42.192.0_through_169.43.159.255");
 		//System.out.println("in: " + inv_id + " out: " + outv_id);
 		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		outv_id = c.findVertId("69.42.215.170");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		outv_id = c.findVertId("9.42.215.170");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
-		
+
+
 		test_graphson_verts = "{\"vertices\":[" +
 				"{\"_id\":\"69.42.215.171\"," +
 				"\"_type\":\"vertex\","+
@@ -261,19 +262,88 @@ extends TestCase
 				"]}";
 
 		a.load(test_graphson_verts);
-		
+
 		outv_id = c.findVertId("69.42.215.171");
 		inv_id = c.findVertId("69.42.192.0_through_69.43.159.255");
 		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		inv_id = c.findVertId("169.42.192.0_through_169.43.159.255");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-		
+
 		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
-	
-	
+
+	public void testJsonVertToMap()
+	{
+		DBConnection c = null;
+		Align a = null;
+		try{
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			c = new DBConnection( client );
+			a = new Align( c );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+
+		String test_graphson_vert = "{" +
+				"\"_id\":\"69.42.215.170\"," +
+				"\"_type\":\"vertex\","+
+				"\"source\":\"test\","+
+				"\"vertexType\": \"IP\"," +
+				"\"ipInt\":1160435626" +
+				"}";
+
+		JSONObject vertJSON = new JSONObject(test_graphson_vert);
+		Map<String, Object> vertMap = a.jsonVertToMap( vertJSON );
+
+		assertEquals(vertJSON.get("vertexType"), vertMap.get("vertexType"));
+		assertEquals(vertJSON.get("ipInt"), vertMap.get("ipInt"));
+		assertEquals(vertJSON.get("source"), vertMap.get("source"));
+
+		test_graphson_vert = "{" +
+				"\"availabilityImpact\": \"PARTIAL\"," +
+				"\"accessVector\": \"NETWORK\"," +
+				"\"cvssDate\": 1072933200," +
+				"\"integrityImpact\": \"NONE\"," +
+				"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
+				"\"accessComplexity\": \"LOW\"," +
+				"\"modifiedDate\": 1220587200," +
+				"\"vertexType\": \"vulnerability\"," +
+				"\"_type\": \"vertex\"," +
+				"\"references\":   [" +
+				"\"http://razor.bindview.com/publish/advisories/adv_Cabletron.html\"," +
+				"\"http://www.securityfocus.com/bid/841\"]," +
+				"\"_id\": \"CVE-1999-1548\"," +
+				"\"source\": \"NVD\"," +
+				"\"description\": \"Cabletron SmartSwitch Router (SSR) 8000 firmware 2.x can only handle 200 ARP requests per second allowing a denial of service attack to succeed with a flood of ARP requests exceeding that limit.\"," +
+				"\"cvssScore\": 5," +
+				"\"publishedDate\": 943419600," +
+				"\"confidentialityImpact\": \"NONE\"," +
+				"\"accessAuthentication\": \"NONE\"" +
+				"}";
+
+		vertJSON = new JSONObject(test_graphson_vert);
+		vertMap = a.jsonVertToMap( vertJSON );
+
+		assertEquals(vertJSON.get("availabilityImpact"), vertMap.get("availabilityImpact"));
+		assertEquals(vertJSON.get("accessVector"), vertMap.get("accessVector"));
+		assertEquals(vertJSON.get("cvssDate"), vertMap.get("cvssDate"));
+		assertEquals(vertJSON.get("integrityImpact"), vertMap.get("integrityImpact"));
+		assertTrue(a.jsonArrayToList((JSONArray)vertJSON.get("vulnerableSoftware")).equals(vertMap.get("vulnerableSoftware")));
+		assertEquals(vertJSON.get("accessComplexity"), vertMap.get("accessComplexity"));
+		assertEquals(vertJSON.get("modifiedDate"), vertMap.get("modifiedDate"));
+		assertEquals(vertJSON.get("vertexType"), vertMap.get("vertexType"));
+		assertTrue(a.jsonArrayToList((JSONArray)vertJSON.get("references")).equals(vertMap.get("references")));
+		assertEquals(vertJSON.get("source"), vertMap.get("source"));
+		assertEquals(vertJSON.get("description"), vertMap.get("description"));
+		assertEquals(vertJSON.get("cvssScore"), vertMap.get("cvssScore"));
+		assertEquals(vertJSON.get("publishedDate"), vertMap.get("publishedDate"));
+		assertEquals(vertJSON.get("confidentialityImpact"), vertMap.get("confidentialityImpact"));
+		assertEquals(vertJSON.get("accessAuthentication"), vertMap.get("accessAuthentication"));
+	}
+
+
 	/**
 	 * Test AlignVertProps method with different merge methods
 	 */
@@ -371,7 +441,7 @@ extends TestCase
 		c.removeCachedVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
-	
+
 
 	/**
 	 * Testing the keepNew option for AlignVertProps

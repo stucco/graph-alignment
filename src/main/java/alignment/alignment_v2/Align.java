@@ -335,7 +335,30 @@ public class Align
 	}
 	 */
 
+	public List<Object> jsonArrayToList(JSONArray a){
+		List<Object> l = new ArrayList<Object>();
+		for(int i=0; i<a.length(); i++){
+			l.add(a.get(i));
+		}
+		return l;
+	}
 
+	public Map<String, Object> jsonVertToMap(JSONObject v){
+		Map<String, Object> vert = new HashMap<String, Object>();
+		for(Object k : v.keySet()){
+			String key = (String) k;
+			Object value = v.get(key);
+			if(value instanceof JSONArray){
+				value = jsonArrayToList((JSONArray)value);
+			}
+			else if(value instanceof JSONObject){
+				logger.warn("jsonVertToMap: unexpected property type: JSONObject for property " + key + "\n" + v);
+			}
+			vert.put(key, value);
+		}
+		return vert;
+	}
+	
 	//only public for tests
 	public String findDuplicateVertex(Map<String, Object> vertex)	{
 		//TODO populate threshold
