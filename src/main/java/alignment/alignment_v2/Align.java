@@ -191,36 +191,42 @@ public class Align
 			logger.warn("no vertex type specified for vertex:" + vert.toString());
 		}else{
 			if(type.equals("addressRange")){
-				List<Constraint> constraints = new ArrayList<Constraint>();
-				Constraint c = new Constraint("vertexType", Condition.eq, "IP");
-				constraints.add(c);
-				c = new Constraint("ipInt", Condition.lte, vert.getLong("endIPInt"));
-				constraints.add(c);
-				c = new Constraint("ipInt", Condition.gte, vert.getLong("startIPInt"));
-				constraints.add(c);
-				List<Map<String,Object>> matches = null;
-				try {
-					matches = connection.findAllVertsWithProps(constraints);
-				} catch (IOException e) {
-					logger.error("Exception!",e);
-				} catch (RexProException e) {
-					logger.error("Exception!",e);
-				}
-				if(matches != null){
-					for(Map<String,Object> match : matches){
-						Map<String,Object> currMatchProps = (Map<String,Object>)match.get("_properties");
-						String inv = vert_name;
-						String outv = (String)currMatchProps.get("name");
-						JSONObject edge = new JSONObject();
-						edge.put("_type", "edge");
-						edge.put("_id", outv + "_inAddressRange_" + inv);
-						edge.put("_label", "inAddressRange");
-						edge.put("_inV", inv);
-						edge.put("_outV", outv);
-						edge.put("inVType", "addressRange");
-						edge.put("outVType", "IP");
-						edges.add(edge);
+				long endIpInt = vert.optLong("endIPInt");
+				long startIpInt = vert.optLong("startIPInt");
+				if( endIpInt !=0 && startIpInt != 0){
+					List<Constraint> constraints = new ArrayList<Constraint>();
+					Constraint c = new Constraint("vertexType", Condition.eq, "IP");
+					constraints.add(c);
+					c = new Constraint("ipInt", Condition.lte, endIpInt);
+					constraints.add(c);
+					c = new Constraint("ipInt", Condition.gte, startIpInt);
+					constraints.add(c);
+					List<Map<String,Object>> matches = null;
+					try {
+						matches = connection.findAllVertsWithProps(constraints);
+					} catch (IOException e) {
+						logger.error("Exception!",e);
+					} catch (RexProException e) {
+						logger.error("Exception!",e);
 					}
+					if(matches != null){
+						for(Map<String,Object> match : matches){
+							Map<String,Object> currMatchProps = (Map<String,Object>)match.get("_properties");
+							String inv = vert_name;
+							String outv = (String)currMatchProps.get("name");
+							JSONObject edge = new JSONObject();
+							edge.put("_type", "edge");
+							edge.put("_id", outv + "_inAddressRange_" + inv);
+							edge.put("_label", "inAddressRange");
+							edge.put("_inV", inv);
+							edge.put("_outV", outv);
+							edge.put("inVType", "addressRange");
+							edge.put("outVType", "IP");
+							edges.add(edge);
+						}
+					}
+				}else{
+					logger.warn("address range vert did not have int addresses: " + vert.toString());
 				}
 			}else if(type.equals("IP")){
 				List<Constraint> constraints = new ArrayList<Constraint>();
