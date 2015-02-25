@@ -1,6 +1,8 @@
 package alignment.alignment_v2;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -113,6 +115,18 @@ public class Align
 				new_vert = (otherVertID == null);
 			}
 			if(new_vert){ //only add new...
+				String type = null;
+				type = (String)vert.opt("vertexType");
+				if(type.equals("IP")){ 
+					//if its an ip vert, and doesn't have an ip int, just add that here.
+					//TODO: the extractors should really be doing this, but some aren't
+					long ipInt = vert.optLong("ipInt");
+					if(ipInt == 0){
+						String ipString = vert.getString("name");
+						ipInt = getIpInt(ipString);
+						vert.put("ipInt", ipInt);
+					}
+				}
 				connection.addVertexFromJSON(vert);
 				List<JSONObject> newEdges = findNewEdges(vert);
 				for(JSONObject edge: newEdges){
@@ -166,7 +180,6 @@ public class Align
 
 		return true;//TODO what if some execute()s pass and some fail?
 	}
-
 
 	private List<JSONObject> findNewEdges(JSONObject vert) {
 		List<JSONObject> edges = new ArrayList<JSONObject>();
@@ -450,5 +463,19 @@ public class Align
 		return property;
 	}
 
+	//TODO only public for tests
+	public long getIpInt(String ipString) {
+		long retAddr = 0;
+		try {
+			InetAddress addr = InetAddress.getByName(ipString);
+			for (byte b: addr.getAddress()){  
+				retAddr = (retAddr << 8) | (b & 0xFF);
+			}
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return retAddr;
+	}
 
 }

@@ -24,7 +24,7 @@ import junit.framework.TestSuite;
 public class AlignTest 
 extends TestCase
 {
-	private static final int WAIT_TIME = 30;
+	private static final int WAIT_TIME = 1;
 	
 	/**
 	 * Create the test case
@@ -343,7 +343,25 @@ extends TestCase
 		assertEquals(vertJSON.get("accessAuthentication"), vertMap.get("accessAuthentication"));
 	}
 
+	public void testGetIpInt()
+	{
+		DBConnection c = null;
+		Align a = null;
+		try{
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			c = new DBConnection( client );
+			a = new Align( c );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
 
+		String ip = "69.42.215.170";
+
+		long ipInt = a.getIpInt(ip);
+		
+		assertEquals(Long.parseLong("1160435626"), ipInt);
+	}
+	
 	/**
 	 * Test AlignVertProps method with different merge methods
 	 */
