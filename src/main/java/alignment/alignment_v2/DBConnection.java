@@ -236,9 +236,11 @@ public class DBConnection {
 			commit();
 			logger.info("Connection is good!");
 		}catch(Exception e){
-			logger.error("could not configure missing vertex indices!", e);
-			this.client = null;
-			logger.error("Connection is unusable!");
+			logger.warn("could not configure missing vertex indices!", e);
+			//NB: this is (typically) non-fatal.  Multiple workers can attempt to create the indices at the same time, and some will just fail in this way.
+			//TODO: these need to either be created in one thread only, or else use proper locking.
+			//this.client = null;
+			//logger.error("Connection is unusable!");
 		}
 		/*
 		currentIndices = client.execute("g.getIndexedKeys(Edge.class)");
