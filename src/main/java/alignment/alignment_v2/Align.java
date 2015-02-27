@@ -105,6 +105,11 @@ public class Align
 		int i=0;
 		for(JSONObject vert : verts){
 			String vert_name = vert.getString("name");
+			String vert_id = vert.optString("_id");
+			if(vert_name == null || vert_name == ""){
+				vert_name = vert_id;
+				vert.put("name", vert_name);
+			}
 			boolean new_vert = false;
 			String otherVertID = connection.findVertId(vert_name);
 			new_vert = (otherVertID == null);
