@@ -24,7 +24,7 @@ import junit.framework.TestSuite;
 public class AlignTest 
 extends TestCase
 {
-	private static final int WAIT_TIME = 1;
+	private static final int WAIT_TIME = 30;
 	
 	/**
 	 * Create the test case
