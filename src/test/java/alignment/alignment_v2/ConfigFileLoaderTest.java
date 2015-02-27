@@ -38,19 +38,20 @@ extends TestCase
 	public void testConfigLoad()
 	{
 		ConfigFileLoader c = null;
-		c = new ConfigFileLoader("../test-classes/alignment.yaml");
+		//c = new ConfigFileLoader("../test-classes/alignment.yaml");
+		c = new ConfigFileLoader("../test-classes/stucco_schema.json");
 
 		Map<String, Map<String, Object>> property = c.getVertexConfig("user");
 		//System.out.println(property);
 		//vertexType={comparisonFunction=none, comparisonWeight=0, resolutionFunction=none}, source={comparisonFunction=none, comparisonWeight=0, resolutionFunction=appendList}
 		Map<String, Object> vt = property.get("vertexType");
 		assertEquals("none", vt.get("comparisonFunction"));
-		assertEquals(0, vt.get("comparisonWeight"));
+		assertTrue((Double)vt.get("comparisonWeight") == 0);
 		assertEquals("none", vt.get("resolutionFunction"));
 
 		Map<String, Object> src = property.get("source");
 		assertEquals("none", src.get("comparisonFunction"));
-		assertEquals(0, src.get("comparisonWeight"));
+		assertTrue((Double)src.get("comparisonWeight") == 0);
 		assertEquals("appendList", src.get("resolutionFunction"));
 	}
 
