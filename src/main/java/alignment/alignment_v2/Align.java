@@ -132,7 +132,9 @@ public class Align
 						vert.put("ipInt", ipInt);
 					}
 				}
-				connection.addVertexFromJSON(vert);
+				vertMap = jsonVertToMap(vert);
+				//connection.addVertexFromJSON(vert);
+				connection.addVertexFromMap(vertMap);
 				List<JSONObject> newEdges = findNewEdges(vert);
 				for(JSONObject edge: newEdges){
 					edges.add(edge);
@@ -351,41 +353,6 @@ public class Align
 		}
 		connection.updateVert(vertID, oldProps);
 	}
-
-	//only needs to be public for testing, will probably make private later.
-	//returns a map of prop names to merge methods, for each vert name
-	//NB: old method, now uses a config file.  may revisit.
-	/*
-    public static Map<String, Map<String, String>> mergeMethodsFromSchema(JSONObject ontology){
-		// TODO probably should use an enum type for this.
-    	HashMap<String, Map<String, String>> mergeMethods = new HashMap<String, Map<String, String>>();
-    	JSONArray verts = ontology.getJSONObject("properties").getJSONObject("vertices").getJSONArray("items");
-
-  //  	for (int i = 0; i < verts.length(); i++)	{
- //		
-  //  		System.out.println("--------->>>>>>" + verts.get(i));
-  //  	}
-
-    	HashMap<String, String> mergeMethodsCurrVert = null;
-    	for(int i=0; i<verts.length(); i++){
-    		mergeMethodsCurrVert = new HashMap<String, String>();
-    		JSONObject currVert = verts.getJSONObject(i);
-    		String vertName = currVert.getString("title");
-    		JSONObject currProps = currVert.getJSONObject("properties");
-    		Iterator<String> k = currProps.keys();
-    		while(k.hasNext()){
-    			String key = k.next();
-    			String method = currProps.getJSONObject(key).optString("merge");
-    			if(method == null || method == "")
-    				method = "keepNew";
-    			mergeMethodsCurrVert.put(key, method);
-    		}
-    		mergeMethods.put(vertName, mergeMethodsCurrVert);
-   // 		System.out.println("for " + vertName + " = " + mergeMethodsCurrVert);
-    	}
-    	return mergeMethods;
-	}
-	 */
 
 	public List<Object> jsonArrayToList(JSONArray a){
 		List<Object> l = new ArrayList<Object>();

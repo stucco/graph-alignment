@@ -288,6 +288,38 @@ public class DBConnection {
 		}
 	}
 
+	public void addVertexFromMap(Map vert){
+		String graphType = getDBType();
+		String name = (String)vert.get("name");
+		//System.out.println("vertex name is: " + name);
+		String id = (String)vert.get("_id");
+		//System.out.println("vertex id is: " + id);
+		if(name == null || name == ""){
+			name = id;
+			vert.put("name", name);
+		}
+		vert.remove("_id"); //Some graph servers will ignore this ID, some won't.  Just remove them so it's consistent.
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("VERT_PROPS", vert);
+		try {
+			Long newID = null;
+			if(graphType == "TitanGraph")
+				newID = (Long)client.execute("v = g.addVertex(null, VERT_PROPS);v.getId();", param).get(0);
+				//newID = (Long)client.execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);v.getId()", param).get(0);
+			if(graphType == "TinkerGraph")
+				newID = Long.parseLong((String)client.execute("v = g.addVertex(null, VERT_PROPS);v.getId();", param).get(0));
+				//newID = Long.parseLong((String)client.execute("v = GraphSONUtility.vertexFromJson(VERT_PROPS, new GraphElementFactory(g), GraphSONMode.NORMAL, null);v.getId()", param).get(0));
+			//System.out.println("new ID is: " + newID);
+			vertIDCache.put(name, newID.toString());
+		} catch (RexProException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public void addEdgeFromJSON(JSONObject edge){
 		Map<String, Object> param = new HashMap<String, Object>();
 
