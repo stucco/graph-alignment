@@ -645,6 +645,28 @@ public class DBConnection {
 		return ret;
 
 	}
+
+	/*
+	 * Only use in tests.
+	 */
+	public boolean removeAllVertices(){
+		//NB: this query is slow enough that connection can time out if the DB starts with many vertices.
+		boolean ret = removeCachedVertices();
+		try{
+			client.execute("g.v().remove();g");
+		}catch(Exception e){
+			e.printStackTrace();
+			ret = false;
+		}
+		try{
+			commit();
+		}catch(Exception e){
+			e.printStackTrace();
+			ret = false;
+		}
+		return ret;
+	}
+
 	/*
     public boolean removeAllEdges(RexsterClient client){
 		return execute("g.E.each{g.removeVertex(it)};g.commit()");

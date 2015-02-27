@@ -61,7 +61,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 
 		String test_graphson_verts = "{\"vertices\":[" +
 				"{" +
@@ -161,7 +161,7 @@ extends TestCase
 		//Map<String, Object> foundVertProps = (Map<String, Object>)foundVert.get("_properties");
 		assertEquals("CVE-1999-1548", (String)foundVert.get("name"));
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -177,7 +177,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 
 		String test_graphson_verts = "{\"vertices\":[" +
 				"{\"_id\":\"69.42.215.170\"," +
@@ -270,7 +270,7 @@ extends TestCase
 		inv_id = c.findVertId("169.42.192.0_through_169.43.159.255");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -377,7 +377,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//c.removeAllEdges();
 
 		Map<String, Object> props = new HashMap<String,Object>();
@@ -472,7 +472,7 @@ extends TestCase
 		testArrayVal = new String[]{"aaa", "bbb"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -493,7 +493,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//c.removeAllEdges();
 
 		c.commit();
@@ -524,7 +524,7 @@ extends TestCase
 		testProp = (String)c.getVertByID(id).get("testprop");
 		assertEquals(testVal, testProp);
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -544,7 +544,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//c.removeAllEdges();
 
 		String testVertex = "v = g.addVertex();" + 
@@ -598,7 +598,7 @@ extends TestCase
 		expectedList.add("bbbb");
 		assertEquals(expectedList, testList);
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -617,7 +617,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//c.removeAllEdges();
 
 		c.commit();
@@ -660,7 +660,7 @@ extends TestCase
 		testVal = "bbbb";
 		assertEquals(testVal, testProp);
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
@@ -679,7 +679,7 @@ extends TestCase
 			e.printStackTrace(); //TODO
 		} //the possible NPE below is fine, don't care if test errors.
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//c.removeAllEdges();
 
 		c.commit();
@@ -711,7 +711,7 @@ extends TestCase
 
 		//TODO: this test seems unfinished??
 
-		c.removeCachedVertices();
+		c.removeAllVertices();
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
