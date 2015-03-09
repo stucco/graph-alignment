@@ -1,6 +1,7 @@
 package alignment.alignment_v2;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 
 import org.apache.commons.configuration.Configuration;
@@ -95,22 +96,32 @@ public class ConfigFileLoader {
     	return vertexConfigMap;
 	}
 	
-	public static Configuration configFromFile(String configFilePath){
+	public static Configuration dbConfigFromFile(String configFilePath){
 		File configFile = new File(configFilePath);
-		return configFromFile(configFile);
+		Map<String, Object> fullConfigMap = configMapFromFile(configFile);
+		Map<String, Object> dbConfigMap = (Map<String, Object>) fullConfigMap.get("database_connection");
+		PropertiesConfiguration dbConfig = new PropertiesConfiguration();
+		for(String key : dbConfigMap.keySet()){
+			dbConfig.addProperty( key, dbConfigMap.get(key));
+		}
+		return dbConfig;
 	}
 	
-	public static Configuration configFromFile(File configFile){
-		//Properties props = new Properties();
-		//props.load(reader);
-		PropertiesConfiguration config = new PropertiesConfiguration();
+	public static Map<String, Object> configMapFromFile(File configFile){
+		Map<String, Object> configMap = null;
 		try {
-			config.load(configFile);
-		} catch (ConfigurationException e) {
+			Yaml yaml = new Yaml();
+			InputStream stream = new FileInputStream(configFile);
+			
+			configMap = (Map<String, Object>) yaml.load( stream );
+			
+			//config.load(configFile);
+		
+		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return config;
+		return configMap;
 	}
 }
 
