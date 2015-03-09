@@ -52,20 +52,22 @@ public class ConfigFileLoader {
 	}
 	
 	//returns a map of prop names to merge methods, for each vert name
-    private Map<String, Map<String, Object>> getVertexConfigFromJsonSchema(String configHeading){
+    private Map<String, Map<String, Object>> getVertexConfigFromJsonSchema(String vertexName){
     	InputStream stream = ConfigFileLoader.class.getClassLoader().getResourceAsStream(path);
     	JSONTokener j = new JSONTokener(stream);
     	JSONObject ontology = new JSONObject(j); 
 
     	HashMap<String, Map<String, Object>> vertexConfigMap = new HashMap<String, Map<String, Object>>();
-    	JSONArray verts = ontology.getJSONObject("properties").getJSONObject("vertices").getJSONArray("items");
-
+    	JSONObject definitions = ontology.getJSONObject("definitions");
+    	
     	HashMap<String, Object> propConfig = null;
-    	String id = "gov.ornl.sava.stucco/graph/vertices/" + configHeading;
-    	for(int i=0; i<verts.length(); i++){
-    		JSONObject currVert = verts.getJSONObject(i);
-    		if(currVert.getString("id").equals(id)){
-    			JSONObject currProps = currVert.getJSONObject("properties");
+    	JSONObject currVert = definitions.getJSONObject(vertexName);
+    	JSONArray items = currVert.getJSONArray("allOf");
+    	
+    	for(int i=0; i<items.length(); i++){
+    		JSONObject item = items.getJSONObject(i);
+    		if(item.has("properties")){
+    			JSONObject currProps = item.getJSONObject("properties");
         		Iterator<String> k = currProps.keys();
         		while(k.hasNext()){
         			String prop = k.next();
