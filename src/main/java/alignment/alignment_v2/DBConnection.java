@@ -70,7 +70,7 @@ public class DBConnection {
 	public static Configuration getDefaultConfig(){
 		Logger logger = LoggerFactory.getLogger(Align.class);
 		logger.info("Loading default DB Config...");
-		Configuration configOpts = ConfigFileLoader.dbConfigFromFile("rt-config.yaml");
+		Configuration configOpts = ConfigFileLoader.dbConfigFromFile("config.yaml");
 		return configOpts;
 	}
 
