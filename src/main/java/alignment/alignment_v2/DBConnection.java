@@ -70,14 +70,14 @@ public class DBConnection {
 	public static Configuration getDefaultConfig(){
 		Logger logger = LoggerFactory.getLogger(Align.class);
 		logger.info("Loading default DB Config...");
-		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-config/rexster-default-config");
+		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-default-config.yml");
 		return configOpts;
 	}
 
 	public static Configuration getTestConfig(){
 		Logger logger = LoggerFactory.getLogger(Align.class);
 		logger.info("Loading test DB Config...");
-		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-config/rexster-test-config");
+		Configuration configOpts = ConfigFileLoader.configFromFile("rexster-test-config.yml");
 		return configOpts;
 	}
 
