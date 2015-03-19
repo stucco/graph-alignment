@@ -384,12 +384,12 @@ public class DBConnection {
 			query += ";g";
 			client.execute(query, params);
 		} catch (RexProException e) {
-			logger.error("'execute' method caused a rexpro problem (again)");
+			logger.error("'execute' method encountered a rexpro problem");
 			logger.error("this query was: " + query + " params were: " + params);
 			logger.error("Exception!",e);
 			return false;
 		} catch (IOException e) {
-			logger.error("'execute' method caused something new and unexpected to break!");
+			logger.error("'execute' method encountered an IO problem ");
 			logger.error("this query was: " + query + " params were: " + params);
 			logger.error("Exception!",e);
 			return false;
