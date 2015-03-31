@@ -1,5 +1,7 @@
 package alignment.alignment_v2;
 
+import gov.ornl.stucco.DBClient.DBConnection;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ import junit.framework.TestSuite;
 public class AlignTest 
 extends TestCase
 {
-	private static final int WAIT_TIME = 30;
+	private static final int WAIT_TIME = 3;
 	
 	/**
 	 * Create the test case

@@ -1,11 +1,11 @@
 package alignment.alignment_v2;
 
 import java.io.*;
-import java.nio.file.Files;
+//import java.nio.file.Files;
 import java.util.*;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
+//import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.json.JSONArray;
 import org.json.JSONObject;

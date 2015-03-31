@@ -1,5 +1,9 @@
 package alignment.alignment_v2;
 
+import gov.ornl.stucco.DBClient.Constraint;
+import gov.ornl.stucco.DBClient.DBConnection;
+import gov.ornl.stucco.DBClient.Constraint.Condition;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -12,8 +16,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.json.*;
-
-import alignment.alignment_v2.Constraint.Condition;
 
 import com.tinkerpop.rexster.client.RexProException;
 import com.tinkerpop.rexster.client.RexsterClient;
