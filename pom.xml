@@ -4,7 +4,7 @@
 	<groupId>alignment</groupId>
 	<artifactId>alignment_v2</artifactId>
 	<version>2.0.1</version>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 
 	<name>alignment_v2</name>
 	<url>http://maven.apache.org</url>
@@ -65,31 +65,14 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>1.14</version>
 		</dependency>
+		<dependency>
+			<groupId>gov.ornl.stucco</groupId>
+			<artifactId>DBClient</artifactId>
+			<version>2.0.1</version>
+		</dependency>
 	</dependencies>
-	<modules>
-	    <module>rexster-client-java</module>
-	</modules>
 	<build>
 		<plugins>
-			<plugin>
-                                <artifactId>maven-assembly-plugin</artifactId>
-                                <configuration>
-                                        <archive>
-                                                <manifest>
-                                                        <mainClass>alignment.alignment_v2.Align</mainClass>
-                                                </manifest>
-                                        </archive>
-                                        <descriptorRefs>
-                                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                                        </descriptorRefs>
-                                </configuration>
-                                <executions>
-                                        <execution>
-                                                <phase>install</phase>
-                                                <goals><goal>single</goal></goals>
-                                        </execution>
-                                </executions>
-                        </plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
@@ -104,11 +87,11 @@
 				<artifactId>maven-scm-plugin</artifactId>
 				<version>1.9</version>
 				<configuration>
-		            <connectionUrl>scm:git:https://github.com/stucco/${module.name}.git</connectionUrl>
-		            <checkoutDirectory>${module.name}</checkoutDirectory>
-		            <scmVersionType>branch</scmVersionType>
-		            <scmVersion>${branch.name}</scmVersion>
-		        </configuration>
+			    	<connectionUrl>scm:git:https://github.com/stucco/rexster-client-java.git</connectionUrl>
+				    <checkoutDirectory>rexster-client-java</checkoutDirectory>
+			    	<scmVersionType>branch</scmVersionType>
+				    <scmVersion>${branch.name}</scmVersion>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
