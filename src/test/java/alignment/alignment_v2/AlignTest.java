@@ -27,7 +27,7 @@ public class AlignTest
 extends TestCase
 {
 	private static final int WAIT_TIME = 3;
-	
+
 	/**
 	 * Create the test case
 	 *
@@ -360,10 +360,10 @@ extends TestCase
 		String ip = "69.42.215.170";
 
 		long ipInt = a.getIpInt(ip);
-		
+
 		assertEquals(Long.parseLong("1160435626"), ipInt);
 	}
-	
+
 	/**
 	 * Test AlignVertProps method with different merge methods
 	 */
@@ -385,7 +385,8 @@ extends TestCase
 		Map<String, Object> props = new HashMap<String,Object>();
 		props.put("NAME", "testvert_align_props");
 		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",NAME)", props);
+		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",NAME)", props);
+		//c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\")");
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
@@ -397,80 +398,80 @@ extends TestCase
 		//update a prop (appendList) (always updates) (list/list case)
 		Map<String, Object> propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		String[] testArrayVal = {"aaa", "bbb"};
-		newProps.put("testproparray", Arrays.asList(testArrayVal));
+		newProps.put("references", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		String[] testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		String[] testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testArrayVal = new String[]{"ccc"};
-		newProps.put("testproparray", Arrays.asList(testArrayVal));
+		newProps.put("references", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		//update a prop (appendList) (always updates) (list/val case)
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testArrayVal = new String[]{"aaa", "bbb"};
-		newProps.put("testproparray", Arrays.asList(testArrayVal));
+		newProps.put("references", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testVal = "ccc";
-		newProps.put("testproparray", testVal);
+		newProps.put("references", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		//update a prop (appendList) (always updates) (val/list case)
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testVal = "aaa";
-		newProps.put("testproparray", testVal);
+		newProps.put("references", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testproparray");
+		testProp = (String)c.getVertByID(id).get("references");
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testArrayVal = new String[]{"bbb", "ccc"};
-		newProps.put("testproparray", Arrays.asList(testArrayVal));
+		newProps.put("references", Arrays.asList(testArrayVal));
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		//update a prop (appendList) (always updates) (val/val case)
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testVal = "aaa";
-		newProps.put("testproparray", testVal);
+		newProps.put("references", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testproparray");
+		testProp = (String)c.getVertByID(id).get("references");
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("testproparray", propEntry);
+		mergeMethods.put("references", propEntry);
 		testVal = "bbb";
-		newProps.put("testproparray", testVal);
+		newProps.put("references", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("testproparray")).toArray(new String[0]);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
 		testArrayVal = new String[]{"aaa", "bbb"};
 		assertTrue(Arrays.equals(testArrayVal, testproparray));
 
@@ -499,7 +500,7 @@ extends TestCase
 		//c.removeAllEdges();
 
 		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"z\",55);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\")");
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
@@ -510,20 +511,20 @@ extends TestCase
 
 		//add a new prop
 		testVal = "aaaa";
-		newProps.put("testprop", testVal);
+		newProps.put("state", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("state");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepNew) (always updates)
 		Map<String, Object> propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("testprop", propEntry);
+		mergeMethods.put("state", propEntry);
 		testVal = "bbbb";
-		newProps.put("testprop", testVal);
+		newProps.put("state", testVal);
 
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("state");
 		assertEquals(testVal, testProp);
 
 		c.removeAllVertices();
@@ -551,22 +552,22 @@ extends TestCase
 
 		String testVertex = "v = g.addVertex();" + 
 				"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
-				"v.setProperty(\"cvssDate\", \"2004-01-01T00:00:00.000-05:00\");" + 
-				"v.setProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
+				"v.setProperty(\"cvssDate\", \"1500\");" + 
+				"v.addProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
 				"v.setProperty(\"_type\", \"vertex\");" +
 				"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
 				"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
-				"v.setProperty(\"source\", \"NVD\");" + 
-				"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
+				"v.addProperty(\"source\", \"NVD\");" + 
+				//"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
 				"v.setProperty(\"vertexType\", \"vulnerability\");" + 
 				"v.setProperty(\"accessComplexity\", \"LOW\");" + 
 				"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
 				"v.setProperty(\"cvssScore\", 10);" +
 				"v.setProperty(\"accessAuthentication\", \"NONE\");" +
-				"v.setProperty(\"modifiedDate\", \"2008-09-09T08:33:31.180-04:00\");" +
+				"v.setProperty(\"modifiedDate\", \"1000\");" +
 				"v.setProperty(\"integrityImpact\", \"COMPLETE\");" +
 				"v.setProperty(\"_id\", \"CVE-1999-0006\");" +
-				"v.setProperty(\"publishedDate\", \"1998-07-14T00:00:00.000-04:00\");" +
+				"v.setProperty(\"publishedDate\", \"2000\");" +
 				"v.setProperty(\"accessVector\", \"NETWORK\")";
 
 		c.commit();
@@ -634,31 +635,31 @@ extends TestCase
 
 		//add a new prop
 		testVal = "aaaa";
-		newProps.put("testprop", testVal);
+		newProps.put("state", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("state");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepUpdates) (update case)
 		Map<String, Object> propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepUpdates");
-		mergeMethods.put("testprop", propEntry);
+		mergeMethods.put("state", propEntry);
 		testVal = "bbbb";
-		newProps.put("testprop", testVal);
+		newProps.put("state", testVal);
 		newProps.put("timestamp", 1001L);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("state");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepUpdates) (no update case)
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepUpdates");
-		mergeMethods.put("testprop", propEntry);
+		mergeMethods.put("state", propEntry);
 		testVal = "cccc";
-		newProps.put("testprop", testVal);
+		newProps.put("state", testVal);
 		newProps.put("timestamp", 999L);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("state");
 		testVal = "bbbb";
 		assertEquals(testVal, testProp);
 
@@ -696,20 +697,20 @@ extends TestCase
 
 		//add a new prop
 		testVal = "aaaa";
-		newProps.put("testprop", testVal);
+		newProps.put("state", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("testprop");
+		testProp = (String)c.getVertByID(id).get("state");
 		assertEquals(testVal, testProp);
 
 		//update a prop (keepConfidence) (update case)
 		Map<String, Object> propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepConfidence");
-		mergeMethods.put("testprop", propEntry);
+		mergeMethods.put("state", propEntry);
 
 		//update a prop (keepConfidence) (no update case)
 		propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "keepConfidence");
-		mergeMethods.put("testprop", propEntry);
+		mergeMethods.put("state", propEntry);
 
 		//TODO: this test seems unfinished??
 
