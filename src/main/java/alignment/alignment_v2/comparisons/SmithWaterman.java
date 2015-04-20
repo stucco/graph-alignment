@@ -1,4 +1,4 @@
-package alignment.comparisons;
+package alignment.alignment_v2.comparisons;
 
 //function is aligning two strings and retern similarity score based on local alignment
 //it is an extension of edit distance and affine gap distance. 

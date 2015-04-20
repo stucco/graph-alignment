@@ -8,8 +8,7 @@ import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alignment.comparisons.SmithWaterman;
-import alignment.comparisons.WHIRL;
+import alignment.alignment_v2.comparisons.*;
 
 public class Compare {
 

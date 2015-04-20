@@ -1,4 +1,4 @@
-package alignment.comparisons;
+package alignment.alignment_v2.comparisons;
 
 import java.util.*;
 //import java.util.stream.*;

@@ -1,4 +1,4 @@
-package alignment.comparisons;
+package alignment.alignment_v2.comparisons;
 
 //Porter Stemmer
 //taken and modified from 

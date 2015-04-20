@@ -1,4 +1,4 @@
-package alignment.comparisons;
+package alignment.alignment_v2.comparisons;
 
 //in constructor function takes a file with stop words
 
