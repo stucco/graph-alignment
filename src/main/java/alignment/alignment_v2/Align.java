@@ -298,12 +298,12 @@ public class Align
 					mergeMethod = (String) vertConfig.get(key).get("resolutionFunction");
 				}catch(NullPointerException e){
 					mergeMethod = null; //this will happen if 'key' isn't in the vertConfig map.
-					if(key != "timestamp" && key != "score"){
+					if(key != "timeStamp" && key != "score"){
 						logger.warn("no config info found for property: " + key);
 					}
 				}
 				//			System.out.println("key = " + key + " mergeMethod = " + mergeMethod);
-				if(key == "timestamp" || key == "score"){
+				if(key == "timeStamp" || key == "score"){
 					//yeah... don't try to merge those here, it breaks things.
 					//TODO these will need special handling .... and it will need to be someplace else, after we finish w/ the rest of the vert's props.
 				}else if(mergeMethod == null || mergeMethod == "keepNew"){
@@ -325,14 +325,14 @@ public class Align
 					}
 					oldProps.put(key, oldList);
 				}else if(mergeMethod == "keepUpdates"){
-					Object oldVal = oldProps.get("timestamp");
+					Object oldVal = oldProps.get("timeStamp");
 					long oldTime = -1;
 					if(oldVal instanceof String)
-						oldTime = Integer.parseInt((String)oldProps.get("timestamp"));
+						oldTime = Integer.parseInt((String)oldProps.get("timeStamp"));
 					else if(oldVal instanceof Long)
 						oldTime = (Long)oldVal;
 					//TODO else warn?
-					long newTime = (Long)newProps.get("timestamp");
+					long newTime = (Long)newProps.get("timeStamp");
 					if(newTime >= oldTime){
 						oldProps.put(key, newProps.get(key));
 					}

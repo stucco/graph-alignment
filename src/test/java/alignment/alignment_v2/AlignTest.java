@@ -85,7 +85,7 @@ extends TestCase
 				"\"accessVector\": \"NETWORK\"," +
 				"\"cvssDate\": 1072933200," +
 				"\"integrityImpact\": \"NONE\"," +
-				"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
+				//"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
 				"\"accessComplexity\": \"LOW\"," +
 				"\"modifiedDate\": 1220587200," +
 				"\"vertexType\": \"vulnerability\"," +
@@ -114,15 +114,15 @@ extends TestCase
 				"\"_id\":\"asdf\"," +
 				"\"_inV\":\"CVE-1999-0002\"," +
 				"\"_outV\":\"CVE-1999-nnnn\"," +
-				"\"_label\":\"some_label_asdf\","+
-				"\"some_property\":\"some_value\""+
+				"\"_label\":\"sameAs\","+
+				"\"description\":\"some_value\""+
 				"}," +
 				"{" +
 				"\"_id\":\"asdfAgain\"," +
 				"\"_inV\":\"CVE-1999-0002\"," +
 				"\"_outV\":\"CVE-1999-1548\"," +
-				"\"_label\":\"some_label_asdfAgain\","+
-				"\"some_property\":\"some_valueAgain\""+
+				"\"_label\":\"sameAs\","+
+				"\"description\":\"some_valueAgain\""+
 				"}]}";
 
 		a.load(test_graphson_verts);
@@ -308,7 +308,7 @@ extends TestCase
 				"\"accessVector\": \"NETWORK\"," +
 				"\"cvssDate\": 1072933200," +
 				"\"integrityImpact\": \"NONE\"," +
-				"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
+				//"\"vulnerableSoftware\": [\"cpe:/h:cabletron:smartswitch_router_8000_firmware:2.0\"]," +
 				"\"accessComplexity\": \"LOW\"," +
 				"\"modifiedDate\": 1220587200," +
 				"\"vertexType\": \"vulnerability\"," +
@@ -332,7 +332,7 @@ extends TestCase
 		assertEquals(vertJSON.get("accessVector"), vertMap.get("accessVector"));
 		assertEquals(vertJSON.get("cvssDate"), vertMap.get("cvssDate"));
 		assertEquals(vertJSON.get("integrityImpact"), vertMap.get("integrityImpact"));
-		assertTrue(a.jsonArrayToList((JSONArray)vertJSON.get("vulnerableSoftware")).equals(vertMap.get("vulnerableSoftware")));
+		//assertTrue(a.jsonArrayToList((JSONArray)vertJSON.get("vulnerableSoftware")).equals(vertMap.get("vulnerableSoftware")));
 		assertEquals(vertJSON.get("accessComplexity"), vertMap.get("accessComplexity"));
 		assertEquals(vertJSON.get("modifiedDate"), vertMap.get("modifiedDate"));
 		assertEquals(vertJSON.get("vertexType"), vertMap.get("vertexType"));
@@ -363,122 +363,6 @@ extends TestCase
 
 		assertEquals(Long.parseLong("1160435626"), ipInt);
 	}
-
-	/**
-	 * Test AlignVertProps method with different merge methods
-	 */
-	public void testAlignVertPropsMergeMethods()
-	{
-		DBConnection c = null;
-		Align a = null;
-		try{
-			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
-			c = new DBConnection( client );
-			a = new Align( c );
-		}catch(Exception e){
-			e.printStackTrace(); //TODO
-		} //the possible NPE below is fine, don't care if test errors.
-
-		c.removeAllVertices();
-		//c.removeAllEdges();
-
-		Map<String, Object> props = new HashMap<String,Object>();
-		props.put("NAME", "testvert_align_props");
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",NAME)", props);
-		//c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\")");
-		c.commit();
-		String id = c.findVertId("testvert_align_props");
-
-		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
-		Map<String, Object> newProps = new HashMap<String,Object>();
-
-		String testVal, testProp;
-
-		//update a prop (appendList) (always updates) (list/list case)
-		Map<String, Object> propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("references", propEntry);
-		String[] testArrayVal = {"aaa", "bbb"};
-		newProps.put("references", Arrays.asList(testArrayVal));
-		a.alignVertProps(id, newProps, mergeMethods);
-		String[] testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("references", propEntry);
-		testArrayVal = new String[]{"ccc"};
-		newProps.put("references", Arrays.asList(testArrayVal));
-		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
-		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		//update a prop (appendList) (always updates) (list/val case)
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("references", propEntry);
-		testArrayVal = new String[]{"aaa", "bbb"};
-		newProps.put("references", Arrays.asList(testArrayVal));
-		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("references", propEntry);
-		testVal = "ccc";
-		newProps.put("references", testVal);
-		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
-		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		//update a prop (appendList) (always updates) (val/list case)
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("references", propEntry);
-		testVal = "aaa";
-		newProps.put("references", testVal);
-		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("references");
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("references", propEntry);
-		testArrayVal = new String[]{"bbb", "ccc"};
-		newProps.put("references", Arrays.asList(testArrayVal));
-		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
-		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		//update a prop (appendList) (always updates) (val/val case)
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "keepNew");
-		mergeMethods.put("references", propEntry);
-		testVal = "aaa";
-		newProps.put("references", testVal);
-		a.alignVertProps(id, newProps, mergeMethods);
-		testProp = (String)c.getVertByID(id).get("references");
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("references", propEntry);
-		testVal = "bbb";
-		newProps.put("references", testVal);
-		a.alignVertProps(id, newProps, mergeMethods);
-		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
-		testArrayVal = new String[]{"aaa", "bbb"};
-		assertTrue(Arrays.equals(testArrayVal, testproparray));
-
-		c.removeAllVertices();
-		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
-	}
-
 
 	/**
 	 * Testing the keepNew option for AlignVertProps
@@ -582,21 +466,24 @@ extends TestCase
 
 		//add a new prop
 		testVal = "aaaa";
-		newProps.put("testprop", testVal);
+		newProps.put("md5hashes", testVal);
 		a.alignVertProps(id, newProps, mergeMethods);	//id, new properties and how to merge 
 
-		testProp = (String)c.getVertByID(id).get("testprop");
-		assertEquals(testVal, testProp);
+		//testProp = (String)c.getVertByID(id).get("md5hashes");
+		ArrayList<String> expectedList = new ArrayList<String>();
+		expectedList.add(testVal);
+		ArrayList<String> testList = (ArrayList<String>)c.getVertByID(id).get("md5hashes");
+		assertEquals(expectedList, testList);
 
 		Map<String, Object> propEntry = new HashMap<String, Object>();
 		propEntry.put("resolutionFunction", "appendList");
-		mergeMethods.put("testprop", propEntry);
+		mergeMethods.put("md5hashes", propEntry);
 		testVal = "bbbb";
-		newProps.put("testprop", testVal);
+		newProps.put("md5hashes", testVal);
 
 		a.alignVertProps(id, newProps, mergeMethods);
-		ArrayList<String> testList = (ArrayList<String>)c.getVertByID(id).get("testprop");
-		ArrayList<String> expectedList = new ArrayList<String>();
+		testList = (ArrayList<String>)c.getVertByID(id).get("md5hashes");
+		expectedList = new ArrayList<String>();
 		expectedList.add("aaaa");
 		expectedList.add("bbbb");
 		assertEquals(expectedList, testList);
@@ -605,6 +492,73 @@ extends TestCase
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
+	/**
+	 * Testing the appendList option for AlignVertProps - more complex test
+	 */
+	public void testAlignVertPropsAppendListComplex()
+	{
+		DBConnection c = null;
+		Align a = null;
+		try{
+			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			c = new DBConnection( client );
+			a = new Align( c );
+		}catch(Exception e){
+			e.printStackTrace(); //TODO
+		} //the possible NPE below is fine, don't care if test errors.
+
+		c.removeAllVertices();
+		//c.removeAllEdges();
+
+		Map<String, Object> props = new HashMap<String,Object>();
+		props.put("NAME", "testvert_align_props");
+		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",NAME)", props);
+		//c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.commit();
+		String id = c.findVertId("testvert_align_props");
+
+		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
+		Map<String, Object> newProps = new HashMap<String,Object>();
+
+		String testVal, testProp;
+
+		//update a prop (appendList) (always updates) (list/list case)
+		Map<String, Object> propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("references", propEntry);
+		String[] testArrayVal = {"aaa", "bbb"};
+		newProps.put("references", Arrays.asList(testArrayVal));
+		a.alignVertProps(id, newProps, mergeMethods);
+		String[] testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
+		assertTrue(Arrays.equals(testArrayVal, testproparray));
+
+		//update a prop (appendList) (always updates) (list/val case)
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "appendList");
+		mergeMethods.put("references", propEntry);
+		testArrayVal = new String[]{"ccc"};
+		newProps.put("references", Arrays.asList(testArrayVal));
+		a.alignVertProps(id, newProps, mergeMethods);
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
+		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
+		assertTrue(Arrays.equals(testArrayVal, testproparray));
+
+		//update with existing values - should stay the same
+		propEntry = new HashMap<String, Object>();
+		propEntry.put("resolutionFunction", "keepNew");
+		mergeMethods.put("references", propEntry);
+		testArrayVal = new String[]{"aaa", "bbb"};
+		newProps.put("references", Arrays.asList(testArrayVal));
+		a.alignVertProps(id, newProps, mergeMethods);
+		testArrayVal = new String[]{"aaa", "bbb", "ccc"};
+		testproparray = ((ArrayList<String>)c.getVertByID(id).get("references")).toArray(new String[0]);
+		assertTrue(Arrays.equals(testArrayVal, testproparray));
+
+		c.removeAllVertices();
+		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
+	}
+	
 	/**
 	 * Testing the keepUpdates option for AlignVertProps
 	 */
@@ -624,7 +578,7 @@ extends TestCase
 		//c.removeAllEdges();
 
 		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.execute("v = g.addVertex();v.setProperty(\"timeStamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
@@ -646,7 +600,7 @@ extends TestCase
 		mergeMethods.put("state", propEntry);
 		testVal = "bbbb";
 		newProps.put("state", testVal);
-		newProps.put("timestamp", 1001L);
+		newProps.put("timeStamp", 1001L);
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)c.getVertByID(id).get("state");
 		assertEquals(testVal, testProp);
@@ -657,7 +611,7 @@ extends TestCase
 		mergeMethods.put("state", propEntry);
 		testVal = "cccc";
 		newProps.put("state", testVal);
-		newProps.put("timestamp", 999L);
+		newProps.put("timeStamp", 999L);
 		a.alignVertProps(id, newProps, mergeMethods);
 		testProp = (String)c.getVertByID(id).get("state");
 		testVal = "bbbb";
@@ -686,7 +640,7 @@ extends TestCase
 		//c.removeAllEdges();
 
 		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"timestamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
+		c.execute("v = g.addVertex();v.setProperty(\"timeStamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
 		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
