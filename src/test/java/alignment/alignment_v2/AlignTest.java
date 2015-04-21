@@ -57,6 +57,12 @@ extends TestCase
 		Align a = null;
 		try{
 			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"references\");");
+			if(names.get(0) == null){
+				client.execute("mgmt = g.getManagementSystem();"
+					+ "name = mgmt.makePropertyKey(\"references\").dataType(String.class).cardinality(Cardinality.SET).make();"
+					+ "mgmt.commit();g;");
+			}
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -173,6 +179,12 @@ extends TestCase
 		Align a = null;
 		try{
 			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"references\");");
+			if(names.get(0) == null){
+				client.execute("mgmt = g.getManagementSystem();"
+					+ "name = mgmt.makePropertyKey(\"references\").dataType(String.class).cardinality(Cardinality.SET).make();"
+					+ "mgmt.commit();g;");
+			}
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -425,6 +437,12 @@ extends TestCase
 		Align a = null;
 		try{
 			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"md5hashes\");");
+			if(names.get(0) == null){
+				client.execute("mgmt = g.getManagementSystem();"
+					+ "name = mgmt.makePropertyKey(\"md5hashes\").dataType(String.class).cardinality(Cardinality.SET).make();"
+					+ "mgmt.commit();g;");
+			}
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -437,12 +455,10 @@ extends TestCase
 		String testVertex = "v = g.addVertex();" + 
 				"v.setProperty(\"name\",\"CVE-1999-0006\");" + 
 				"v.setProperty(\"cvssDate\", \"1500\");" + 
-				"v.addProperty(\"references\", \"http://www.securityfocus.com/bid/133\");" +
 				"v.setProperty(\"_type\", \"vertex\");" +
 				"v.setProperty(\"availabilityImpact\", \"COMPLETE\");" +
 				"v.setProperty(\"description\", \"Buffer overflow in POP servers based on BSD/Qualcomm's qpopper allows remote attackers to gain root access using a long PASS command.\");" +
-				"v.addProperty(\"source\", \"NVD\");" + 
-				//"v.setProperty(\"vulnerableSoftware\", \"cpe:/a:qualcomm:qpopper:2.4\");" + 
+				"v.addProperty(\"source\", \"NVD\");" +  
 				"v.setProperty(\"vertexType\", \"vulnerability\");" + 
 				"v.setProperty(\"accessComplexity\", \"LOW\");" + 
 				"v.setProperty(\"confidentialityImpact\", \"COMPLETE\");" + 
@@ -501,6 +517,12 @@ extends TestCase
 		Align a = null;
 		try{
 			RexsterClient client = DBConnection.createClient(DBConnection.getTestConfig(), WAIT_TIME);
+			List names = client.execute("mgmt = g.getManagementSystem();mgmt.getPropertyKey(\"references\");");
+			if(names.get(0) == null){
+				client.execute("mgmt = g.getManagementSystem();"
+					+ "name = mgmt.makePropertyKey(\"references\").dataType(String.class).cardinality(Cardinality.SET).make();"
+					+ "mgmt.commit();g;");
+			}
 			c = new DBConnection( client );
 			a = new Align( c );
 		}catch(Exception e){
@@ -546,7 +568,7 @@ extends TestCase
 
 		//update with existing values - should stay the same
 		propEntry = new HashMap<String, Object>();
-		propEntry.put("resolutionFunction", "keepNew");
+		propEntry.put("resolutionFunction", "appendList");
 		mergeMethods.put("references", propEntry);
 		testArrayVal = new String[]{"aaa", "bbb"};
 		newProps.put("references", Arrays.asList(testArrayVal));

@@ -137,6 +137,7 @@ public class Align
 				vertMap = jsonVertToMap(vert);
 				//connection.addVertexFromJSON(vert);
 				connection.addVertexFromMap(vertMap);
+				connection.commit();
 				List<JSONObject> newEdges = findNewEdges(vert);
 				for(JSONObject edge: newEdges){
 					edges.add(edge);
