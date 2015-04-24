@@ -148,7 +148,7 @@ public class Align
 					alignVertProps(otherVertID, vertMap);
 				}
 				else{
-					logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert...");
+					logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
 				}
 			}
 			i++;
@@ -177,7 +177,7 @@ public class Align
 			String label = edge.optString("_label");
 			if(connection.edgeExists(inv_id, outv_id, label)){
 				//TODO need to merge edge props for this case, like verts above...
-				logger.debug("Attempted to add edge with duplicate name.  ignoring ...");
+				logger.debug("Attempted to add duplicate edge.  ignoring it.  edge was: " + edge);
 				continue;
 			}
 			connection.addEdgeFromJSON(edge);
