@@ -215,7 +215,7 @@ extends TestCase
 				"]}";
 
 		a.load(test_graphson_verts);
-
+		
 		test_graphson_verts = "{\"vertices\":[" +
 				"{\"_id\":\"69.42.192.0_through_69.43.159.255\"," +
 				"\"_type\":\"vertex\","+
@@ -229,7 +229,7 @@ extends TestCase
 				"]}";
 
 		a.load(test_graphson_verts);
-
+		
 		String outv_id = c.findVertId("69.42.215.170");
 		String inv_id = c.findVertId("69.42.192.0_through_69.43.159.255");
 		assertTrue(c.edgeExists(inv_id, outv_id, "inAddressRange"));
@@ -264,7 +264,6 @@ extends TestCase
 
 		outv_id = c.findVertId("9.42.215.170");
 		assertFalse(c.edgeExists(inv_id, outv_id, "inAddressRange"));
-
 
 		test_graphson_verts = "{\"vertices\":[" +
 				"{\"_id\":\"69.42.215.171\"," +
