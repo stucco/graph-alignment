@@ -34,11 +34,11 @@ public class Align
 	private ConfigFileLoader config = null;
 	private DBConnection connection = null;
 
-	public Align(){
+	public Align() throws IOException{
 		this(new DBConnection());
 	}
 
-	public Align(DBConnection c) {
+	public Align(DBConnection c) throws IOException {
 		this.connection = c;
 		client = connection.getClient(); //TODO shouldn't need this...
 
@@ -72,6 +72,8 @@ public class Align
 		//do all the json obj parsing up front, in case you need to panic & leave early.
 		List<JSONObject> verts = new ArrayList<JSONObject>();
 		List<JSONObject> edges = new ArrayList<JSONObject>();
+		List<JSONObject> vertsToRetry = new ArrayList<JSONObject>();
+		List<JSONObject> edgesToRetry = new ArrayList<JSONObject>();
 		try{
 			JSONObject graphson = new JSONObject(newGraphSection);
 			JSONArray json_verts = graphson.optJSONArray("vertices");
@@ -106,87 +108,121 @@ public class Align
 		//for *vertices*, you have a json object that you can load.
 		int i=0;
 		for(JSONObject vert : verts){
-			String vert_name = vert.getString("name");
-			String vert_id = vert.optString("_id");
-			if(vert_name == null || vert_name == ""){
-				vert_name = vert_id;
-				vert.put("name", vert_name);
-			}
-			boolean new_vert = false;
-			String otherVertID = connection.findVertId(vert_name);
-			new_vert = (otherVertID == null);
-			Map<String, Object> vertMap = null;
-			if(!new_vert && SEARCH_FOR_DUPLICATES){
-				vertMap = jsonVertToMap(vert);
-				otherVertID = findDuplicateVertex(vertMap);
+			try{
+				String vert_name = vert.getString("name");
+				String vert_id = vert.optString("_id");
+				if(vert_name == null || vert_name == ""){
+					vert_name = vert_id;
+					vert.put("name", vert_name);
+				}
+				boolean new_vert = false;
+				String otherVertID = connection.findVertId(vert_name);
 				new_vert = (otherVertID == null);
-			}
-			if(new_vert){ //only add new...
-				String type = null;
-				type = (String)vert.opt("vertexType");
-				if(type.equals("IP")){ 
-					//if its an ip vert, and doesn't have an ip int, just add that here.
-					//TODO: the extractors should really be doing this, but some aren't
-					long ipInt = vert.optLong("ipInt");
-					if(ipInt == 0){
-						String ipString = vert.getString("name");
-						ipInt = getIpInt(ipString);
-						vert.put("ipInt", ipInt);
+				Map<String, Object> vertMap = null;
+				if(!new_vert && SEARCH_FOR_DUPLICATES){
+					vertMap = jsonVertToMap(vert);
+					otherVertID = findDuplicateVertex(vertMap);
+					new_vert = (otherVertID == null);
+				}
+				if(new_vert){ //only add new...
+					String type = null;
+					type = (String)vert.opt("vertexType");
+					if(type.equals("IP")){ 
+						//if its an ip vert, and doesn't have an ip int, just add that here.
+						//TODO: the extractors should really be doing this, but some aren't
+						long ipInt = vert.optLong("ipInt");
+						if(ipInt == 0){
+							String ipString = vert.getString("name");
+							ipInt = getIpInt(ipString);
+							vert.put("ipInt", ipInt);
+						}
+					}
+					vertMap = jsonVertToMap(vert);
+					//connection.addVertexFromJSON(vert);
+					connection.addVertexFromMap(vertMap);
+					connection.commit();
+					List<JSONObject> newEdges = findNewEdges(vert);
+					for(JSONObject edge: newEdges){
+						edges.add(edge);
+					}
+				}else{
+					if(ALIGN_VERT_PROPS){
+						if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
+						alignVertProps(otherVertID, vertMap);
+					}
+					else{
+						logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
 					}
 				}
-				vertMap = jsonVertToMap(vert);
-				//connection.addVertexFromJSON(vert);
-				connection.addVertexFromMap(vertMap);
-				connection.commit();
-				List<JSONObject> newEdges = findNewEdges(vert);
-				for(JSONObject edge: newEdges){
-					edges.add(edge);
-				}
-			}else{
-				if(ALIGN_VERT_PROPS){
-					if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
-					alignVertProps(otherVertID, vertMap);
-				}
-				else{
-					logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
-				}
+			}catch(Exception e){
+				//TODO warn
+				vertsToRetry.add(vert);
 			}
 			i++;
 			if(i%150 == 0){ //TODO revisit this 
-				connection.commit();//only commit periodically, so that operations can be combined by Titan.
+				//only commit periodically, so that operations can be combined by Titan.
+				try {
+					connection.commit();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		connection.commit(); //make sure all verts are committed before proceeding.
+		//make sure all verts are committed before proceeding.
+		try {
+			connection.commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		Map<String, Object> param = new HashMap<String, Object>();
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
 		i=0;
 		for(JSONObject edge : edges){
-			String outv_id = connection.findVertId(edge.getString("_outV"));
-			String inv_id = connection.findVertId(edge.getString("_inV"));
-			String edgeName = edge.getString("_id");
-			//String edgeID = findEdgeId(edgeName);
-			if(outv_id == null){
-				logger.error("Could not find out_v for edge: " + edge);
-				continue;
+			try{
+				String outv_id = connection.findVertId(edge.getString("_outV"));
+				String inv_id = connection.findVertId(edge.getString("_inV"));
+				String edgeName = edge.getString("_id");
+				//String edgeID = findEdgeId(edgeName);
+				if(outv_id == null){
+					logger.error("Could not find out_v for edge: " + edge);
+					continue;
+				}
+				if(inv_id == null){
+					logger.error("Could not find in_v for edge: " + edge);
+					continue;
+				}
+				String label = edge.optString("_label");
+				if(connection.edgeExists(inv_id, outv_id, label)){
+					//TODO need to merge edge props for this case, like verts above...
+					logger.debug("Attempted to add duplicate edge.  ignoring it.  edge was: " + edge);
+					continue;
+				}
+				connection.addEdgeFromJSON(edge);
+			}catch(Exception e){
+				//TODO warn
+				edgesToRetry.add(edge);
 			}
-			if(inv_id == null){
-				logger.error("Could not find in_v for edge: " + edge);
-				continue;
-			}
-			String label = edge.optString("_label");
-			if(connection.edgeExists(inv_id, outv_id, label)){
-				//TODO need to merge edge props for this case, like verts above...
-				logger.debug("Attempted to add duplicate edge.  ignoring it.  edge was: " + edge);
-				continue;
-			}
-			connection.addEdgeFromJSON(edge);
 			i++;
 			if(i%150 == 0){ //TODO revisit this
-				connection.commit();//only commit periodically, so that operations can be combined by Titan.
+				//only commit periodically, so that operations can be combined by Titan.
+				try {
+					connection.commit();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
-		connection.commit(); //make sure all edges are committed also.
+		//make sure all edges are committed also.
+		try {
+			connection.commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return true;//TODO what if some execute()s pass and some fail?
 	}
@@ -275,14 +311,14 @@ public class Align
 		return edges;
 	}
 
-	public void alignVertProps(String vertID, Map<String, Object> newProps){
+	public void alignVertProps(String vertID, Map<String, Object> newProps) throws RexProException, IOException{
 		String type = (String)newProps.get("vertexType");
 		Map<String, Map<String, Object>> mergeMethods = getVertexConfig(type);
 		alignVertProps(vertID, newProps, mergeMethods);
 	}
 	
 	//mergeMethods are derived from ontology definition
-	public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, Map<String, Object>> vertConfig){
+	public void alignVertProps(String vertID, Map<String, Object> newProps, Map<String, Map<String, Object>> vertConfig) throws RexProException, IOException{
 
 		//	System.out.println("vertID = " + vertID);
 		//	System.out.println("newProps = " + newProps);

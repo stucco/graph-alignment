@@ -50,8 +50,10 @@ extends TestCase
 	/**
 	 * Add a duplicate vertex, from a different source, with similar but non-identical properties.
 	 * See if the Align class can identify that they should be matched.
+	 * @throws IOException 
+	 * @throws RexProException 
 	 */
-	public void testLoadDuplicate()
+	public void testLoadDuplicate() throws RexProException, IOException
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -173,7 +175,7 @@ extends TestCase
 		//DBConnection.closeClient(this.client); //can close now, instead of waiting for finalize() to do it
 	}
 
-	public void testIPRangeHandling()
+	public void testIPRangeHandling() throws IOException, RexProException
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -377,9 +379,11 @@ extends TestCase
 
 	/**
 	 * Testing the keepNew option for AlignVertProps
+	 * @throws IOException 
+	 * @throws RexProException 
 	 */
 
-	public void testAlignVertPropsKeepNew()
+	public void testAlignVertPropsKeepNew() throws RexProException, IOException
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -428,9 +432,11 @@ extends TestCase
 
 	/**
 	 * Testing the appendList option for AlignVertProps
+	 * @throws IOException 
+	 * @throws RexProException 
 	 */
 
-	public void testAlignVertPropsAppendList()
+	public void testAlignVertPropsAppendList() throws RexProException, IOException
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -509,8 +515,10 @@ extends TestCase
 
 	/**
 	 * Testing the appendList option for AlignVertProps - more complex test
+	 * @throws IOException 
+	 * @throws RexProException 
 	 */
-	public void testAlignVertPropsAppendListComplex()
+	public void testAlignVertPropsAppendListComplex() throws RexProException, IOException
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -582,8 +590,10 @@ extends TestCase
 	
 	/**
 	 * Testing the keepUpdates option for AlignVertProps
+	 * @throws IOException 
+	 * @throws RexProException 
 	 */
-	public void testAlignVertPropsKeepUpdates()
+	public void testAlignVertPropsKeepUpdates() throws RexProException, IOException
 	{
 		DBConnection c = null;
 		Align a = null;
@@ -644,8 +654,10 @@ extends TestCase
 
 	/**
 	 * Testing the keepConfidence option for AlignVertProps
+	 * @throws IOException 
+	 * @throws RexProException 
 	 */
-	public void testAlignVertPropsKeepConfidence()
+	public void testAlignVertPropsKeepConfidence() throws RexProException, IOException
 	{
 		DBConnection c = null;
 		Align a = null;
