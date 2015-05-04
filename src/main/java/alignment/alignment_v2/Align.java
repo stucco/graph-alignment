@@ -69,6 +69,7 @@ public class Align
 
 	public boolean load(String newGraphSection){
 
+		boolean ret = true;
 		//do all the json obj parsing up front, in case you need to panic & leave early.
 		List<JSONObject> verts = new ArrayList<JSONObject>();
 		List<JSONObject> edges = new ArrayList<JSONObject>();
@@ -118,35 +119,23 @@ public class Align
 				boolean new_vert = false;
 				String otherVertID = connection.findVertId(vert_name);
 				new_vert = (otherVertID == null);
-				Map<String, Object> vertMap = null;
+				
 				if(!new_vert && SEARCH_FOR_DUPLICATES){
+					Map<String, Object> vertMap = null;
 					vertMap = jsonVertToMap(vert);
 					otherVertID = findDuplicateVertex(vertMap);
 					new_vert = (otherVertID == null);
 				}
 				if(new_vert){ //only add new...
-					String type = null;
-					type = (String)vert.opt("vertexType");
-					if(type.equals("IP")){ 
-						//if its an ip vert, and doesn't have an ip int, just add that here.
-						//TODO: the extractors should really be doing this, but some aren't
-						long ipInt = vert.optLong("ipInt");
-						if(ipInt == 0){
-							String ipString = vert.getString("name");
-							ipInt = getIpInt(ipString);
-							vert.put("ipInt", ipInt);
-						}
-					}
-					vertMap = jsonVertToMap(vert);
-					//connection.addVertexFromJSON(vert);
-					connection.addVertexFromMap(vertMap);
-					connection.commit();
+					loadNewJSONVert(vert);
+					
 					List<JSONObject> newEdges = findNewEdges(vert);
 					for(JSONObject edge: newEdges){
 						edges.add(edge);
 					}
 				}else{
 					if(ALIGN_VERT_PROPS){
+						Map<String, Object> vertMap = null;
 						if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
 						alignVertProps(otherVertID, vertMap);
 					}
@@ -159,7 +148,7 @@ public class Align
 				vertsToRetry.add(vert);
 			}
 			i++;
-			if(i%150 == 0){ //TODO revisit this 
+			if(i%100 == 0){ //TODO revisit this 
 				//only commit periodically, so that operations can be combined by Titan.
 				try {
 					connection.commit();
@@ -177,36 +166,18 @@ public class Align
 			e.printStackTrace();
 		}
 
-		Map<String, Object> param = new HashMap<String, Object>();
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
 		i=0;
 		for(JSONObject edge : edges){
 			try{
-				String outv_id = connection.findVertId(edge.getString("_outV"));
-				String inv_id = connection.findVertId(edge.getString("_inV"));
-				String edgeName = edge.getString("_id");
-				//String edgeID = findEdgeId(edgeName);
-				if(outv_id == null){
-					logger.error("Could not find out_v for edge: " + edge);
-					continue;
-				}
-				if(inv_id == null){
-					logger.error("Could not find in_v for edge: " + edge);
-					continue;
-				}
-				String label = edge.optString("_label");
-				if(connection.edgeExists(inv_id, outv_id, label)){
-					//TODO need to merge edge props for this case, like verts above...
-					logger.debug("Attempted to add duplicate edge.  ignoring it.  edge was: " + edge);
-					continue;
-				}
-				connection.addEdgeFromJSON(edge);
+				boolean edgeResult = loadJSONEdge(edge);
+				if( edgeResult == false) edgesToRetry.add(edge);  //this can happen if the edge is missing one of its verts, which could be in the retry queue as well.
 			}catch(Exception e){
 				//TODO warn
 				edgesToRetry.add(edge);
 			}
 			i++;
-			if(i%150 == 0){ //TODO revisit this
+			if(i%100 == 0){ //TODO revisit this
 				//only commit periodically, so that operations can be combined by Titan.
 				try {
 					connection.commit();
@@ -224,9 +195,137 @@ public class Align
 			e.printStackTrace();
 		}
 
-		return true;//TODO what if some execute()s pass and some fail?
+		//retry verts as needed.
+		i=0;
+		for(JSONObject vert : vertsToRetry){
+			try{
+				String vert_name = vert.getString("name");
+				boolean new_vert = false;
+				String otherVertID = connection.findVertId(vert_name);
+				new_vert = (otherVertID == null);
+				
+				if(!new_vert && SEARCH_FOR_DUPLICATES){
+					Map<String, Object> vertMap = null;
+					vertMap = jsonVertToMap(vert);
+					otherVertID = findDuplicateVertex(vertMap);
+					new_vert = (otherVertID == null);
+				}
+				if(new_vert){ //only add new...
+					loadNewJSONVert(vert);
+					
+					List<JSONObject> newEdges = findNewEdges(vert);
+					for(JSONObject edge: newEdges){
+						edges.add(edge);
+					}
+				}else{
+					if(ALIGN_VERT_PROPS){
+						Map<String, Object> vertMap = null;
+						if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
+						alignVertProps(otherVertID, vertMap);
+					}
+					else{
+						logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
+					}
+				}
+			}catch(Exception e){
+				//TODO warn
+				ret = false;
+			}
+			i++;
+			if(i%100 == 0){ //TODO revisit this 
+				//only commit periodically, so that operations can be combined by Titan.
+				try {
+					connection.commit();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		//make sure all verts are committed before proceeding.
+		try {
+			connection.commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
+		i=0;
+		for(JSONObject edge : edgesToRetry){
+			try{
+				loadJSONEdge(edge); //TODO: unused return code - is it useful here?
+			}catch(Exception e){
+				//TODO warn
+				ret = false;
+			}
+			i++;
+			if(i%100 == 0){ //TODO revisit this
+				//only commit periodically, so that operations can be combined by Titan.
+				try {
+					connection.commit();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		//make sure all edges are committed also.
+		try {
+			connection.commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return ret;//TODO currently this is not idempotent, but after docIDs are added to the metadata (and used) they will be.
 	}
 
+	private void loadNewJSONVert(JSONObject vert) throws RexProException, IOException{
+		Map<String, Object> vertMap = null;
+		String type = null;
+		type = (String)vert.opt("vertexType");
+		if(type.equals("IP")){ 
+			//if its an ip vert, and doesn't have an ip int, just add that here.
+			//TODO: the extractors should really be doing this, but some aren't
+			long ipInt = vert.optLong("ipInt");
+			if(ipInt == 0){
+				String ipString = vert.getString("name");
+				ipInt = getIpInt(ipString);
+				vert.put("ipInt", ipInt);
+			}
+		}
+		vertMap = jsonVertToMap(vert);
+		//connection.addVertexFromJSON(vert);
+		connection.addVertexFromMap(vertMap);
+		connection.commit();
+	}
+	
+	//return true if succeeded
+	//return false if edge cannot be added
+	private boolean loadJSONEdge(JSONObject edge) throws JSONException, IOException, RexProException{
+		String outv_id = connection.findVertId(edge.getString("_outV"));
+		String inv_id = connection.findVertId(edge.getString("_inV"));
+		String edgeName = edge.getString("_id");
+		//String edgeID = findEdgeId(edgeName);
+		if(outv_id == null){
+			logger.error("Could not find out_v for edge: " + edge);
+			return false;
+		}
+		if(inv_id == null){
+			logger.error("Could not find in_v for edge: " + edge);
+			return false;
+		}
+		String label = edge.optString("_label");
+		if(connection.edgeExists(inv_id, outv_id, label)){
+			//TODO need to merge edge props for this case, like verts above...
+			logger.debug("Attempted to add duplicate edge.  ignoring it.  edge was: " + edge);
+			return false;
+		}
+		connection.addEdgeFromJSON(edge); //TODO unused return code from this - is it even useful?
+		return true;
+	}
+	
 	private List<JSONObject> findNewEdges(JSONObject vert) {
 		List<JSONObject> edges = new ArrayList<JSONObject>();
 		
