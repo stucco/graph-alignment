@@ -398,9 +398,7 @@ extends TestCase
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\")");
-		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
@@ -475,9 +473,7 @@ extends TestCase
 				"v.setProperty(\"publishedDate\", \"2000\");" +
 				"v.setProperty(\"accessVector\", \"NETWORK\")";
 
-		c.commit();
-		c.execute(testVertex);
-		c.commit();
+		c.execute(testVertex + ";g.commit()");
 
 		String id = c.findVertId("CVE-1999-0006");
 		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
@@ -541,10 +537,8 @@ extends TestCase
 
 		Map<String, Object> props = new HashMap<String,Object>();
 		props.put("NAME", "testvert_align_props");
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",NAME)", props);
+		c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",NAME);g.commit()", props);
 		//c.execute("v = g.addVertex();v.setProperty(\"startTime\",55);v.setProperty(\"name\",\"testvert_align_props\")");
-		c.commit();
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
@@ -608,9 +602,7 @@ extends TestCase
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"timeStamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
-		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"timeStamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();
@@ -672,9 +664,7 @@ extends TestCase
 		c.removeAllVertices();
 		//c.removeAllEdges();
 
-		c.commit();
-		c.execute("v = g.addVertex();v.setProperty(\"timeStamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\")");
-		c.commit();
+		c.execute("v = g.addVertex();v.setProperty(\"timeStamp\",1000L);v.setProperty(\"name\",\"testvert_align_props\");g.commit()");
 		String id = c.findVertId("testvert_align_props");
 
 		Map<String, Map<String, Object>> mergeMethods = new HashMap<String, Map<String, Object>>();

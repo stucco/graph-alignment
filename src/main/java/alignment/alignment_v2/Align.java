@@ -107,7 +107,6 @@ public class Align
 		}
 
 		//for *vertices*, you have a json object that you can load.
-		int i=0;
 		for(JSONObject vert : verts){
 			try{
 				String vert_name = vert.getString("name");
@@ -147,27 +146,9 @@ public class Align
 				//TODO warn
 				vertsToRetry.add(vert);
 			}
-			i++;
-			if(i%100 == 0){ //TODO revisit this 
-				//only commit periodically, so that operations can be combined by Titan.
-				try {
-					connection.commit();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		//make sure all verts are committed before proceeding.
-		try {
-			connection.commit();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
-		i=0;
 		for(JSONObject edge : edges){
 			try{
 				boolean edgeResult = loadJSONEdge(edge);
@@ -176,27 +157,9 @@ public class Align
 				//TODO warn
 				edgesToRetry.add(edge);
 			}
-			i++;
-			if(i%100 == 0){ //TODO revisit this
-				//only commit periodically, so that operations can be combined by Titan.
-				try {
-					connection.commit();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		//make sure all edges are committed also.
-		try {
-			connection.commit();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		//retry verts as needed.
-		i=0;
 		for(JSONObject vert : vertsToRetry){
 			try{
 				String vert_name = vert.getString("name");
@@ -231,27 +194,9 @@ public class Align
 				//TODO warn
 				ret = false;
 			}
-			i++;
-			if(i%100 == 0){ //TODO revisit this 
-				//only commit periodically, so that operations can be combined by Titan.
-				try {
-					connection.commit();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		//make sure all verts are committed before proceeding.
-		try {
-			connection.commit();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
-		i=0;
 		for(JSONObject edge : edgesToRetry){
 			try{
 				loadJSONEdge(edge); //TODO: unused return code - is it useful here?
@@ -259,23 +204,6 @@ public class Align
 				//TODO warn
 				ret = false;
 			}
-			i++;
-			if(i%100 == 0){ //TODO revisit this
-				//only commit periodically, so that operations can be combined by Titan.
-				try {
-					connection.commit();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		//make sure all edges are committed also.
-		try {
-			connection.commit();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 		return ret;//TODO currently this is not idempotent, but after docIDs are added to the metadata (and used) they will be.
@@ -298,7 +226,6 @@ public class Align
 		vertMap = jsonVertToMap(vert);
 		//connection.addVertexFromJSON(vert);
 		connection.addVertexFromMap(vertMap);
-		connection.commit();
 	}
 	
 	//return true if succeeded
