@@ -151,7 +151,7 @@ public class Align
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
 		for(JSONObject edge : edges){
 			try{
-				boolean edgeResult = loadJSONEdge(edge);
+				boolean edgeResult = loadJSONEdge(edge, false);
 				if( edgeResult == false) edgesToRetry.add(edge);  //this can happen if the edge is missing one of its verts, which could be in the retry queue as well.
 			}catch(Exception e){
 				//TODO warn
@@ -199,7 +199,7 @@ public class Align
 		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
 		for(JSONObject edge : edgesToRetry){
 			try{
-				loadJSONEdge(edge); //TODO: unused return code - is it useful here?
+				loadJSONEdge(edge, true); //TODO: unused return code - is it useful here?
 			}catch(Exception e){
 				//TODO warn
 				ret = false;
@@ -228,23 +228,27 @@ public class Align
 		connection.addVertexFromMap(vertMap);
 	}
 	
+	private boolean loadJSONEdge(JSONObject edge) throws JSONException, IOException, RexProException{
+		return loadJSONEdge(edge, true);
+	}
+	
 	//return true if succeeded
 	//return false if edge cannot be added
-	private boolean loadJSONEdge(JSONObject edge) throws JSONException, IOException, RexProException{
+	private boolean loadJSONEdge(JSONObject edge, boolean lastTry) throws JSONException, IOException, RexProException{
 		String outv_id = connection.findVertId(edge.getString("_outV"));
 		String inv_id = connection.findVertId(edge.getString("_inV"));
 		String edgeName = edge.getString("_id");
 		//String edgeID = findEdgeId(edgeName);
 		if(outv_id == null){
-			logger.error("Could not find out_v for edge: " + edge);
+			if(lastTry) logger.warn("Could not find out_v for edge: " + edge);
 			return false;
 		}
 		if(inv_id == null){
-			logger.error("Could not find in_v for edge: " + edge);
+			if(lastTry) logger.warn("Could not find in_v for edge: " + edge);
 			return false;
 		}
 		String label = edge.optString("_label");
-		if(connection.edgeExists(inv_id, outv_id, label)){
+		if(connection.getEdgeCount(inv_id, outv_id, label) >= 1){
 			//TODO need to merge edge props for this case, like verts above...
 			logger.debug("Attempted to add duplicate edge.  ignoring it.  edge was: " + edge);
 			return false;
