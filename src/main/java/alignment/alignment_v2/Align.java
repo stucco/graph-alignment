@@ -58,17 +58,6 @@ public class Align
 		super.finalize();
 	}
 
-
-
-	//   public void printGraph()	{
-	//   	int i = 1;
-	//   	for (String key : vertIDCache.keySet())	{
-	//  		System.out.println(i + " key = " + key + "; value = " + vertIDCache.get(key));
-	//  		i++;
-	//  	}
-	//   }
-
-
 	public boolean load(String newGraphSection){
 
 		boolean ret = true;
