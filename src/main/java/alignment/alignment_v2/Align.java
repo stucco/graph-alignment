@@ -5,6 +5,8 @@ import gov.ornl.stucco.DBClient.DBConnection;
 import gov.ornl.stucco.DBClient.Constraint.Condition;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -143,7 +145,9 @@ public class Align
 					}
 				}
 			}catch(Exception e){
-				//TODO warn
+				logger.info("Could not add vertex!  Adding vertex to retry queue.");
+				logger.info("vertex was: " + vert);
+				logger.info("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
 				vertsToRetry.add(vert);
 			}
 		}
@@ -154,7 +158,9 @@ public class Align
 				boolean edgeResult = loadJSONEdge(edge, false);
 				if( edgeResult == false) edgesToRetry.add(edge);  //this can happen if the edge is missing one of its verts, which could be in the retry queue as well.
 			}catch(Exception e){
-				//TODO warn
+				logger.info("Could not add edge!  Adding edge to retry queue.");
+				logger.info("edge was: " + edge);
+				logger.info("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
 				edgesToRetry.add(edge);
 			}
 		}
@@ -191,7 +197,9 @@ public class Align
 					}
 				}
 			}catch(Exception e){
-				//TODO warn
+				logger.error("Could not add vertex!  Vertex is out of retry attempts!");
+				logger.error("vertex was: " + vert);
+				logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
 				ret = false;
 			}
 		}
@@ -201,7 +209,9 @@ public class Align
 			try{
 				loadJSONEdge(edge, true); //TODO: unused return code - is it useful here?
 			}catch(Exception e){
-				//TODO warn
+				logger.error("Could not add edge!  Edge is out of retry attempts!");
+				logger.error("edge was: " + edge);
+				logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
 				ret = false;
 			}
 		}
@@ -515,6 +525,13 @@ public class Align
 			e.printStackTrace();
 		}
 		return retAddr;
+	}
+	
+	private static String getStackTrace(Exception e){
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		e.printStackTrace(pw);
+		return sw.toString();
 	}
 
 }
