@@ -257,7 +257,7 @@ public class Align
 		return true;
 	}
 	
-	private List<JSONObject> findNewEdges(JSONObject vert) {
+	private List<JSONObject> findNewEdges(JSONObject vert) throws IOException, RexProException {
 		List<JSONObject> edges = new ArrayList<JSONObject>();
 		
 		String vert_name = vert.getString("name");
@@ -278,13 +278,9 @@ public class Align
 					c = new Constraint("ipInt", Condition.gte, startIpInt);
 					constraints.add(c);
 					List<Map<String,Object>> matches = null;
-					try {
-						matches = connection.findAllVertsWithProps(constraints);
-					} catch (IOException e) {
-						logger.error("Exception!",e);
-					} catch (RexProException e) {
-						logger.error("Exception!",e);
-					}
+
+					matches = connection.findAllVertsWithProps(constraints);
+
 					if(matches != null){
 						for(Map<String,Object> match : matches){
 							Map<String,Object> currMatchProps = (Map<String,Object>)match.get("_properties");
@@ -313,13 +309,9 @@ public class Align
 				c = new Constraint("startIPInt", Condition.lte, vert.getLong("ipInt"));
 				constraints.add(c);
 				List<Map<String,Object>> matches = null;
-				try {
-					matches = connection.findAllVertsWithProps(constraints);
-				} catch (IOException e) {
-					logger.error("Exception!",e);
-				} catch (RexProException e) {
-					logger.error("Exception!",e);
-				}
+
+				matches = connection.findAllVertsWithProps(constraints);
+
 				if(matches != null){
 					for(Map<String,Object> match : matches){
 						Map<String,Object> currMatchProps = (Map<String,Object>)match.get("_properties");
