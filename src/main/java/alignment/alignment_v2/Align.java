@@ -351,6 +351,15 @@ public class Align
 		while(k.hasNext()){
 			key = k.next();
 			if(oldProps.containsKey(key)){ //both old & new have this, so check how to merge.
+				if(key == "timeStamp" || key == "score"){
+					//yeah... don't try to merge those here, it breaks things.
+					//TODO these will need special handling .... and it will need to be someplace else, after we finish w/ the rest of the vert's props.
+					continue;
+				}
+				if(oldProps.get(key).equals(newProps.get(key))){
+					//if they're already the same value, don't waste any more time with it.
+					continue;
+				}
 				String mergeMethod = null;
 				try{
 					mergeMethod = (String) vertConfig.get(key).get("resolutionFunction");
@@ -361,10 +370,7 @@ public class Align
 					}
 				}
 				//			System.out.println("key = " + key + " mergeMethod = " + mergeMethod);
-				if(key == "timeStamp" || key == "score"){
-					//yeah... don't try to merge those here, it breaks things.
-					//TODO these will need special handling .... and it will need to be someplace else, after we finish w/ the rest of the vert's props.
-				}else if(mergeMethod == null || mergeMethod == "keepNew"){
+				if(mergeMethod == null || mergeMethod == "keepNew"){
 					oldProps.put(key, newProps.get(key));
 				}else if(mergeMethod == "appendList"){ 
 					Object oldVal = oldProps.get(key);
