@@ -31,6 +31,8 @@ public class Align
 
 	private static final boolean SEARCH_FOR_DUPLICATES = false;
 	private static final boolean ALIGN_VERT_PROPS = false;
+	private static final int VERTEX_RETRIES = 2;
+	private static final int EDGE_RETRIES = 2;
 	private RexsterClient client = null;
 	private Logger logger = null;
 	private ConfigFileLoader config = null;
@@ -64,8 +66,6 @@ public class Align
 		//do all the json obj parsing up front, in case you need to panic & leave early.
 		List<JSONObject> verts = new ArrayList<JSONObject>();
 		List<JSONObject> edges = new ArrayList<JSONObject>();
-		List<JSONObject> vertsToRetry = new ArrayList<JSONObject>();
-		List<JSONObject> edgesToRetry = new ArrayList<JSONObject>();
 		try{
 			JSONObject graphson = new JSONObject(newGraphSection);
 			JSONArray json_verts = graphson.optJSONArray("vertices");
@@ -97,114 +97,88 @@ public class Align
 			return false;
 		}
 
-		//for *vertices*, you have a json object that you can load.
-		for(JSONObject vert : verts){
-			try{
-				String vert_name = vert.getString("name");
-				String vert_id = vert.optString("_id");
-				if(vert_name == null || vert_name == ""){
-					vert_name = vert_id;
-					vert.put("name", vert_name);
-				}
-				boolean new_vert = false;
-				String otherVertID = connection.findVertId(vert_name);
-				new_vert = (otherVertID == null);
-				
-				if(!new_vert && SEARCH_FOR_DUPLICATES){
-					Map<String, Object> vertMap = null;
-					vertMap = jsonVertToMap(vert);
-					otherVertID = findDuplicateVertex(vertMap);
-					new_vert = (otherVertID == null);
-				}
-				if(new_vert){ //only add new...
-					loadNewJSONVert(vert);
-					
-					List<JSONObject> newEdges = findNewEdges(vert);
-					for(JSONObject edge: newEdges){
-						edges.add(edge);
+		//try loading vertices.
+		List<JSONObject> vertsToRetry;
+		for(int currTry = 0; currTry <= VERTEX_RETRIES; currTry++){
+			vertsToRetry = new ArrayList<JSONObject>();
+			for(JSONObject vert : verts){
+				try{
+					String vert_name = vert.getString("name");
+					String vert_id = vert.optString("_id");
+					if(vert_name == null || vert_name == ""){
+						vert_name = vert_id;
+						vert.put("name", vert_name);
 					}
-				}else{
-					if(ALIGN_VERT_PROPS){
+					boolean new_vert = false;
+					String otherVertID = connection.findVertId(vert_name);
+					new_vert = (otherVertID == null);
+
+					if(new_vert && SEARCH_FOR_DUPLICATES){
 						Map<String, Object> vertMap = null;
-						if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
-						alignVertProps(otherVertID, vertMap);
+						vertMap = jsonVertToMap(vert);
+						otherVertID = findDuplicateVertex(vertMap);
+						new_vert = (otherVertID == null);
+					}
+					if(new_vert){ //only add new...
+						loadNewJSONVert(vert);
+						List<JSONObject> newEdges = findNewEdges(vert);
+						for(JSONObject edge: newEdges){
+							edges.add(edge);
+						}
+					}else{
+						if(ALIGN_VERT_PROPS){
+							Map<String, Object> vertMap = null;
+							if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
+							alignVertProps(otherVertID, vertMap);
+						}
+						else{
+							logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
+						}
+					}
+				}catch(Exception e){
+					if(currTry >= VERTEX_RETRIES){ //out of tries
+						logger.error("Could not add vertex!  Vertex is out of retry attempts!");
+						logger.error("vertex was: " + vert);
+						logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
+						ret = false;
+					}else{
+						logger.info("Could not add vertex!  Adding vertex to retry queue.");
+						logger.info("vertex was: " + vert);
+						logger.info("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
+						vertsToRetry.add(vert);
+					}
+				}
+			}
+			verts = vertsToRetry;
+		}
+
+		//try loading edges.
+		List<JSONObject> edgesToRetry;
+		for(int currTry = 0; currTry <= EDGE_RETRIES; currTry++){
+			edgesToRetry = new ArrayList<JSONObject>();
+			logger.debug("");//TODO try count / edge count info
+			for(JSONObject edge : edges){
+				try{
+					boolean edgeResult = loadJSONEdge(edge, false);
+					if( edgeResult == false) edgesToRetry.add(edge);  //this can happen if the edge is missing one of its verts, which could be in the retry queue as well.
+				}catch(Exception e){
+					if(currTry >= EDGE_RETRIES){ //out of tries
+						logger.error("Could not add edge!  Edge is out of retry attempts!");
+						logger.error("edge was: " + edge);
+						logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
+						ret = false;
 					}
 					else{
-						logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
+						logger.info("Could not add edge!  Adding edge to retry queue.");
+						logger.info("edge was: " + edge);
+						logger.info("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
+						edgesToRetry.add(edge);
 					}
 				}
-			}catch(Exception e){
-				logger.info("Could not add vertex!  Adding vertex to retry queue.");
-				logger.info("vertex was: " + vert);
-				logger.info("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
-				vertsToRetry.add(vert);
 			}
+			edges = edgesToRetry;
 		}
 
-		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
-		for(JSONObject edge : edges){
-			try{
-				boolean edgeResult = loadJSONEdge(edge, false);
-				if( edgeResult == false) edgesToRetry.add(edge);  //this can happen if the edge is missing one of its verts, which could be in the retry queue as well.
-			}catch(Exception e){
-				logger.info("Could not add edge!  Adding edge to retry queue.");
-				logger.info("edge was: " + edge);
-				logger.info("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
-				edgesToRetry.add(edge);
-			}
-		}
-
-		//retry verts as needed.
-		for(JSONObject vert : vertsToRetry){
-			try{
-				String vert_name = vert.getString("name");
-				boolean new_vert = false;
-				String otherVertID = connection.findVertId(vert_name);
-				new_vert = (otherVertID == null);
-				
-				if(!new_vert && SEARCH_FOR_DUPLICATES){
-					Map<String, Object> vertMap = null;
-					vertMap = jsonVertToMap(vert);
-					otherVertID = findDuplicateVertex(vertMap);
-					new_vert = (otherVertID == null);
-				}
-				if(new_vert){ //only add new...
-					loadNewJSONVert(vert);
-					
-					List<JSONObject> newEdges = findNewEdges(vert);
-					for(JSONObject edge: newEdges){
-						edges.add(edge);
-					}
-				}else{
-					if(ALIGN_VERT_PROPS){
-						Map<String, Object> vertMap = null;
-						if(vertMap == null) vertMap = jsonVertToMap(vert); //might have this from above already, or might not
-						alignVertProps(otherVertID, vertMap);
-					}
-					else{
-						logger.debug("Attempted to add vertex when duplicate exists.  ALIGN_VERT_PROPS is false, so ignoring new vert.  vert was: " + vert);
-					}
-				}
-			}catch(Exception e){
-				logger.error("Could not add vertex!  Vertex is out of retry attempts!");
-				logger.error("vertex was: " + vert);
-				logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
-				ret = false;
-			}
-		}
-
-		//for *edges*, you can't really do that, so find IDs and build a map of needed properties instead.
-		for(JSONObject edge : edgesToRetry){
-			try{
-				loadJSONEdge(edge, true); //TODO: unused return code - is it useful here?
-			}catch(Exception e){
-				logger.error("Could not add edge!  Edge is out of retry attempts!");
-				logger.error("edge was: " + edge);
-				logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
-				ret = false;
-			}
-		}
-		
 		return ret;//TODO currently this is not idempotent, but after docIDs are added to the metadata (and used) they will be.
 	}
 
