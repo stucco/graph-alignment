@@ -155,14 +155,15 @@ public class Align
 		//try loading edges.
 		List<JSONObject> edgesToRetry;
 		for(int currTry = 0; currTry <= EDGE_RETRIES; currTry++){
+			boolean lastTry = currTry >= EDGE_RETRIES;
 			edgesToRetry = new ArrayList<JSONObject>();
-			logger.debug("");//TODO try count / edge count info
+			//logger.debug("");//TODO try count / edge count info
 			for(JSONObject edge : edges){
 				try{
-					boolean edgeResult = loadJSONEdge(edge, false);
+					boolean edgeResult = loadJSONEdge(edge, lastTry);
 					if( edgeResult == false) edgesToRetry.add(edge);  //this can happen if the edge is missing one of its verts, which could be in the retry queue as well.
 				}catch(Exception e){
-					if(currTry >= EDGE_RETRIES){ //out of tries
+					if(lastTry){ //out of tries
 						logger.error("Could not add edge!  Edge is out of retry attempts!");
 						logger.error("edge was: " + edge);
 						logger.error("exception was: " + e.getLocalizedMessage() + "\n" + getStackTrace(e));
