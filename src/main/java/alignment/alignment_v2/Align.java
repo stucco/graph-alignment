@@ -61,7 +61,6 @@ public class Align
 	}
 
 	public boolean load(String newGraphSection){
-
 		boolean ret = true;
 		//do all the json obj parsing up front, in case you need to panic & leave early.
 		List<JSONObject> verts = new ArrayList<JSONObject>();
@@ -96,7 +95,30 @@ public class Align
 			logger.error("Exception!",e);
 			return false;
 		}
-
+		return load(verts, edges);
+	}
+	
+	public boolean load(JSONObject newGraphSection){
+		boolean ret = true;
+		List<JSONObject> verts = new ArrayList<JSONObject>();
+		List<JSONObject> edges = new ArrayList<JSONObject>();
+		
+		JSONArray v = newGraphSection.getJSONArray("vertices");
+		for(int i=0; i<v.length(); i++){
+			verts.add(v.getJSONObject(i));
+		}
+		
+		JSONArray e = newGraphSection.getJSONArray("edges");
+		for(int i=0; i<e.length(); i++){
+			edges.add(e.getJSONObject(i));
+		}
+		
+		return load(verts, edges);
+	}
+	
+	public boolean load(List<JSONObject> verts, List<JSONObject> edges){
+		boolean ret = true;
+		
 		//try loading vertices.
 		List<JSONObject> vertsToRetry;
 		for(int currTry = 0; currTry <= VERTEX_RETRIES; currTry++){
