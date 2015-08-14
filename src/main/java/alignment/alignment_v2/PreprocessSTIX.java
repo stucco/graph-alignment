@@ -228,7 +228,8 @@ public class PreprocessSTIX {
 		try {
 			Document initialDoc = parseXMLText(STIXString);
 			Document normalizedDoc = normalizeSTIX(initialDoc);
-			JSONObject graph = generateGRAPHson(normalizedDoc);
+			Document finishedDoc = flattenSTIX(normalizedDoc);
+			JSONObject graph = generateGRAPHson(finishedDoc);
 			return graph;
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
@@ -252,6 +253,144 @@ public class PreprocessSTIX {
 		
 		//TODO: need to break off child nodes, re-add with idrefs
 		
+		return newDocument;
+	}
+	
+	
+	//Titan doesn't handle vertices with Object type values well.
+	//At this point, the document should be normalized, and items should be simple enough that we can just flatten them here.
+	static Document flattenSTIX(Document initialDoc) throws ParserConfigurationException {
+		//System.out.println("flattening document: " + XMLToString(initialDoc));
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(false);
+        DocumentBuilder builder;
+        Document newDocument = null;
+
+		builder = dbf.newDocumentBuilder();
+		newDocument = builder.newDocument();
+		Element newRoot = newDocument.createElement("stix:STIX_Package");
+		newDocument.appendChild(newRoot);
+		//System.out.println("created new document: " + XMLToString(newDocument));
+		
+		//handle attributes of root node.
+		NamedNodeMap attrs = initialDoc.getFirstChild().getAttributes();
+		for(int i=0; attrs != null && i<attrs.getLength(); i++){
+			Attr attr = (Attr) newDocument.importNode(attrs.item(i), true);
+			//newRoot.appendChild(attr);
+			newRoot.setAttribute(attr.getName(), attr.getValue());
+		}
+		
+		//build the initial list of nodes to handle
+		//NodeList nodes = initialDoc.getChildNodes();
+		NodeList nodes = initialDoc.getFirstChild().getChildNodes();
+		List<Node> nodesToHandle = new LinkedList<Node>();
+		for(int i=0; nodes != null && i<nodes.getLength(); i++){
+			//go ahead and make a new copy of these nodes, so they're associated with the new document, to save hassle later.
+			Node node = newDocument.importNode(nodes.item(i), true);
+			//skip empty text nodes.
+			if(isEmptyNode(node)){
+				continue;
+			}
+			nodesToHandle.add(node);
+		}
+		
+		//handle everything in the list as needed.
+		boolean done = false;
+		while(!done){
+			List<Node> nextNodesToHandle = new LinkedList<Node>();
+			for(Node n : nodesToHandle){
+				//skip empty text nodes.
+				if(isEmptyNode(n)){
+					continue;
+				}
+				short nTypeCode = n.getNodeType();
+				
+				//handle attributes of the current node
+				NamedNodeMap currAttrs = n.getAttributes();
+				for(int i=0; currAttrs != null && i<currAttrs.getLength(); i++){
+					//System.out.println("handling attributes of element: " + nodeToString(n));
+					Attr attr = (Attr) newDocument.importNode(currAttrs.item(i), true);
+					//n.removeChild(attr);
+					//newRoot.setAttribute(attr.getName(), attr.getValue());
+					String tagName = n.getNodeName() + "--" + attr.getName(); //getNodeName returns the tag name, if the node is an element node.
+					Element newElement = newDocument.createElement(tagName);
+					//newElement.setNodeValue(attr.getValue());
+					Node text = newDocument.createTextNode(attr.getValue());
+					newElement.appendChild(text);
+					//System.out.println("created new element: " + nodeToString(newElement));
+					newRoot.appendChild(newElement);
+					//System.out.println("modified the new document (3): " + XMLToString(newDocument));
+				}
+				
+				
+				//add this node if appropriate
+				if(!(n.hasChildNodes())){
+					newRoot.appendChild(n);
+					//System.out.println("modified the new document (1): " + XMLToString(newDocument));
+				}else if(n.getChildNodes().getLength() == 1 && n.getFirstChild().getNodeType() == Node.TEXT_NODE){
+					newRoot.appendChild(n);
+					//System.out.println("modified the new document (2): " + XMLToString(newDocument));
+				}else{ //and now handle the child nodes, by promoting them into the list for next time.
+					NodeList childNodes = n.getChildNodes();
+					for(int i=0; i<childNodes.getLength(); i++){
+						//Node newNode = n.cloneNode(false);
+						Node currChild = childNodes.item(i);
+						short currChildTypeCode = currChild.getNodeType();
+						//System.out.println("child node " + nodeToString(currChild));
+						if(currChildTypeCode == Node.ELEMENT_NODE){
+							String tagName = n.getNodeName() + "--" + currChild.getNodeName(); //getNodeName returns the tag name, if the node is an element node.
+							
+							Element newElement = newDocument.createElement(tagName);
+							//System.out.println("created new element: " + nodeToString(newElement));
+							
+							//NamedNodeMap childAttrs = currChild.getAttributes();
+							//for(int j=0; childAttrs != null && j<childAttrs.getLength(); j++){
+							//	Attr attr = (Attr) newDocument.importNode(childAttrs.item(j), true);
+							//	newElement.setAttribute(attr.getName(), attr.getValue());
+							//}
+							//handle attributes of the current node
+							//NamedNodeMap currAttrs = n.getAttributes();
+							NamedNodeMap childAttrs = currChild.getAttributes();
+							for(int j=0; childAttrs != null && j<childAttrs.getLength(); j++){
+								//System.out.println("handling attributes of element: " + nodeToString(n));
+								Attr attr = (Attr) newDocument.importNode(childAttrs.item(j), true);
+								//n.removeChild(attr);
+								//newRoot.setAttribute(attr.getName(), attr.getValue());
+								String tagName2 = n.getNodeName() + "--" + currChild.getNodeName() + "--" + attr.getName(); //getNodeName returns the tag name, if the node is an element node.
+								Element newElement2 = newDocument.createElement(tagName2);
+								//newElement.setNodeValue(attr.getValue());
+								Node text = newDocument.createTextNode(attr.getValue());
+								newElement2.appendChild(text);
+								//System.out.println("created new element: " + nodeToString(newElement2));
+								newRoot.appendChild(newElement2);
+								//System.out.println("modified the new document (3): " + XMLToString(newDocument));
+							}
+							
+							NodeList gChildNodes = currChild.getChildNodes();
+							//TODO: confirm that moving nodes below doesn't screw with the NodeList state.
+							for(int j=0; j<gChildNodes.getLength(); j++){
+								Node gChild = gChildNodes.item(j);
+								if(isEmptyNode(gChild)){
+									continue;
+								}
+								newElement.appendChild(gChild);
+							}
+							nextNodesToHandle.add(newElement);
+						}else{//TODO else (properly) handle other types as needed
+							//System.out.println("Element type is: " + currChildTypeCode);
+							nextNodesToHandle.add(currChild);
+							//newRoot.appendChild(currChild);
+							//System.out.println("modified the new document (3): " + XMLToString(newDocument));
+						}
+					}
+				}
+			}
+			if(nextNodesToHandle.size() == 0){
+				done = true;
+			}else{
+				nodesToHandle = nextNodesToHandle;
+			}
+		}
 		return newDocument;
 	}
 	
