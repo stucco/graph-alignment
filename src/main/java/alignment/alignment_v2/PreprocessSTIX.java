@@ -75,7 +75,71 @@ import org.xml.sax.SAXException;
 
 public class PreprocessSTIX {
 
-	
+	//"sort" the top-level elements of this STIX document (eg. so they can be more easily compared.)
+	static Document sortXML(Document initialDoc) throws ParserConfigurationException {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(false);
+        DocumentBuilder builder;
+        Document newDocument = null;
+        
+        builder = dbf.newDocumentBuilder();
+		newDocument = builder.newDocument();
+		Element newRoot = newDocument.createElement("stix:STIX_Package");
+		newDocument.appendChild(newRoot);
+		
+		//build the initial list of nodes to handle
+		//NodeList nodes = initialDoc.getChildNodes();
+		NodeList nodes = initialDoc.getFirstChild().getChildNodes();
+		if(nodes == null){ //if you never had any nodes, just return what you had.
+			return initialDoc;
+		}
+		int nodeCount = nodes.getLength();
+		List<Node> nodesToHandle = new ArrayList<Node>(nodeCount);
+		List<String> nodeStringsToHandle = new ArrayList<String>(nodeCount);
+		for(int i=0; nodes != null && i<nodeCount; i++){
+			//go ahead and make a new copy of these nodes, so they're associated with the new document, to save hassle later.
+			Node node = newDocument.importNode(nodes.item(i), true);
+			//skip empty text nodes.
+			if(isEmptyNode(node)){
+				continue;
+			}
+			nodesToHandle.add(node);
+			nodeStringsToHandle.add(nodeToString(node));
+		}
+		
+		//TODO: this is just a really crappy bubble sort.  But leaving it for now, since this is currently only used in the unit tests.
+		boolean sorted = false;
+		while(!sorted){
+			sorted = true;
+			for(int i=1; i<nodeCount; i++){
+				if( nodeStringsToHandle.get(i-1).compareTo(nodeStringsToHandle.get(i)) > 0){
+					sorted = false;
+					String tempString = nodeStringsToHandle.get(i-1);
+					nodeStringsToHandle.set(i-1, nodeStringsToHandle.get(i));
+					nodeStringsToHandle.set(i, tempString);
+					Node tempNode = nodesToHandle.get(i-1);
+					nodesToHandle.set(i-1, nodesToHandle.get(i));
+					nodesToHandle.set(i, tempNode);
+				}
+			}
+		}
+		
+		//and now, put the nodes into the new document.
+		for(int i=0; nodes != null && i<nodeCount; i++){
+			Node curr = nodesToHandle.get(i);
+			newRoot.appendChild(curr);
+		}
+		
+		//copy attributes of root node.
+		NamedNodeMap attrs = initialDoc.getFirstChild().getAttributes();
+		for(int i=0; attrs != null && i<attrs.getLength(); i++){
+			Attr attr = (Attr) newDocument.importNode(attrs.item(i), true);
+			//newRoot.appendChild(attr);
+			newRoot.setAttribute(attr.getName(), attr.getValue());
+		}
+		
+		return newDocument;
+	}
 	
 	public static Document parseXMLText(String documentText){
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -102,6 +166,62 @@ public class PreprocessSTIX {
 		return doc;
 	}
 	
+	//wow. Something so basic ends up like this.  see: https://stackoverflow.com/a/5456836
+	public static String XMLToString(Document doc){
+		((Element)doc.getFirstChild()).setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+		
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer;
+		String output = null;
+		try {
+			transformer = tf.newTransformer();
+			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			StringWriter writer = new StringWriter();
+			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+			output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+		} catch (TransformerConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return output;
+	}
+	
+	//this is kind of hacky, and likely slow.  use for debugging only.
+	private static String nodeToString(Node node){
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(false);
+        DocumentBuilder builder;
+        Document newDocument = null;
+		try {
+			builder = dbf.newDocumentBuilder();
+			newDocument = builder.newDocument();
+			//Element elementCopy = (Element)element.cloneNode(true);
+			Node nodeCopy = newDocument.importNode(node, true);
+			
+			Element newRoot = newDocument.createElement("temp");
+			newDocument.appendChild(newRoot);
+			newRoot.appendChild(nodeCopy);
+
+			return XMLToString(newDocument);
+		}catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private static boolean isEmptyNode(Node n){
+		if(n.getNodeType() == Node.TEXT_NODE){
+			String text = n.getNodeValue();
+			if(text.replace(" ", "").equals("")){
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	//public interface.  Takes any valid STIX, and converts it to Titan-friendly GraphSON.
 	public static JSONObject preprocessSTIX(String STIXString){
