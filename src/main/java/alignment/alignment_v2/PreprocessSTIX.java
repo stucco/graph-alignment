@@ -367,8 +367,8 @@ public class PreprocessSTIX {
 							}
 							
 							NodeList gChildNodes = currChild.getChildNodes();
-							//TODO: confirm that moving nodes below doesn't screw with the NodeList state.
-							for(int j=0; j<gChildNodes.getLength(); j++){
+							//NB: calling appendChild changes the state of gChildNodes, so iterating backwards here.
+							for(int j = gChildNodes.getLength()-1; j>=0; j--){
 								Node gChild = gChildNodes.item(j);
 								if(isEmptyNode(gChild)){
 									continue;
