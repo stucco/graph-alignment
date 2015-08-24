@@ -205,17 +205,17 @@ public class PreprocessSTIXTest extends PreprocessSTIX{
 			
 			Document initialDoc = parseXMLText(STIXString);
 			assertNotNull(initialDoc);
-			System.out.println("initialDoc:\n" + XMLToString(initialDoc));
+			//System.out.println("initialDoc:\n" + XMLToString(initialDoc));
 			
 			Document normalizedDoc = flattenSTIX(initialDoc);
 			assertNotNull(normalizedDoc);
 			normalizedDoc = sortXML(normalizedDoc);
-			System.out.println("normalizedDoc:\n" + XMLToString(normalizedDoc));
+			//System.out.println("normalizedDoc:\n" + XMLToString(normalizedDoc));
 			
 			Document expectedDoc = parseXMLText(expectedNormalizedSTIXString);
 			assertNotNull(expectedDoc);
 			expectedDoc = sortXML(expectedDoc);
-			System.out.println("expectedDoc:\n" + XMLToString(expectedDoc));
+			//System.out.println("expectedDoc:\n" + XMLToString(expectedDoc));
 			
 			assertTrue(XMLToString(expectedDoc).equals(XMLToString(normalizedDoc)));
 			
