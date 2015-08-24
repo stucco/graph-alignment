@@ -108,6 +108,14 @@ public class PreprocessSTIXTest extends PreprocessSTIX{
 				"    </stix:STIX_Header> " +
 				"</stix:STIX_Package>";
 			
+			//strip whitespace
+			while(STIXString.contains("> ")){
+				STIXString = STIXString.replaceAll("> ", ">");
+			}
+			while(STIXString.contains(" <")){
+				STIXString = STIXString.replaceAll(" <", "<");
+			}
+
 			STIXPackage testPackage = STIXPackage.fromXMLString(STIXString);
 			
 			assertTrue(PreprocessSTIX.validate(testPackage));
