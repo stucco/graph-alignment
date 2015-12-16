@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.*;
 import org.jdom2.*;
 
@@ -23,10 +24,22 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 
 	String[] allVerts = {"Account", "Organization", "Address", "AddressRange", "Port", "DNSName", "Malware", "Exploit", "HTTPRequest", "DNSRecord", "IP", "Service", "Host", "Vulnerability", "Flow", "AS", "Software"};
 
-	@Test 
+	private long ipToLong(String ipString)	{
+		long ipLong = 0;
+		long ip;
+		String[] ipArray = ipString.split("\\.");
+		for (int i = 3; i >= 0; i--) {
+			ip = Long.parseLong(ipArray[3 - i]);
+			ipLong |= ip << (i * 8);
+		}
+		
+		return ipLong;
+	}
+
+//	@Test 
 	public void testVulnerabilityExploit() {
 
-		System.out.println("RUNNING: GraphConstructorTest.testVulnerabilityExploit()");
+		System.out.println("[RUNNING] GraphConstructorTest.testVulnerabilityExploit()");
 
 		String stix =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -54,7 +67,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"                <ttp:Exploits>"+
 			"                    <ttp:Exploit id=\"stucco:exploit-5b890dac-8005-48b1-a801-d1352898cd14\">"+
 			"                        <ttp:Title>exploit/aix/rpc_cmsd_opcode21</ttp:Title>"+
-			"                        <ttp:Description>This module exploits a buffer overflow vulnerability in opcode 21 handled by rpc.cmsd on AIX. By making a request with a long string passed to the first argument of the \"rtable_create\" RPC, a stack based buffer overflow occurs. This leads to arbitrary code execution.  NOTE: Unsuccessful attempts may cause inetd/portmapper to enter a state where further attempts are not possible.</ttp:Description>"+
+			"                        <ttp:Description>This module exploits a buffer overflow vulnerability.</ttp:Description>"+
 			"                        <ttp:Short_Description>AIX Calendar Manager Service Daemon (rpc.cmsd) Opcode 21 Buffer Overflow</ttp:Short_Description>"+
 			"                    </ttp:Exploit>"+
 			"                </ttp:Exploits>"+
@@ -62,14 +75,9 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            <ttp:Exploit_Targets>"+
 			"                <ttp:Exploit_Target>"+
 			"                    <stixCommon:Relationship>Exploits</stixCommon:Relationship>"+
-			"                    <stixCommon:Exploit_Target xsi:type=\"et:ExploitTargetType\"> "+
-			"            		<et:Title>Vulnerability</et:Title>"+
-			"            		<et:Vulnerability>"+
-			"                		<et:Description>CVE-2009-3699</et:Description>"+
-			"                		<et:CVE_ID>CVE-2009-3699</et:CVE_ID>"+
-			"                		<et:Source>Metasploit</et:Source>"+
-			"            		</et:Vulnerability>"+
-			"		     </stixCommon:Exploit_Target>" +
+			"                    <stixCommon:Exploit_Target"+
+			"                        idref=\"Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760\""+
+			"                        xmlns=\"\" xsi:type=\"et:ExploitTargetType\"/>"+
 			"                </ttp:Exploit_Target>"+
 			"            </ttp:Exploit_Targets>"+
 			"            <ttp:Information_Source>"+
@@ -83,18 +91,76 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            </ttp:Information_Source>"+
 			"        </stix:TTP>"+
 			"    </stix:TTPs>"+
+			"    <stix:Exploit_Targets>"+
+			"        <stixCommon:Exploit_Target"+
+			"            id=\"Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760\""+
+			"            xmlns=\"\""+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\">"+
+			"            <et:Title>Vulnerability</et:Title>"+
+			"            <et:Vulnerability>"+
+			"                <et:Description>CVE-2009-3699</et:Description>"+
+			"                <et:CVE_ID>CVE-2009-3699</et:CVE_ID>"+
+			"                <et:Source>Metasploit</et:Source>"+
+			"            </et:Vulnerability>"+
+			"        </stixCommon:Exploit_Target>"+
+			"    </stix:Exploit_Targets>"+
 			"</stix:STIX_Package>";
+
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
-		assertTrue(true);
+		graphConstructor.constructGraph(pack.toXMLString());
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+
+		System.out.println("Testing Exploit Vertex ... ");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		String ttpPath = "//*[@id = \"stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(ttpPath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d"));
+		JSONObject vertex = vertices.getJSONObject("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d");
+		assertEquals(vertex.getString("vertexType"), "Exploit");
+		assertEquals(vertex.getString("name"), "exploit/aix/rpc_cmsd_opcode21");
+		assertEquals(vertex.get("source").toString(), "[Metasploit]");
+		assertEquals(vertex.get("description").toString(), "[This module exploits a buffer overflow vulnerability.]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		assertEquals(vertex.get("shortDescription").toString(), "[AIX Calendar Manager Service Daemon (rpc.cmsd) Opcode 21 Buffer Overflow]");
+		
+		System.out.println("Testing Vulnerability Vertex ... ");
+		String etPath = "//*[@id = \"Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760\"]";
+		xp = xpfac.compile(etPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		
+		assertTrue(vertices.has("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760"));
+		vertex = vertices.getJSONObject("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760");
+		assertEquals(vertex.getString("vertexType"), "Vulnerability");
+		assertEquals(vertex.getString("name"), "CVE-2009-3699");
+		assertEquals(vertex.getString("source"), "Metasploit");
+		assertEquals(vertex.get("description").toString(), "[CVE-2009-3699]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		JSONArray edges = graph.getJSONArray("edges");
+		
+		System.out.println("Testing Exploit -> Vulnerability Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("CVE-2009-3699") && 
+				edge.getString("outV").equals("exploit/aix/rpc_cmsd_opcode21") && 
+				edge.getString("label").equals("Exploits")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 	
 //	@Test 
 	public void testMalwareIP() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testMalwareIP()");
+		System.out.println("[RUNNING] GraphConstructorTest.testMalwareIP()");
 		
 		String stix =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -116,6 +182,21 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            </stixCommon:Identity>"+
 			"        </stix:Information_Source>"+
 			"    </stix:STIX_Header>"+
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
+			"        <cybox:Observable id=\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\">"+
+			"            <cybox:Title>IP</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>1d4.us</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:ip-1730444733\">"+
+			"                <cybox:Description>103.36.125.189</cybox:Description>"+
+			"                <cybox:Properties category=\"ipv4-addr\""+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
+			"                    <AddressObj:Address_Value>103.36.125.189</AddressObj:Address_Value>"+
+			"                </cybox:Properties>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"    </stix:Observables>"+
 			"    <stix:TTPs>"+
 			"        <stix:TTP"+
 			"            id=\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\""+
@@ -135,19 +216,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"                <ttp:Infrastructure>"+
 			"                    <ttp:Observable_Characterization"+
 			"                        cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
-			"                        <cybox:Observable>"+
-			"            		    <cybox:Title>IP</cybox:Title>"+
-			"            		    <cybox:Observable_Source>"+
-			"                		<cyboxCommon:Information_Source_Type>1d4.us</cyboxCommon:Information_Source_Type>"+
-			"            			</cybox:Observable_Source>"+
-			"            			<cybox:Object id=\"stucco:ip-1730444733\">"+
-			"                		    <cybox:Description>103.36.125.189</cybox:Description>"+
-			"                		    <cybox:Properties category=\"ipv4-addr\""+
-			"                    		xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
-			"                    		<AddressObj:Address_Value>103.36.125.189</AddressObj:Address_Value>"+
-			"                		</cybox:Properties>"+
-			"            		    </cybox:Object>"+
-			"			 </cybox:Observable>" +
+			"                        <cybox:Observable idref=\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\"/>"+
 			"                    </ttp:Observable_Characterization>"+
 			"                </ttp:Infrastructure>"+
 			"            </ttp:Resources>"+
@@ -162,19 +231,60 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            </ttp:Information_Source>"+
 			"        </stix:TTP>"+
 			"    </stix:TTPs>"+
-			"</stix:STIX_Package>";
-	
+			"</stix:STIX_Package>";	
+
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
-		assertTrue(true);
+		graphConstructor.constructGraph(pack.toXMLString());
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Malware Vertex ... ");
+		String malwarePath = "//*[@id = \"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(malwarePath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3"));
+		JSONObject vertex = vertices.getJSONObject("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
+		assertEquals(vertex.getString("vertexType"), "Malware");
+		assertEquals(vertex.getString("name"), "Scanner");
+		assertEquals(vertex.getString("source"), "1d4.us");
+		assertEquals(vertex.get("description").toString(), "[Scanner]");
+		
+		System.out.println("Testing IP Vertex ... ");
+		String ipPath = "//*[@id = \"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\"]";
+		xp = xpfac.compile(malwarePath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229"));
+		vertex = vertices.getJSONObject("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "103.36.125.189");
+		assertEquals(vertex.getLong("ipInt"), ipToLong("103.36.125.189"));
+		assertEquals(vertex.getString("source"), "1d4.us");
+		assertEquals(vertex.get("description").toString(), "[103.36.125.189]");
+		
+		JSONArray edges = graph.getJSONArray("edges");
+		
+		System.out.println("Testing Malware -> IP Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("103.36.125.189") && 
+				edge.getString("outV").equals("Scanner") && 
+				edge.getString("label").equals("Uses_IP")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}		
 	
 //	@Test 
 	public void testFlowAddressIpPort() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testFlowAddressIpPort()");
+		System.out.println("[RUNNING] GraphConstructorTest.testFlowAddressIpPort()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -310,14 +420,185 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
-		assertTrue(true);
+		graphConstructor.constructGraph(pack.toXMLString());
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Flow Vertex ... ");
+		String flowPath = "//*[@id = \"stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(flowPath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb"));
+		JSONObject vertex = vertices.getJSONObject("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb");
+		assertEquals(vertex.getString("vertexType"), "Flow");
+		assertEquals(vertex.getString("name"), "10.10.10.1:56867_through_10.10.10.100:22");
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[10.10.10.1, port 56867 to 10.10.10.100, port 22]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+	
+		
+		System.out.println("Testing (Source) Address Vertex ... ");
+		String addressPath = "//*[@id = \"stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f\"]";
+		xp = xpfac.compile(addressPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f"));
+		vertex = vertices.getJSONObject("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f");
+		assertEquals(vertex.getString("vertexType"), "Address");
+		assertEquals(vertex.getString("name"), "10.10.10.1:56867");
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[10.10.10.1, port 56867]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing (Destination) Address Vertex ... ");
+		addressPath = "//*[@id = \"stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd\"]";
+		xp = xpfac.compile(addressPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd"));
+		vertex = vertices.getJSONObject("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd");
+		assertEquals(vertex.getString("vertexType"), "Address");
+		assertEquals(vertex.getString("name"), "10.10.10.100:22");
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[10.10.10.100, port 22]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing (Source) IP Vertex ... ");
+		String ipPath = "//*[@id = \"stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489"));
+		vertex = vertices.getJSONObject("stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "10.10.10.1");
+		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.1"));
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[10.10.10.1]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing (Destination) IP Vertex ... ");
+		ipPath = "//*[@id = \"stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a"));
+		vertex = vertices.getJSONObject("stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "10.10.10.100");
+		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.100"));
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[10.10.10.100]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing (Source) Port Vertex ... ");
+		String portPath = "//*[@id = \"stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09\"]";
+		xp = xpfac.compile(portPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09"));
+		vertex = vertices.getJSONObject("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09");
+		assertEquals(vertex.getString("vertexType"), "Port");
+		assertEquals(vertex.getString("name"), "56867");
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[56867]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing (Destination) Port Vertex ... ");
+		portPath = "//*[@id = \"stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26\"]";
+		xp = xpfac.compile(portPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26"));
+		vertex = vertices.getJSONObject("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26");
+		assertEquals(vertex.getString("vertexType"), "Port");
+		assertEquals(vertex.getString("name"), "22");
+		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("description").toString(), "[22]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Flow -> (Source) Address Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("10.10.10.1:56867") && 
+				edge.getString("outV").equals("10.10.10.1:56867_through_10.10.10.100:22") && 
+				edge.getString("label").equals("Src_Socket_Address")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+		
+		System.out.println("Testing Flow -> (Destination) Address Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("10.10.10.100:22") && 
+				edge.getString("outV").equals("10.10.10.1:56867_through_10.10.10.100:22") && 
+				edge.getString("label").equals("Dest_Socket_Address")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+		
+		System.out.println("Testing (Source) Address -> IP Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("10.10.10.1") && 
+				edge.getString("outV").equals("10.10.10.1:56867") && 
+				edge.getString("label").equals("Has_IP")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+		
+		System.out.println("Testing (Destination) Address -> IP Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("10.10.10.100") && 
+				edge.getString("outV").equals("10.10.10.100:22") && 
+				edge.getString("label").equals("Has_IP")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+		
+		System.out.println("Testing (Source) Address -> Port Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("56867") && 
+				edge.getString("outV").equals("10.10.10.1:56867") && 
+				edge.getString("label").equals("Has_Port")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+		
+		System.out.println("Testing (Destination) Address -> Port Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("22") && 
+				edge.getString("outV").equals("10.10.10.100:22") && 
+				edge.getString("label").equals("Has_Port")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
 	}		
 	
-//	@Test 
+	@Test 
 	public void testOrganizationAddressRangeAS() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testOrganizationAddressRangeAS()");
+		System.out.println("[RUNNING] GraphConstructorTest.testOrganizationAddressRangeAS()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -372,7 +653,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"                    <cybox:Related_Object idref=\"stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95\">"+
 			"                        <cybox:Description>AS O1COMM with ASN 19864 contains IP address range 69.19.190.0 through 69.19.190.255</cybox:Description>"+
 			"                        <cybox:Discovery_Method>"+
-			"                            <cyboxCommon:Information_Source_Type>Caida</cyboxCommon:Information_Source_Type>"+
+			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
 			"                        </cybox:Discovery_Method>"+
 			"                        <cybox:Relationship>Contains</cybox:Relationship>"+
 			"                    </cybox:Related_Object>"+
@@ -400,7 +681,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"                    <cybox:Related_Object idref=\"stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f\">"+
 			"                        <cybox:Description>Organization O1.com has AS</cybox:Description>"+
 			"                        <cybox:Discovery_Method>"+
-			"                            <cyboxCommon:Information_Source_Type>Caida</cyboxCommon:Information_Source_Type>"+
+			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
 			"                        </cybox:Discovery_Method>"+
 			"                        <cybox:Relationship>Has_AS</cybox:Relationship>"+
 			"                    </cybox:Related_Object>"+
@@ -413,14 +694,86 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
-		assertTrue(true);
+		graphConstructor.constructGraph(pack.toXMLString());
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Organization Vertex ... ");
+		String organizationPath = "//*[@id = \"stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(organizationPath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598"));
+		JSONObject vertex = vertices.getJSONObject("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598");
+		assertEquals(vertex.getString("vertexType"), "Organization");
+		assertEquals(vertex.getString("name"), "O1.com");
+		assertEquals(vertex.get("source").toString(), "[CAIDA]");
+		assertEquals(vertex.getString("description"), "Organization O1.com located in US has a range of IP addresses");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+	
+		
+		System.out.println("Testing AS Vertex ... ");
+		String asPath = "//*[@id = \"stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f\"]";
+		xp = xpfac.compile(asPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f"));
+		vertex = vertices.getJSONObject("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f");
+		assertEquals(vertex.getString("vertexType"), "AS");
+		assertEquals(vertex.getString("name"), "O1COMM");
+		assertEquals(vertex.getString("number"), "19864");
+		assertEquals(vertex.get("source").toString(), "[CAIDA]");
+		assertEquals(vertex.getString("description"), "AS O1COMM has ASN 19864");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing AddressRange Vertex ... ");
+		String addressRangePath = "//*[@id = \"stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95\"]";
+		xp = xpfac.compile(asPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertTrue(vertices.has("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95"));
+		vertex = vertices.getJSONObject("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95");
+		assertEquals(vertex.getString("vertexType"), "AddressRange");
+		assertEquals(vertex.getString("name"), "69.19.190.0 - 69.19.190.255");
+		assertEquals(vertex.getString("startIP"), "69.19.190.0");
+		assertEquals(vertex.getLong("startIPInt"), ipToLong("69.19.190.0"));
+		assertEquals(vertex.getString("endIP"), "69.19.190.255");
+		assertEquals(vertex.getLong("endIPInt"), ipToLong("69.19.190.255"));
+		assertEquals(vertex.get("source").toString(), "[CAIDA]");
+		assertEquals(vertex.getString("description"), "69.19.190.0 through 69.19.190.255");
+		
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Organization -> AS Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("O1COMM") && 
+				edge.getString("outV").equals("O1.com") && 
+				edge.getString("label").equals("Has_AS")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+		
+		System.out.println("Testing AS -> AddressRange Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inV").equals("69.19.190.0 - 69.19.190.255") && 
+				edge.getString("outV").equals("O1COMM") && 
+				edge.getString("label").equals("Contains")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 	
 //	@Test 
 	public void testSoftware() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testSoftware()");
+		System.out.println("[RUNNING] GraphConstructorTest.testSoftware()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -466,14 +819,15 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
+	//	System.out.println(pack.toXMLString());
+		graphConstructor.constructGraph(pack.toXMLString());
 		assertTrue(true);
 	}
 	
 //	@Test 
 	public void testDNSRecordIpDNSName() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testDNSRecordIpDNSName()");
+		System.out.println("[RUNNING] GraphConstructorTest.testDNSRecordIpDNSName()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -589,14 +943,14 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
+		graphConstructor.constructGraph(pack.toXMLString());
 		assertTrue(true);
 	}
 	
 //	@Test 
 	public void testServicePort() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testServicePort()");
+		System.out.println("[RUNNING] GraphConstructorTest.testServicePort()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -658,14 +1012,14 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
+		graphConstructor.constructGraph(pack.toXMLString());
 		assertTrue(true);
 	}
 	
 //	@Test 
 	public void testHTTPRequestIpPortDNSName() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testHTTPRequestIpPortDNSName()");
+		System.out.println("[RUNNING] GraphConstructorTest.testHTTPRequestIpPortDNSName()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -793,14 +1147,14 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
+		graphConstructor.constructGraph(pack.toXMLString());
 		assertTrue(true);
 	}
 	
 //	@Test 
 	public void testHostSoftware() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testHostSoftware()");
+		System.out.println("[RUNNING] GraphConstructorTest.testHostSoftware()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -865,14 +1219,14 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
+		graphConstructor.constructGraph(pack.toXMLString());
 		assertTrue(true);
 	}
 	
 //	@Test 
 	public void testHostSoftwareAccountIp() {
 		
-		System.out.println("RUNNING: GraphConstructorTest.testHostSoftwareAccountIp()");
+		System.out.println("[RUNNING] GraphConstructorTest.testHostSoftwareAccountIp()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -992,7 +1346,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"                <cyboxCommon:Information_Source_Type>LoginEvent</cyboxCommon:Information_Source_Type>"+
 			"            </cybox:Observable_Source>"+
 			"            <cybox:Object id=\"stucco:hostname-host_at_192.168.10.11\">"+
-			"                <cybox:Description>host_at_192.168.10.11</cybox:Description>"+
+			"                <cybox:Description>host at 192.168.10.11</cybox:Description>"+
 			"                <cybox:Properties"+
 			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"HostnameObj:HostnameObjectType\">"+
 			"                    <HostnameObj:Hostname_Value>host_at_192.168.10.11</HostnameObj:Hostname_Value>"+
@@ -1014,7 +1368,375 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(stix);
+		graphConstructor.constructGraph(pack.toXMLString());
+		assertTrue(true);
+	}
+
+//	@Test 
+	public void testVulnerabilityWithSolution() {
+		
+		System.out.println("[RUNNING] GraphConstructorTest.testVulnerabilityWithSolution()");
+		
+		String stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+			"<stix:STIX_Package"+
+			"    id=\"stucco:bugtraq-67d2ef28-9edb-4031-9867-ff502313590a\""+
+			"    timestamp=\"2015-12-14T19:38:02.569Z\""+
+			"    xmlns:coa=\"http://stix.mitre.org/CourseOfAction-1\""+
+			"    xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\""+
+			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
+			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\" xmlns:stucco=\"gov.ornl.stucco\">"+
+			"    <stix:STIX_Header>"+
+			"        <stix:Title>Vulnerability Description</stix:Title>"+
+			"        <stix:Information_Source>"+
+			"            <stixCommon:Identity>"+
+			"                <stixCommon:Name>Bugtraq</stixCommon:Name>"+
+			"            </stixCommon:Identity>"+
+			"        </stix:Information_Source>"+
+			"    </stix:STIX_Header>"+
+			"    <stix:Exploit_Targets>"+
+			"        <stixCommon:Exploit_Target"+
+			"            id=\"stucco:vulnerability-b73ca23e-66d6-4fd7-89b4-30859796b38e\""+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\">"+
+			"            <et:Title>Vulnerability</et:Title>"+
+			"            <et:Vulnerability>"+
+			"                <et:Description>WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities WebGate eDVR Manager is prone to multiple buffer-overflow vulnerabilities because it fails to perform boundary checks before copying user-supplied data to insufficiently sized memory buffer. The controls are identified by CLSID's: 359742AF-BF34-4379-A084-B7BF0E5F34B0 4E14C449-A61A-4BF7-8082-65A91298A6D8 5A216ADB-3009-4211-AB77-F1857A99482C An attacker can exploit these issues to execute arbitrary code in the context of the application, usually Internet Explorer, using the ActiveX control.Failed attacks will likely cause denial-of-service conditions.</et:Description>"+
+			"                <et:Short_Description>WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities</et:Short_Description>"+
+			"                <et:CVE_ID>CVE-2015-2098</et:CVE_ID>"+
+			"                <et:OSVDB_ID>72838</et:OSVDB_ID>"+
+			"                <et:Source>Bugtraq</et:Source>"+
+			"                <et:Published_DateTime>2015-03-27T00:00:00.000-04:00</et:Published_DateTime>"+
+			"                <et:References>"+
+			"                    <stixCommon:Reference>http://support.microsoft.com/kb/240797</stixCommon:Reference>"+
+			"                    <stixCommon:Reference>Second</stixCommon:Reference>"+
+			"                    <stixCommon:Reference>Third</stixCommon:Reference>"+
+			"                </et:References>"+
+			"            </et:Vulnerability>"+
+			"            <et:Potential_COAs>"+
+			"                <et:Potential_COA>"+
+			"                    <stixCommon:Course_Of_Action"+
+			"                        idref=\"stucco:vulnerability-9e478710-0aa7-4fdc-b768-44c4d0f8812b\" xsi:type=\"coa:CourseOfActionType\"/>"+
+			"                </et:Potential_COA>"+
+			"            </et:Potential_COAs>"+
+			"        </stixCommon:Exploit_Target>"+
+			"    </stix:Exploit_Targets>"+
+			"    <stix:Courses_Of_Action>"+
+			"        <stix:Course_Of_Action"+
+			"            id=\"stucco:vulnerability-9e478710-0aa7-4fdc-b768-44c4d0f8812b\""+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"coa:CourseOfActionType\">"+
+			"            <coa:Title>Vulnerability</coa:Title>"+
+			"            <coa:Description>Solution: Currently, we are not aware of any vendor-supplied patches. If you feel we are in error or are aware of more recent information, please mail us at: vuldb@securityfocus.com.</coa:Description>"+
+			"            <coa:Information_Source>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Bugtraq</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </coa:Information_Source>"+
+			"        </stix:Course_Of_Action>"+
+			"    </stix:Courses_Of_Action>"+
+			"</stix:STIX_Package>";
+
+		STIXPackage pack = new STIXPackage().fromXMLString(stix);
+		assertTrue(validate(pack));
+		GraphConstructor graphConstructor = new GraphConstructor();
+		graphConstructor.constructGraph(pack.toXMLString());
+		JSONObject graph = graphConstructor.getGraph();
+		System.out.println(graph.toString(2));
+		assertTrue(true);
+	}
+
+//	@Test 
+	public void testAllStixElements() {
+		
+		System.out.println("[RUNNING] GraphConstructorTest.testAllStixElements()");
+		
+		String stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\""+
+			"    xmlns:campaign=\"http://stix.mitre.org/Campaign-1\""+
+			"    xmlns:coa=\"http://stix.mitre.org/CourseOfAction-1\""+
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\""+
+			"    xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\""+
+			"    xmlns:incident=\"http://stix.mitre.org/Incident-1\""+
+			"    xmlns:indicator=\"http://stix.mitre.org/Indicator-2\""+
+			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
+			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\""+
+			"    xmlns:ta=\"http://stix.mitre.org/ThreatActor-1\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\">"+
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
+			"        <cybox:Observable>"+
+			"            <cybox:Title>Observable</cybox:Title>"+
+			"        </cybox:Observable>"+
+			"    </stix:Observables>"+
+			"    <stix:Indicators>"+
+			"        <stix:Indicator"+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"indicator:IndicatorType\">"+
+			"            <indicator:Title>Indicator</indicator:Title>"+
+			"            <indicator:Description>Indicator description</indicator:Description>"+
+			"            <indicator:Producer>"+
+			"                <stixCommon:Identity>"+
+			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
+			"                </stixCommon:Identity>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </indicator:Producer>"+
+			"        </stix:Indicator>"+
+			"    </stix:Indicators>"+
+			"    <stix:TTPs>"+
+			"        <stix:TTP xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\">"+
+			"            <ttp:Title>TTP</ttp:Title>"+
+			"        </stix:TTP>"+
+			"    </stix:TTPs>"+
+			"    <stix:Exploit_Targets>"+
+			"        <stixCommon:Exploit_Target"+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\">"+
+			"            <et:Title>Exploit_Target</et:Title>"+
+			"            <et:Weakness>"+
+			"                <et:Description>Description of this weakness</et:Description>"+
+			"                <et:CWE_ID>CWE-997</et:CWE_ID>"+
+			"            </et:Weakness>"+
+			"            <et:Information_Source>"+
+			"                <stixCommon:Identity>"+
+			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
+			"                </stixCommon:Identity>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </et:Information_Source>"+
+			"        </stixCommon:Exploit_Target>"+
+			"    </stix:Exploit_Targets>"+
+			"    <stix:Incidents>"+
+			"        <stix:Incident"+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"incident:IncidentType\">"+
+			"            <incident:Title>Incident</incident:Title>"+
+			"            <incident:Description>Indicator description</incident:Description>"+
+			"            <incident:Information_Source>"+
+			"                <stixCommon:Identity>"+
+			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
+			"                </stixCommon:Identity>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </incident:Information_Source>"+
+			"        </stix:Incident>"+
+			"    </stix:Incidents>"+
+			"    <stix:Courses_Of_Action>"+
+			"        <stix:Course_Of_Action"+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"coa:CourseOfActionType\">"+
+			"            <coa:Title>Course_Of_Action</coa:Title>"+
+			"            <coa:Description>Indicator description</coa:Description>"+
+			"            <coa:Information_Source>"+
+			"                <stixCommon:Identity>"+
+			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
+			"                </stixCommon:Identity>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </coa:Information_Source>"+
+			"        </stix:Course_Of_Action>"+
+			"    </stix:Courses_Of_Action>"+
+			"    <stix:Campaigns>"+
+			"        <stix:Campaign"+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"campaign:CampaignType\">"+
+			"            <campaign:Title>Campaign</campaign:Title>"+
+			"            <campaign:Description>Indicator description</campaign:Description>"+
+			"            <campaign:Names>"+
+			"                <campaign:Name>Campaigns Name</campaign:Name>"+
+			"            </campaign:Names>"+
+			"            <campaign:Information_Source>"+
+			"                <stixCommon:Identity>"+
+			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
+			"                </stixCommon:Identity>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </campaign:Information_Source>"+
+			"        </stix:Campaign>"+
+			"    </stix:Campaigns>"+
+			"    <stix:Threat_Actors>"+
+			"        <stix:Threat_Actor"+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ta:ThreatActorType\">"+
+			"            <ta:Title>Threat_Actor</ta:Title>"+
+			"            <ta:Identity>"+
+			"                <stixCommon:Name>Actor's name</stixCommon:Name>"+
+			"                <stixCommon:Related_Identities>"+
+			"                    <stixCommon:Related_Identity>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>Related Name</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Related_Identity>"+
+			"                </stixCommon:Related_Identities>"+
+			"            </ta:Identity>"+
+			"        </stix:Threat_Actor>"+
+			"    </stix:Threat_Actors>"+
+			"</stix:STIX_Package>";
+
+		STIXPackage pack = new STIXPackage().fromXMLString(stix);
+		assertTrue(validate(pack));
+		GraphConstructor graphConstructor = new GraphConstructor();
+		graphConstructor.constructGraph(pack.toXMLString());
+		assertTrue(true);
+	}
+
+	@Test 
+	public void testDataForAllignment() {
+		
+		System.out.println("[RUNNING] GraphConstructorTest.testDataForAllignment()");
+		
+		String stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+			"<stix:STIX_Package"+
+			"    id=\"stucco:caida-2a3dc54f-f53e-4ba9-b7db-139424f935a5\""+
+			"    timestamp=\"2015-12-14T21:09:52.024Z\""+
+			"    xmlns=\"http://xml/metadataSharing.xsd\""+
+			"    xmlns:ASObj=\"http://cybox.mitre.org/objects#ASObject-1\""+
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\""+
+			"    xmlns:WhoisObj=\"http://cybox.mitre.org/objects#WhoisObject-2\""+
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\""+
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\""+
+			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
+			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\" xmlns:stucco=\"gov.ornl.stucco\">"+
+			"    <stix:STIX_Header>"+
+			"        <stix:Title>IP-AS Links Dataset</stix:Title>"+
+			"        <stix:Information_Source>"+
+			"            <stixCommon:Identity>"+
+			"                <stixCommon:Name>CAIDA</stixCommon:Name>"+
+			"            </stixCommon:Identity>"+
+			"        </stix:Information_Source>"+
+			"    </stix:STIX_Header>"+
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
+			"        <cybox:Observable id=\"stucco:addressRange-6f73e483-e897-430c-b09f-96219fe457ac\">"+
+			"            <cybox:Title>AddressRange</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:addressRange-3630347008-3630347263\">"+
+			"                <cybox:Description>216.98.179.0 through 216.98.179.255</cybox:Description>"+
+			"                <cybox:Properties category=\"ipv4-addr\""+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
+			"                    <AddressObj:Address_Value apply_condition=\"ANY\""+
+			"                        condition=\"InclusiveBetween\" delimiter=\" - \">216.98.179.0 - 216.98.179.255</AddressObj:Address_Value>"+
+			"                </cybox:Properties>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"        <cybox:Observable id=\"stucco:addressRange-33f72b4c-e6f2-4d82-88d4-2a7711ce7bfe\">"+
+			"            <cybox:Title>AddressRange</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:addressRange-3630349312-3630349567\">"+
+			"                <cybox:Description>216.98.188.0 through 216.98.188.255</cybox:Description>"+
+			"                <cybox:Properties category=\"ipv4-addr\""+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
+			"                    <AddressObj:Address_Value apply_condition=\"ANY\""+
+			"                        condition=\"InclusiveBetween\" delimiter=\" - \">216.98.188.0 - 216.98.188.255</AddressObj:Address_Value>"+
+			"                </cybox:Properties>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"        <cybox:Observable id=\"stucco:as-7c852f47-dd54-4153-869e-e00b844fef38\">"+
+			"            <cybox:Title>AS</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:as-18vo_18548\">"+
+			"                <cybox:Description>AS 18VO has ASN 18548</cybox:Description>"+
+			"                <cybox:Properties"+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ASObj:ASObjectType\">"+
+			"                    <ASObj:Number>18548</ASObj:Number>"+
+			"                    <ASObj:Name>18VO</ASObj:Name>"+
+			"                    <ASObj:Regional_Internet_Registry>ARIN</ASObj:Regional_Internet_Registry>"+
+			"                </cybox:Properties>"+
+			"                <cybox:Related_Objects>"+
+			"                    <cybox:Related_Object idref=\"stucco:addressRange-6f73e483-e897-430c-b09f-96219fe457ac\">"+
+			"                        <cybox:Description>AS 18VO with ASN 18548 contains IP address range 216.98.179.0 through 216.98.179.255</cybox:Description>"+
+			"                        <cybox:Discovery_Method>"+
+			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"                        </cybox:Discovery_Method>"+
+			"                        <cybox:Relationship>Contains</cybox:Relationship>"+
+			"                    </cybox:Related_Object>"+
+			"                    <cybox:Related_Object idref=\"stucco:addressRange-33f72b4c-e6f2-4d82-88d4-2a7711ce7bfe\">"+
+			"                        <cybox:Description>AS 18VO with ASN 18548 contains IP address range 216.98.188.0 through 216.98.188.255</cybox:Description>"+
+			"                        <cybox:Discovery_Method>"+
+			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"                        </cybox:Discovery_Method>"+
+			"                        <cybox:Relationship>Contains</cybox:Relationship>"+
+			"                    </cybox:Related_Object>"+
+			"                </cybox:Related_Objects>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"        <cybox:Observable id=\"stucco:organization-8972a1d6-b59d-43de-83b8-851ee5871fcf\">"+
+			"            <cybox:Title>Organization</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:organization-1_800_video_on__inc.\">"+
+			"                <cybox:Description>Organization 1 800 Video On, Inc. located in US has a range of IP addresses</cybox:Description>"+
+			"                <cybox:Properties"+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WhoisObj:WhoisObjectType\">"+
+			"                    <WhoisObj:Registrants>"+
+			"                        <WhoisObj:Registrant>"+
+			"                            <WhoisObj:Address>US</WhoisObj:Address>"+
+			"                            <WhoisObj:Organization>1 800 Video On, Inc.</WhoisObj:Organization>"+
+			"                            <WhoisObj:Registrant_ID>18VO-ARIN</WhoisObj:Registrant_ID>"+
+			"                        </WhoisObj:Registrant>"+
+			"                    </WhoisObj:Registrants>"+
+			"                </cybox:Properties>"+
+			"                <cybox:Related_Objects>"+
+			"                    <cybox:Related_Object idref=\"stucco:as-7c852f47-dd54-4153-869e-e00b844fef38\">"+
+			"                        <cybox:Description>Organization 1 800 Video On, Inc. has AS</cybox:Description>"+
+			"                        <cybox:Discovery_Method>"+
+			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
+			"                        </cybox:Discovery_Method>"+
+			"                        <cybox:Relationship>Has_AS</cybox:Relationship>"+
+			"                    </cybox:Related_Object>"+
+			"                </cybox:Related_Objects>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"        <cybox:Observable id=\"stucco:as-cbfcb18b-4e0b-4e48-b05f-db95de633bed\">"+
+			"            <cybox:Title>AS</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>DifferentSource</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:as-one-eleven_12285\">"+
+			"                <cybox:Description>18548</cybox:Description>"+
+			"                <cybox:Properties"+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ASObj:ASObjectType\">"+
+			"                    <ASObj:Number>18548</ASObj:Number>"+
+			"                </cybox:Properties>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"    </stix:Observables>"+
+			"</stix:STIX_Package>";
+
+		STIXPackage pack = new STIXPackage().fromXMLString(stix);
+		assertTrue(validate(pack));
+		GraphConstructor graphConstructor = new GraphConstructor();
+		graphConstructor.constructGraph(pack.toXMLString());
+		JSONObject graph = graphConstructor.getGraph();
+		System.out.println(graph.toString(2));
 		assertTrue(true);
 	}
 }
