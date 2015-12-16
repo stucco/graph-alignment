@@ -1,0 +1,5304 @@
+{
+  "properties": {
+    "vertices": {
+      "title": "vertices",
+      "vertexType": "vertices",
+      "description": "The list of vertices in this graph",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Account"
+          },
+          {
+            "$ref": "#/definitions/Software"
+          },
+          {
+            "$ref": "#/definitions/Service"
+          },
+          {
+            "$ref": "#/definitions/Vulnerability"
+          },
+          {
+            "$ref": "#/definitions/Host"
+          },
+          {
+            "$ref": "#/definitions/Port"
+          },
+          {
+            "$ref": "#/definitions/DNSRecord"
+          },
+          {
+            "$ref": "#/definitions/Malware"
+          },
+          {
+            "$ref": "#/definitions/Address"
+          },
+          {
+            "$ref": "#/definitions/Flow"
+          },
+          {
+            "$ref": "#/definitions/DNSName"
+          },
+          {
+            "$ref": "#/definitions/IP"
+          },
+          {
+            "$ref": "#/definitions/AddressRange"
+          },
+          {
+            "$ref": "#/definitions/AS"
+          },
+          {
+            "$ref": "#/definitions/Organization"
+          },
+          {
+            "$ref": "#/definitions/HTTPRequest"
+          },
+          {
+            "$ref": "#/definitions/Exploit"
+          }
+        ]
+      }
+    },
+    "edges": {
+      "title": "edges",
+      "vertexType": "edges",
+      "description": "The list of edges in this graph",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/Exploits"
+          },
+          {
+            "$ref": "#/definitions/Uses_IP"
+          },
+          {
+            "$ref": "#/definitions/Uses_Address"
+          },
+          {
+            "$ref": "#/definitions/Has_AffectedSoftware"
+          },
+          {
+            "$ref": "#/definitions/Has_IP"
+          },
+          {
+            "$ref": "#/definitions/Has_Port"
+          },
+          {
+            "$ref": "#/definitions/Has_DNSName"
+          },
+          {
+            "$ref": "#/definitions/Resolved_To"
+          },
+          {
+            "$ref": "#/definitions/Runs_As"
+          },
+          {
+            "$ref": "#/definitions/Moved_By"
+          },
+          {
+            "$ref": "#/definitions/Runs_On"
+          },
+          {
+            "$ref": "#/definitions/Runs"
+          },
+          {
+            "$ref": "#/definitions/Logs_In_From"
+          },
+          {
+            "$ref": "#/definitions/Logs_In_To"
+          },
+          {
+            "$ref": "#/definitions/Requested_By"
+          },
+          {
+            "$ref": "#/definitions/Requested_IP"
+          },
+          {
+            "$ref": "#/definitions/Served_By"
+          },
+          {
+            "$ref": "#/definitions/Requested_DNSName"
+          },
+          {
+            "$ref": "#/definitions/Contained_Within"
+          },
+          {
+            "$ref": "#/definitions/Has_AS"
+          },
+          {
+            "$ref": "#/definitions/Contains"
+          },
+          {
+            "$ref": "#/definitions/Served_On"
+          },
+          {
+            "$ref": "#/definitions/Src_Socket_Address"
+          },
+          {
+            "$ref": "#/definitions/Dest_Socket_Address"
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "vertex": {
+      "description": "vertex base element",
+      "properties": {
+        "sourceDocument": {
+          "description": "xml string of STIX formatted source document",
+          "type": "string",
+          "cardinality": "single"
+        },
+        "score": {
+          "description": "the calculated confidence score of this node",
+          "id": "gov.ornl.sava.graphson.normal/graph/vertices/base/score",
+          "type": "number",
+          "maximum": "1.0",
+          "minimum": "0.0"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "sourceDocument"
+      ]
+    },
+    "edge": {
+      "description": "edge base elements",
+      "properties": {
+        "properties": {
+          "inV": {
+            "description": "incoming vertex (head) name",
+            "type": "string",
+            "cardinality": "single"
+          },
+          "score": {
+            "description": "the calculated confidence score of this edge",
+            "type": "number",
+            "maximum": "1.0",
+            "minimum": "0.0"
+          },
+          "label": {
+            "description": "relationship between head and tail",
+            "type": "string",
+            "cardinality": "single"
+          },
+          "outV": {
+            "description": "outgoing vertex (tail) name",
+            "type": "string",
+            "cordinality": "single"
+          }
+        }
+      },
+      "type": "object",
+      "required": [
+        "inV",
+        "outV",
+        "label"
+      ]
+    },
+    "Account": {
+      "title": "Account",
+      "vertexType": "Account",
+      "description": "account on some specific system(s), either belonging to some specific user or a system account. All software runs as some account. All accounts are associated with a user or users (such as system accounts.)",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Account"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Username"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Account observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Account Observable",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Account",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Account",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:account-.+$"
+              }
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "UserAccountObj:UserAccountObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Description": {
+                "description": "Observable description of Account",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              },
+              "Username": {
+                "description": "Account username",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to Host",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Logs_In_From",
+                      "Logs_In_To"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "account Logs_In_To host; account Logs_In_From host",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Properties": {
+                  "attr": {
+                    "type": {
+                      "description": "attribute to specify type of this object",
+                      "type": "string",
+                      "cardinality": "single",
+                      "enum": [
+                        "UserSessionObj:UserSessionObjectType"
+                      ],
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "none"
+                    }
+                  },
+                  "Login_Time": {
+                    "description": "login time of this account into related host",
+                    "type": "string",
+                    "cardinality": "single",
+                    "comparisonFunction": "compareTimestamps",
+                    "comparisonWeight": "TBD",
+                    "resolutionFunction": "keepNew"
+                  }
+                },
+                "State": {
+                  "description": "current state of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "TBD"
+                },
+                "Relationship": {
+                  "description": "Account Logs_In_To or Logs_In_From Host",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Logs_In_From",
+                    "Logs_In_To"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Address": {
+      "title": "Address",
+      "vertexType": "Address",
+      "description": "any address, either inside or outside of the network",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Address"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Port' or local-name() = 'IP_Address']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none",
+          "pattern": "IP_Address:Port"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/IP_Address.object_reference:Observable/Object/Properties/Port.object_reference"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Address observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Address",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Address",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Address",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:address-\\d+_\\d$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of Address",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "SocketAddressObj:SocketAddressObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Custom_Properties": {
+                "Property": {
+                  "description": "banner of this address represented as a custom field",
+                  "type": "string",
+                  "cardinality": "set",
+                  "attr": {
+                    "name": {
+                      "description": "name of the custom field",
+                      "type": "string",
+                      "cardinality": "single",
+                      "enum": [
+                        "Banner"
+                      ],
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "TBD"
+                    }
+                  },
+                  "comparisonFunction": "TBD",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "TBD"
+                }
+              },
+              "Port": {
+                "attr": {
+                  "object_reference": {
+                    "description": "id reference to Port",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Has_Port"
+                    ]
+                  }
+                }
+              },
+              "IP_Address": {
+                "attr": {
+                  "object_reference": {
+                    "description": "id reference to IP address",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Has_IP"
+                    ]
+                  }
+                }
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to DNSName",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Has_DNSName"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "Address has DNSName",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Relationship": {
+                  "description": "Has_DNSName",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Has_DNSName"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Has_DNSName": {
+      "title": "Has_DNSName",
+      "vertexType": "Has_DNSName",
+      "description": "Address Has_DNSName DNSName",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Address"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "DNSName"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "AddressRange": {
+      "title": "AddressRange",
+      "vertexType": "AddressRange",
+      "description": "address range",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "AddressRange"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "description": "description",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 3.383410480090717,
+          "resolutionFunction": "TBD"
+        },
+        "endIP": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "description": "end IP",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "TBD",
+          "regex": "^.* - (.*$)"
+        },
+        "startIP": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "description": "start IP",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD",
+          "regex": "(^.*) - .*$"
+        },
+        "startIPInt": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "description": "start IP, as integer",
+          "type": "integer",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD",
+          "regex": "(^.*) - .*",
+          "applyFunction": "ipToLong"
+        },
+        "location": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Location']/*[local-name() = 'Name']",
+          "description": "Country Name",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "TBD",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        },
+        "endIPInt": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "description": "end IP, as integer",
+          "type": "integer",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD",
+          "regex": ".* - (.*$)",
+          "applyFunction": "ipToLong"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description",
+        "startIP",
+        "endIP",
+        "startIPInt",
+        "endIPInt"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Address_Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          },
+          {
+            "keys": [
+              "location"
+            ],
+            "path": "Observable/Object/Location/Name"
+          },
+          {
+            "keys": [
+              "startIP"
+            ],
+            "path": "Observable/Object/Properties/Address_Value",
+            "function": "getStartIP"
+          },
+          {
+            "keys": [
+              "endIP"
+            ],
+            "path": "Observable/Object/Properties/Address_Value",
+            "function": "getEndIP"
+          }
+        ],
+        "sbTree": [
+          {
+            "keys": [
+              "startIPInt"
+            ],
+            "path": "Observable/Object/Properties/Address_Value",
+            "function": "ipToLong"
+          },
+          {
+            "keys": [
+              "endIPInt"
+            ],
+            "path": "Observable/Object/Properties/Address_Value",
+            "function": "ipToLong"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "Observable/Object/Description"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted AddressRange observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this AddressRange Observable",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "AddressRange"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this AddressRange",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:addressRange-\\d+-\\d+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of AddressRange",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "WHIRL",
+              "comparisonWeight": 3.383410480090717,
+              "resolutionFunction": "TBD"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "AddressObj:AddressObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                },
+                "category": {
+                  "description": "defines type of this Address",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "ipv4-addr",
+                    "ipv6-addr"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Address_Value": {
+                "type": "string",
+                "cardinality": "single",
+                "attr": {
+                  "condition": {
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "InclusiveBetween"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "delimiter": {
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      " - "
+                    ],
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "apply_condition": {
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "ANY"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "TBD"
+                  }
+                },
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              }
+            },
+            "Location": {
+              "attr": {
+                "id": {
+                  "description": "country acronyms",
+                  "type": "string",
+                  "cardinality": "single",
+                  "comparisonFunction": "TBD",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "TBD"
+                }
+              },
+              "Name": {
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "TBD",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Served_By": {
+      "title": "Served_By",
+      "vertexType": "Served_By",
+      "description": "DNSRecord Served_By IP; HTTPRequest Served_By DNSName",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "DNSRecord",
+            "HTTPRequest"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "IP",
+            "DNSName"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Port": {
+      "title": "Port",
+      "vertexType": "Port",
+      "description": "a specific port",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Port"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Port_Value']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Port_Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Port observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Port",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Port",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Port",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:port-\\d+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of Port",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "PortObj:PortObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Port_Value": {
+                "description": "Port value",
+                "type": "number",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Exploits": {
+      "title": "Exploits",
+      "vertexType": "Exploits",
+      "description": "Exploit Exploits Vulnerability'",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Exploit"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Vulnerability"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Moved_By": {
+      "title": "Moved_By",
+      "vertexType": "Moved_By",
+      "description": "Software Moved_By Flow",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Software"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Flow"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Served_On": {
+      "title": "Served_On",
+      "vertexType": "Served_On",
+      "description": "HTTPRequest Served_On Port",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "HTTPRequest"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Port"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Weakness": {
+      "title": "Weakness",
+      "vertexType": "Weakness",
+      "description": "Exploit Target used to characterize weakness",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Weakness"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']/*[local-name() = 'CWE_ID']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']/*[local-name() = 'Description']",
+          "description": "descriptive summary of this Weakness family",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 5.8790593,
+          "resolutionFunction": "appendList"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Exploit_Targets']/*[local-name() = 'Information_Source']//*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      }
+    },
+    "Runs_On": {
+      "title": "Runs_As",
+      "vertexType": "Runs_As",
+      "description": "Service Runs_On Port",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Service"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Port"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Runs_As": {
+      "title": "Runs_As",
+      "vertexType": "Runs_As",
+      "description": "Software Runs_As Account",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Software"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Account"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "HTTPRequest": {
+      "title": "HTTPRequest",
+      "vertexType": "HTTPRequest",
+      "description": "HTTP Requests to service",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "HTTPRequest"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'HTTP_Request_Response']/*[local-name() = 'HTTP_Client_Request']/*[local-name() = 'HTTP_Request_Line']/*[local-name() = 'Value']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/HTTP_Request_Response/HTTP_Client_Request/HTTP_Request_Line/Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "Observable/Object/Description"
+          },
+          {
+            "keys": [
+              "rawHeader"
+            ],
+            "path": "Observable/Object/Properties/HTTP_Request_Response/HTTP_Client_Request/HTTP_Request_Header/Raw_Header"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted HTTP request observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this HTTPRequest",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "HTTPRequest",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this HTTPRequest",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:httpRequest-.+"
+              }
+            },
+            "Description": {
+              "description": "Observable description of HTTPRequest",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "HTTPSessionObj:HTTPSessionObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "HTTP_Request_Response": {
+                "HTTP_Client_Request": {
+                  "HTTP_Request_Line": {
+                    "HTTP_Method": {
+                      "description": "http method type",
+                      "type": "string",
+                      "cardinality": "single",
+                      "enum": [
+                        "GET",
+                        "POST",
+                        "HEAD",
+                        "PUT"
+                      ],
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": "TBD",
+                      "resolutionFunction": "TBD"
+                    },
+                    "Version": {
+                      "description": "http request version",
+                      "type": "string",
+                      "cardinality": "single",
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "none"
+                    },
+                    "Value": {
+                      "description": "http request value",
+                      "type": "string",
+                      "cardinality": "single",
+                      "comparisonFunction": "TBD",
+                      "comparisonWeight": "TBD",
+                      "resolutionFunction": "TBD"
+                    }
+                  },
+                  "HTTP_Request_Header": {
+                    "Parsed_Header": {
+                      "Content_Length": {
+                        "description": "length of request",
+                        "type": "number",
+                        "cardinality": "single",
+                        "comparisonFunction": "TBD",
+                        "comparisonWeight": "TBD",
+                        "resolutionFunction": "TBD"
+                      },
+                      "Referer": {
+                        "Value": {
+                          "description": "http referer",
+                          "type": "string",
+                          "cardinality": "single",
+                          "comparisonFunction": "TBD",
+                          "comparisonWeight": "TBD",
+                          "resolutionFunction": "TBD"
+                        }
+                      },
+                      "Host": {
+                        "Port": {
+                          "attr": {
+                            "object_reference": {
+                              "description": "referencing http server's Port object",
+                              "type": "string",
+                              "cardinality": "single",
+                              "label": [
+                                "Served_On"
+                              ]
+                            }
+                          }
+                        },
+                        "Domain_Name": {
+                          "attr": {
+                            "object_reference": {
+                              "description": "referencing http server's DNSName object",
+                              "type": "string",
+                              "cardinality": "single",
+                              "label": [
+                                "Served_By"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "Accept_Language": {
+                        "description": "http request accept language",
+                        "type": "string",
+                        "cardinality": "single",
+                        "comparisonFunction": "exact",
+                        "comparisonWeight": 1.0,
+                        "resolutionFunction": "TBD"
+                      },
+                      "From": {
+                        "attr": {
+                          "object_reference": {
+                            "description": "referencing IP address of requester",
+                            "type": "string",
+                            "cardinality": "single",
+                            "label": [
+                              "Requested_By"
+                            ]
+                          }
+                        }
+                      },
+                      "Date": {
+                        "description": "http request date",
+                        "type": "string",
+                        "cardinality": "single",
+                        "comparisonFunction": "compareTimestamps",
+                        "comparisonWeight": "TBD",
+                        "resolutionFunction": "TBD"
+                      },
+                      "User_Agent": {
+                        "description": "user agent of the http request",
+                        "type": "string",
+                        "cardinality": "single",
+                        "comparisonFunction": "exact",
+                        "comparisonWeight": "TBD",
+                        "resolutionFunction": "TBD"
+                      }
+                    },
+                    "Raw_Header": {
+                      "description": "unparsed http request",
+                      "type": "string",
+                      "cardinality": "single",
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": "TBD",
+                      "resolutionFunction": "TBD"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "DNSRecord": {
+      "title": "DNSRecord",
+      "vertexType": "DNSRecord",
+      "description": "dns records of various domain name systems",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "DNSRecord"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Domain_Name']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList",
+          "delimiter": "##comma##"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Domain_Name.object_reference - Observable/Object/Properties/Value + : + Observable/Object/Properties/IP_Address.object_reference - Observable/Object/Properties/Address_Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted DNSRecord observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this DNSRecord Observable",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "DNSRecord",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this DNSRecord",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:dnsRecord-.+$"
+              }
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "DNSRecordObj:DNSRecordObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Description": {
+                "description": "Observable description of DNSRecord",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              },
+              "Queried_Date": {
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "compareTimestamps",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "keepNew"
+              },
+              "Entry_Type": {
+                "description": "resource record type",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              },
+              "Domain_Name": {
+                "attr": {
+                  "object_reference": {
+                    "description": "referencing queried DNSName",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Requested_DNSName"
+                    ]
+                  }
+                }
+              },
+              "Flags": {
+                "description": "dns request flags",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              },
+              "TTL": {
+                "description": "total time to live",
+                "type": "integer",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              },
+              "IP_Address": {
+                "attr": {
+                  "object_reference": {
+                    "description": "referencing IP Address of queried DNSName",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Requested_IP"
+                    ]
+                  }
+                }
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to IP address of requester (Requested_By) and responded server (Served_By)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Requested_By",
+                      "Served_By"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "ip address was requested by requester (Requested_By) and served by server (Served_By)",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Relationship": {
+                  "description": "Requested_By; Served_By",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Requested_By",
+                    "Served_By"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "IP": {
+      "title": "IP",
+      "vertexType": "IP",
+      "description": "a specific IP address",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "IP"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "ipInt": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+          "description": "start IP, as integer",
+          "type": "integer",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD",
+          "applyFunction": "ipToLong"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description",
+        "ipInt"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Address_Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/bservable_Source/Information_Source_Type"
+          }
+        ],
+        "sb-tree": [
+          {
+            "keys": [
+              "ipInt"
+            ],
+            "path": "Observable/Object/Properties/Address_Value",
+            "function": "ipToLong"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted IP observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this IP Observable",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "IP",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this IP",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:ip-\\d+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of IP address",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "AddressObj:AddressObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                },
+                "category": {
+                  "description": "defines type of this IP",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "ipv4-addr",
+                    "ipv6-addr"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Address_Value": {
+                "description": "IP value",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to AddressRange",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Contained_Within"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "IP Address Contained_Within AddressRange",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Relationship": {
+                  "description": "IP address Contained_Within AddressRange",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Contained_Within"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Src_Socket_Address": {
+      "title": "Src_Socket_Address",
+      "vertexType": "Src_Socket_Address",
+      "description": "Flow's Src_Socket_Address Address",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Flow"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Address"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Uses_IP": {
+      "title": "Uses_IP",
+      "vertexType": "Uses_IP",
+      "description": "Malware Uses_IP IP",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Malware"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "IP"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Vulnerability": {
+      "title": "Vulnerability",
+      "vertexType": "Vulnerability",
+      "description": "a flaw in some software, that can cause improper, unintended operation, and can potentially be exploited as part of an attack",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Vulnerability"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'CVE_ID']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Description']",
+          "description": "description",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 3.383410480090717,
+          "resolutionFunction": "appendList"
+        },
+        "solution": {
+          "xpath": ".[local-name() = 'Course_Of_Action']/*[local-name() = 'Description']",
+          "description": "solution",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 6.1163623196299,
+          "resolutionFunction": "appendList"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Source']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        },
+        "publishedDate": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Published_DateTime']",
+          "description": "published date",
+          "type": "number",
+          "cardinality": "single",
+          "comparisonFunction": "compareTimestamps",
+          "comparisonWeight": 1.373463923761563,
+          "resolutionFunction": "keepNew"
+        },
+        "shortDescription": {
+          "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Short_Description']",
+          "description": "short description",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 6.882437470997878,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Exploit_Target/Vulnerability/CVE_ID"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Exploit_Target/Vulnerability/Source"
+          }
+        ],
+        "sbTree": [
+          {
+            "keys": [
+              "publishedDate"
+            ],
+            "path": "Exploit_Target/Vulnerability/Published_DateTime"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "Exploit_Target/Vulnerability/Description"
+          },
+          {
+            "keys": [
+              "shortDescription"
+            ],
+            "path": [
+              "Exploit_Target/Vulnerability/Short_Description"
+            ]
+          },
+          {
+            "keys": [
+              "solution"
+            ],
+            "path": "Course_Of_Action/Description"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Vulnerabilities (Exploit_Target) and their solutions (COA)",
+        "Course_Of_Action": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this vulnerability",
+              "type": "string",
+              "cardinality": "single"
+            },
+            "type": {
+              "description": "attribute to specify type of this object",
+              "type": "string",
+              "cardinality": "single",
+              "enum": [
+                "coa:CourseOfActionType"
+              ],
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            }
+          },
+          "Title": {
+            "description": "title for this Course_Of_Action",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Vulnerability",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Description": {
+            "description": "Course_Of_Action description of solution for Vulnerability",
+            "type": "string",
+            "cardinality": "single",
+            "comparisonFunction": "WHIRL",
+            "comparisonWeight": 6.1163623196299,
+            "resolutionFunction": "TBD"
+          },
+          "Information_Source": {
+            "Contributing_Sources": {
+              "Source": {
+                "Identity": {
+                  "Name": {
+                    "description": "data source for this Vulnerability Solution",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "appendPosition": "Course_Of_Action/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Exploit_Target": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Vulnerability",
+              "type": "string",
+              "cardinality": "single"
+            },
+            "type": {
+              "description": "attribute to specify type of this object",
+              "type": "string",
+              "cardinality": "single",
+              "enum": [
+                "et:ExploitTargetType"
+              ],
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            }
+          },
+          "Title": {
+            "description": "title for this Exploit_Target",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Vulnerability",
+            "comparisonFunction": "exact",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Information_Source": {
+            "Contributing_Sources": {
+              "Source": {
+                "Identity": {
+                  "Name": {
+                    "description": "data source for this Vulnerability",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "appendPosition": "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  }
+                }
+              }
+            }
+          },
+          "Potential_COAs": {
+            "Potential_COA": {
+              "Course_Of_Action": {
+                "attr": {
+                  "type": {
+                    "description": "attribute to specify type of this object",
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "coa:CourseOfActionType"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "idref": {
+                    "description": "id reference to related Course_Of_Action (solution for this vulnerability)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Indicated_Solution"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "Vulnerability": {
+            "Description": {
+              "description": "Exploit_Target description of Vulnerability",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "WHIRL",
+              "comparisonWeight": 3.383410480090717,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Exploit_Target/Vulnerability/Description"
+            },
+            "Affected_Software": {
+              "Affected_Software": {
+                "Observable": {
+                  "attr": {
+                    "idref": {
+                      "description": "id reference to affected Software",
+                      "type": "string",
+                      "cardinality": "single",
+                      "label": [
+                        "Has_AffectedSoftware"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "References": {
+              "Reference": {
+                "description": "references",
+                "type": "string",
+                "cardinality": "set",
+                "comparisonFunction": "compareReferences",
+                "comparisonWeight": 2.21228381503559,
+                "resolutionFunction": "appendList",
+                "appendPosition": "Exploit_Target/Vulnerability/References/Reference"
+              }
+            },
+            "CVE_ID": {
+              "description": "CWE Number",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 0.1650552902059562,
+              "resolutionFunction": "duplicateObject"
+            },
+            "Published_DateTime": {
+              "description": "published date",
+              "type": "number",
+              "cardinality": "single",
+              "comparisonFunction": "compareTimestamps",
+              "comparisonWeight": 1.373463923761563,
+              "resolutionFunction": "keepNew"
+            },
+            "OSVDB_ID": {
+              "description": "vulnerability database id",
+              "type": "integer",
+              "cardinality": "set",
+              "comparisonFunction": "TBD",
+              "comparisonWeight": "TBD",
+              "resolutionFunction": "TBD"
+            },
+            "Source": {
+              "description": "data source for this Vulnerability",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name"
+            },
+            "Short_Description": {
+              "description": "short description",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "WHIRL",
+              "comparisonWeight": 6.882437470997878,
+              "resolutionFunction": "TBD"
+            },
+            "CVSS_Score": {
+              "Base_Score": {
+                "description": "CVSS score",
+                "type": "number",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 0.7038249561307638,
+                "resolutionFunction": "keepConfidence"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Has_AffectedSoftware": {
+      "title": "Has_AffectedSoftware",
+      "vertexType": "Has_AffectedSoftware",
+      "description": "Vulnerability Has_AffectedSoftware Software",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Vulnerability"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Software"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "AS": {
+      "title": "AS",
+      "vertexType": "AS",
+      "description": "descripiton of autonomous systems",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "AS"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD"
+        },
+        "number": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Number']",
+          "type": "integer",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Name"
+          },
+          {
+            "keys": [
+              "number"
+            ],
+            "path": "Observable/Object/Properties/Number"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "Observable/Object/Description"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted AS observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Address",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "AS",
+            "comparisonFunction": "exact",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this AS",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:as-.+"
+              }
+            },
+            "Description": {
+              "description": "Observable description of AS",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "ASObj:ASObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Name": {
+                "description": "AS name",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              },
+              "Number": {
+                "description": "AS number",
+                "type": "number",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              },
+              "Regional_Internet_Registry": {
+                "description": "regional internet registry",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": "TBD",
+                "resolutionFunction": "TBD"
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to AddressRange",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Contains"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "AS Contains AddressRange",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Relationship": {
+                  "description": "Contains",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Contains"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Course_Of_Action": {
+      "title": "Course_Of_Action",
+      "vertexType": "Course_Of_Action",
+      "description": "Incident is an instance of Indicator with discovered information during response ivestigation",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Course_Of_Action"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Course_Of_Action']/*[local-name() = 'Title']",
+          "cardinality": "single"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Course_Of_Action']/*[local-name() = 'Description']",
+          "cardinality": "set"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Course_Of_Action']/*[local-name() = 'Producer']//*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "cardinality": "single"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      }
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "vertexType": "Campaign",
+      "description": "Campaign is instance of ThreatActors observed throug Incidents/TTPs",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Campaign"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Campaign']/*[local-name() = 'Names']/*[local-name() = 'Name']",
+          "cardinality": "single"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Campaign']/*[local-name() = 'Description'] | .[local-name() = 'Campaign']/*[local-name() = 'Activity']/*[local-name() = 'Description']",
+          "cardinality": "set"
+        },
+        "alias": {
+          "xpath": ".[local-name() = 'Campaign']/*[local-name() = 'Names']/*[local-name() = 'Name']",
+          "cardinality": "set"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Campaign']/*[local-name() = 'Producer']//*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "cardinality": "single"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      }
+    },
+    "Logs_In_To": {
+      "title": "Logs_In_To",
+      "vertexType": "Logs_In_To",
+      "description": "Account Logs_In_To Host",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Account"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Host"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Contains": {
+      "title": "Contains",
+      "vertexType": "Contains",
+      "description": "AS Contains AddressRange",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "AS"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "AddressRange"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Software": {
+      "title": "Software",
+      "vertexType": "Software",
+      "description": "Any software components on a system, including OSes, applications, services, and libraries.",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Software"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Product' or local-name() = 'Vendor' or local-name() = 'Update' or local-name() = 'Edition' or local-name() = 'Language' or local-name() = 'Version'] | .[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Custom_Properties']/*[local-name() = 'Property' and @name = \"Part\"]",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none",
+          "pattern": "cpe:Property:Vendor:Product:Version:Update:Edition:Language",
+          "applyFunction": "cleanCpeName"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "description": "description",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 3.033507781,
+          "resolutionFunction": "TBD"
+        },
+        "nvdId": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Custom_Properties' and @name = \"NVD_ID\"]",
+          "description": "NVD ID",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          },
+          {
+            "keys": [
+              "nvdId"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Software observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this software",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Software",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Software",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:software-.+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of Software",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "TBD",
+              "comparisonWeight": 3.033507781,
+              "resolutionFunction": "TBD"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "ProductObj:ProductObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Language": {
+                "description": "software language",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 0.008644951,
+                "resolutionFunction": "appendList",
+                "delimiter": "##"
+              },
+              "Version": {
+                "description": "software version",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 8.713991,
+                "resolutionFunction": "appendList",
+                "delimiter": "##"
+              },
+              "Product": {
+                "description": "software name",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 7.6517224,
+                "resolutionFunction": "appendList",
+                "delimiter": "##"
+              },
+              "Vendor": {
+                "description": "vendor",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 6.062343,
+                "resolutionFunction": "appendList",
+                "delimiter": "##"
+              },
+              "Update": {
+                "description": "update",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "compareTimestamps",
+                "comparisonWeight": 1.1007229,
+                "resolutionFunction": "keepNew"
+              },
+              "Edition": {
+                "description": "edition",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 0.540115,
+                "resolutionFunction": "appendList",
+                "delimiter": "##"
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to Account (Runs_As) and Flow (Moved_By)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Runs_As",
+                      "Moved_By"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "software Runs_As account; software Resolved_To process; software Moved_By flow",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Properties": {
+                  "attr": {
+                    "type": {
+                      "description": "attribute to specify type of this object",
+                      "type": "string",
+                      "cardinality": "single",
+                      "enum": [
+                        "ProcessObj:ProcessObjectType"
+                      ],
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "none"
+                    }
+                  },
+                  "Name": {
+                    "description": "Process Path (Name)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 0.45797676,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  },
+                  "Parent_PID": {
+                    "description": "Process PPID",
+                    "type": "integer",
+                    "cardinality": "single",
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 0.5673976,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  },
+                  "PID": {
+                    "description": "Process PID",
+                    "type": "integer",
+                    "cardinality": "single",
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 0.5673976,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  },
+                  "Argument_List": {
+                    "Argument": {
+                      "description": "Process Args",
+                      "type": "string",
+                      "cardinality": "set",
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 0.43408045,
+                      "resolutionFunction": "appendList",
+                      "appendPosition": "Observable/Object/Related_Objects/Related_Object/Properties/Argument_List/Argument"
+                    }
+                  }
+                },
+                "Relationship": {
+                  "description": "Software Runs_As Account, Initialized_To Process, and Moved_By Flow",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Initialized_To",
+                    "Moved_By",
+                    "Runs_As"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            },
+            "Custom_Properties": {
+              "Property": {
+                "description": "part type",
+                "type": "string",
+                "cardinality": "single",
+                "attr": {
+                  "name": {
+                    "description": "name of the custom field",
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "Part"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  }
+                },
+                "comparisonFunction": "exact",
+                "comparisonWeight": 0.4717679,
+                "resolutionFunction": "appendList",
+                "delimiter": "##"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Organization": {
+      "title": "Organization",
+      "vertexType": "Organization",
+      "description": "Descriptions of Oraganizations posessing AS",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Organization"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Registrants']/*[local-name() = 'Registrant']/*[local-name() = 'Organization']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Registrants/Registrant/Organization"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          },
+          {
+            "keys": [
+              "address"
+            ],
+            "path": "Observable/Object/Properties/Registrants/Registrant/Address"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "Observable/Object/Description"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Organization observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Organization Observable",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Organization",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Organization",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:organization-\\s+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of this Organization",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "WhoisObj:WhoisObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Registrants": {
+                "Registrant": {
+                  "Organization": {
+                    "description": "Organization name",
+                    "type": "string",
+                    "cardinality": "single",
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "Address": {
+                    "description": "Organization physical address",
+                    "type": "string",
+                    "cardinality": "single",
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": "TBD",
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  },
+                  "Registrant_ID": {
+                    "type": "string",
+                    "cardinality": "single",
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": "TBD",
+                    "resolutionFunction": "none"
+                  }
+                }
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to AS",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Has_AS"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "Organization Has_AS AS",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Relationship": {
+                  "description": "Has_AS",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Has_AS"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Dest_Socket_Address": {
+      "title": "Dest_Socket_Address",
+      "vertexType": "Dest_Socket_Address",
+      "description": "Flow's Dest_Socket_Address Address",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Flow"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Address"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Requested_DNSName": {
+      "title": "Requested_DNSName",
+      "vertexType": "Requested_DNSName",
+      "description": "DNSRecord Requested_DNSName DNSName",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "DNSRecord"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "DNSName"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "DNSName": {
+      "title": "DNSName",
+      "vertexType": "DNSName",
+      "description": "a DNS name (and possibly associated info - registration info, etc.)",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "DNSName"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted  DNSName observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this DNSName",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "DNSName",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this DNSName",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:dnsName-.+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of DNSName",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "DomainNameObj:DomainNameObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Value": {
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to IP Address",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Resolved_To"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "DNSName Resolved_To IP Address",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Properties": {
+                  "attr": {
+                    "type": {
+                      "description": "attribute to specify type of this object",
+                      "type": "string",
+                      "cardinality": "single",
+                      "enum": [
+                        "WhoisObj:WhoisObjectType"
+                      ],
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "none"
+                    }
+                  },
+                  "Nameservers": {
+                    "Nameserver": {
+                      "Value": {
+                        "description": "nameserver of this DNSName",
+                        "type": "string",
+                        "cardinality": "single",
+                        "comparisonFunction": "exact",
+                        "comparisonWeight": "TBD",
+                        "resolutionFunction": "appendList",
+                        "appendPosition": "Observable/Object/Related_Objects/Related_Object/Properties/Nameservers/Nameserver/Value"
+                      }
+                    }
+                  }
+                },
+                "Relationship": {
+                  "description": "Resolved_To",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Resolved_To"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Uses_Address": {
+      "title": "Uses_Address",
+      "vertexType": "Uses_Address",
+      "description": "Malware/Host Uses_Address Address",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Malware",
+            "Host"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Address"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Requested_By": {
+      "title": "Requested_By",
+      "vertexType": "Requested_By",
+      "description": "DNSRecord/HTTPRequest Requested_By IP",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "DNSRecord",
+            "HTTPRequest"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "IP"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Runs": {
+      "title": "Runs",
+      "vertexType": "Runs",
+      "description": "Host Runs Software",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Host"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Software"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Malware": {
+      "title": "Malware",
+      "vertexType": "Malware",
+      "description": "any malicious software.  This can refer to either a stored binary or a running instance. Malware can contain code to launch an exploit. Malware can itself be an asset that an attacker uses in future attacks (eg. a backdoor left on a compromised system.) or can automatically launch additional attacks on behalf of the original attacker. Malware can be hosted by or communicate with servers controlled by the attacker. Malware can contain code to load other malware. Malware can reuse components from other malware samples.",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Malware"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Name']",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Description']",
+          "description": "descriptive summary of this malware family",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 5.8790593,
+          "resolutionFunction": "appendList"
+        },
+        "solution": {
+          "xpath": ".[local-name() = 'Course_Of_Action']/*[local-name() = 'Description']",
+          "description": "description of removal procedure",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "TBD",
+          "comparisonWeight": "TBD",
+          "resolutionFunction": "TBD"
+        },
+        "alias": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Name']",
+          "cardinality": "set",
+          "comparisonFunction": "TBD",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        },
+        "details": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Attack_Patterns']/*[local-name() = 'Attack_Pattern']/*[local-name() = 'Description']",
+          "description": "additional text description of this malware",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 5.8044763,
+          "resolutionFunction": "appendList"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "TTP/Behavior/Malware/Malware_Instance/Title"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "TTP/Behavior/Malware/Malware_Instance/Description"
+          },
+          {
+            "keys": [
+              "details"
+            ],
+            "path": "TTP/Behavior/Attack_Patterns/Attack_Pattern/Description"
+          },
+          {
+            "keys": [
+              "solution"
+            ],
+            "path": "Course_Of_Action/Description"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Malware instances",
+        "TTP": {
+          "attr": {
+            "id": {
+              "description": "unique id of this Malware",
+              "type": "string",
+              "cardinality": "single"
+            },
+            "type": {
+              "description": "attribute to specify type of this object",
+              "type": "string",
+              "cardinality": "single",
+              "enum": [
+                "ttp:TTPType"
+              ],
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            }
+          },
+          "Title": {
+            "description": "title for this TTP",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Malware",
+            "comparisonFunction": "exact",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Information_Source": {
+            "Contributing_Sources": {
+              "Source": {
+                "Identity": {
+                  "Name": {
+                    "description": "data source for this Malware",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "appendPosition": "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  }
+                }
+              }
+            }
+          },
+          "Behavior": {
+            "Malware": {
+              "Malware_Instance": {
+                "Title": {
+                  "description": "Malware title/name",
+                  "type": "string",
+                  "cardinality": "single",
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                },
+                "Name": {
+                  "description": "Malware name",
+                  "type": "string",
+                  "cardinality": "set",
+                  "comparisonFunction": "TBD",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Behavior/Malware/Malware_Instance/Name"
+                },
+                "Type": {
+                  "description": "Malware Type",
+                  "type": "string",
+                  "cardinality": "set",
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.4822443,
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Behavior/Malware/Malware_Instance/Type"
+                },
+                "Description": {
+                  "description": "TTP description of Malware",
+                  "type": "string",
+                  "cardinality": "set",
+                  "comparisonFunction": "WHIRL",
+                  "comparisonWeight": 5.8790593,
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Behavior/Malware/Malware_Instance/Description"
+                }
+              }
+            }
+          },
+          "Resources": {
+            "Infrastructure": {
+              "Observable_Characterization": {
+                "attr": {
+                  "cybox_minor_version": {
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "1.0"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "cybox_major_version": {
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "1.0",
+                      "2.0"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  }
+                },
+                "Observable": {
+                  "attr": {
+                    "idref": {
+                      "description": "reference to IP or Address (IP + Port) leveraged by this Malware",
+                      "type": "string",
+                      "cardinality": "single",
+                      "label": [
+                        "Uses_IP",
+                        "Uses_Address"
+                      ]
+                    }
+                  },
+                  "Event": {
+                    "Event": {
+                      "Actions": {
+                        "Action": {
+                          "attr": {
+                            "type": {
+                              "description": "attribute to specify type of this object",
+                              "type": "string",
+                              "cardinality": "single",
+                              "enum": [
+                                "maecBundle:MalwareActionType"
+                              ],
+                              "comparisonFunction": "exact",
+                              "comparisonWeight": 1.0,
+                              "resolutionFunction": "none"
+                            }
+                          },
+                          "Type": {
+                            "description": "type of action taken in compliance with used process, registry key, or file",
+                            "type": "string",
+                            "cardinality": "single",
+                            "enum": [
+                              "Created",
+                              "Modified"
+                            ],
+                            "comparisonFunction": "exact",
+                            "comparisonWeight": 1.0,
+                            "resolutionFunction": "none"
+                          },
+                          "Description": {
+                            "description": "descriptions of actions used by this Malware",
+                            "type": "string",
+                            "cardinality": "single",
+                            "comparisonFunction": "exact",
+                            "comparisonWeight": 1.0,
+                            "resolutionFunction": "none"
+                          },
+                          "Associated_Objects": {
+                            "Associated_Object": {
+                              "Properties": {
+                                "attr": {
+                                  "type": {
+                                    "description": "attribute to specify type of this object",
+                                    "type": "string",
+                                    "cardinality": "single",
+                                    "enum": [
+                                      "WinRegistryKeyObj:WindowsRegistryKeyObjectType",
+                                      "ProcessObj:ProcessObjectType",
+                                      "FileObj:FileObjectType"
+                                    ],
+                                    "comparisonFunction": "exact",
+                                    "comparisonWeight": 1.0,
+                                    "resolutionFunction": "none"
+                                  }
+                                },
+                                "Key": {
+                                  "description": "files, regestry keys, or processes used by this Malware during an attack",
+                                  "type": "string",
+                                  "cardinality": "single",
+                                  "comparisonFunction": "exact",
+                                  "comparisonWeight": "TBD",
+                                  "resolutionFunction": "appendList",
+                                  "appendPosition": "TTP/Resources/Infrastructure/Observable_Characterization/Observable/Event/Event/Actions/Action/Associated_Objects/Associated_Object"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Tools": {
+              "Tool": {
+                "Name": {
+                  "description": "name of file used by this Malware",
+                  "type": "string",
+                  "cardinality": "single",
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Resources/Tools/Tool"
+                },
+                "Type": {
+                  "enum": [
+                    "File"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Resources/Tools/Tool"
+                },
+                "Tool_Hashes": {
+                  "Hash": {
+                    "Type": {
+                      "enum": [
+                        "MD5",
+                        "SHA-1"
+                      ],
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "none"
+                    },
+                    "Simple_Hash_Value": {
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": "TBD",
+                      "resolutionFunction": "appendList",
+                      "appendPosition": "TTP/Resources/Tools/Tool/Tool_Hashes"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "Victim_Targeting": {
+            "Targeted_Systems": {
+              "comparisonFunction": "exact",
+              "comparisonWeight": "TBD",
+              "resolutionFunction": "appendList",
+              "appendPosition": "TTP/Victim_Targeting/Targeted_Systems"
+            }
+          }
+        },
+        "Course_Of_Action": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this course of action",
+              "type": "string",
+              "cardinality": "single"
+            },
+            "type": {
+              "description": "attribute to specify type of this object",
+              "type": "string",
+              "cardinality": "single",
+              "enum": [
+                "coa:CourseOfActionType"
+              ],
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            }
+          },
+          "Title": {
+            "description": "title for this Course_Of_Action",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Malware",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Description": {
+            "description": "Course_Of_Action description of solution for Malware",
+            "type": "string",
+            "cardinality": "single",
+            "comparisonFunction": "WHIRL",
+            "comparisonWeight": 6.1163623196299,
+            "resolutionFunction": "TBD"
+          },
+          "Information_Source": {
+            "Contributing_Sources": {
+              "Source": {
+                "Identity": {
+                  "Name": {
+                    "description": "data source for this Malware solution",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "appendPosition": "Course_Of_Action/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Indicator": {
+          "attr": {
+            "id": {
+              "description": "unique id of this Malware",
+              "type": "string",
+              "cardinality": "single"
+            },
+            "type": {
+              "description": "attribute to specify type of this object",
+              "type": "string",
+              "cardinality": "single",
+              "enum": [
+                "indicator:IndicatorType"
+              ],
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            }
+          },
+          "Title": {
+            "description": "title for this Indicator",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Malware",
+            "comparisonFunction": "exact",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Suggested_COAs": {
+            "Suggested_COA": {
+              "Course_Of_Action": {
+                "attr": {
+                  "type": {
+                    "description": "attribute to specify type of this object",
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "coa:CourseOfActionType"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "idref": {
+                    "description": "id reference to related Course_Of_Action (solution for indicated Malware)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Indicated_Solution"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "Indicated_TTP": {
+            "TTP": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "ttp:TTPType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                },
+                "idref": {
+                  "description": "id reference to related TTP (Malware)",
+                  "type": "string",
+                  "cardinality": "single",
+                  "label": [
+                    "Indicated_Malware"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Exploit": {
+      "title": "Exploit",
+      "vertexType": "Exploit",
+      "description": "Exploit characteristics",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Exploit"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Title']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Description']",
+          "description": "descriptive summary of this Exploit family",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 5.8790593,
+          "resolutionFunction": "appendList"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        },
+        "shortDescription": {
+          "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Short_Description']",
+          "description": "additional text description of this Exploit",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 5.8044763,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "TTP/Behavior/Exploits/Exploit/Title"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ],
+            "path": "TTP/Behavior/Exploits/Exploit/Description"
+          },
+          {
+            "keys": [
+              "shortDescription"
+            ],
+            "path": "TTP/Behavior/Exploits/Exploit/Short_Description"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Exploits",
+        "TTP": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Exploit",
+              "type": "string",
+              "cardinality": "single"
+            },
+            "type": {
+              "description": "attribute to specify type of this object",
+              "type": "string",
+              "cardinality": "single",
+              "enum": [
+                "ttp:TTPType"
+              ],
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            }
+          },
+          "Title": {
+            "description": "title for this TTP",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Exploit",
+            "comparisonFunction": "exact",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Information_Source": {
+            "Contributing_Sources": {
+              "Source": {
+                "Identity": {
+                  "Name": {
+                    "description": "data source for this Exploit",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "appendPosition": "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  }
+                }
+              }
+            }
+          },
+          "Behavior": {
+            "Exploits": {
+              "Exploit": {
+                "attr": {
+                  "id": {
+                    "description": "a unique id for this course of action",
+                    "type": "string",
+                    "cardinality": "single"
+                  }
+                },
+                "Title": {
+                  "description": "Exploit title/name",
+                  "type": "string",
+                  "cardinality": "single",
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                },
+                "Description": {
+                  "description": "TTP description of Exploit",
+                  "type": "string",
+                  "cardinality": "set",
+                  "comparisonFunction": "WHIRL",
+                  "comparisonWeight": 5.8790593,
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Behavior/Exploits/Exploit/Description"
+                },
+                "Short_Description": {
+                  "description": "short descriptive summary of this Exploit",
+                  "type": "string",
+                  "cardinality": "set",
+                  "comparisonFunction": "WHIRL",
+                  "comparisonWeight": 5.8790593,
+                  "resolutionFunction": "appendList",
+                  "appendPosition": "TTP/Behavior/Exploits/Exploit/Short_Description"
+                }
+              }
+            }
+          },
+          "Exploit_Targets": {
+            "Exploit_Target": {
+              "Relationship": {
+                "description": "Exploit Exploits Vulnerability",
+                "type": "string",
+                "cardinality": "single",
+                "enum": [
+                  "Exploits"
+                ]
+              },
+              "Exploit_Target": {
+                "attr": {
+                  "type": {
+                    "description": "attribute to specify type of this object",
+                    "type": "string",
+                    "cardinality": "single",
+                    "enum": [
+                      "et:ExploitTargetType"
+                    ],
+                    "comparisonFunction": "exact",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "none"
+                  },
+                  "idref": {
+                    "description": "id reference to related Vulnerability (Exploit_Target)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Exploits"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Has_IP": {
+      "title": "Has_IP",
+      "vertexType": "Has_IP",
+      "description": "Address Has_IP IP",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Address"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "IP"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Service": {
+      "title": "Service",
+      "vertexType": "Service",
+      "description": "expected or actual service using some port",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Service"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Name"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Service info observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Service",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Service",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Service",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:service-.$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of Service",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "ProcessObj:ProcessObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Name": {
+                "description": "name of this Service",
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              },
+              "Port_List": {
+                "Port": {
+                  "attr": {
+                    "object_reference": {
+                      "description": "id reference to Port",
+                      "type": "string",
+                      "cardinality": "single",
+                      "label": [
+                        "Runs_On"
+                      ]
+                    }
+                  }
+                }
+              },
+              "Custom_Properties": {
+                "Property": {
+                  "description": "Notes and References for this Service are represented as a custom fields",
+                  "type": "string",
+                  "cardinality": "set",
+                  "attr": {
+                    "name": {
+                      "description": "name of the custom field",
+                      "type": "string",
+                      "cardinality": "single",
+                      "enum": [
+                        "Notes",
+                        "Reference"
+                      ],
+                      "comparisonFunction": "TBD",
+                      "comparisonWeight": "TBD",
+                      "resolutionFunction": "TBD"
+                    }
+                  },
+                  "comparisonFunction": "TBD",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "TBD"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Has_Port": {
+      "title": "Has_Port'",
+      "vertexType": "Has_Port'",
+      "description": "Address Has_Port Port",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Address"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Port"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Host": {
+      "title": "Host",
+      "vertexType": "Host",
+      "description": "Any entity on the network, including PCs, routers, switches, virtual machines, etc.",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Host"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hostname_Value']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Hostname_Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Host observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Host",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Host",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Host",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single",
+                "pattern": "^stucco:hostname-.+$"
+              }
+            },
+            "Description": {
+              "description": "Observable description of Host",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "HostnameObj:HostnameObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Hostname_Value": {
+                "type": "string",
+                "cardinality": "single",
+                "comparisonFunction": "exact",
+                "comparisonWeight": 1.0,
+                "resolutionFunction": "none"
+              }
+            },
+            "Related_Objects": {
+              "Related_Object": {
+                "attr": {
+                  "idref": {
+                    "description": "id reference to IP Address (Resolved_To), Address (Uses_Address), or Software (Runs)",
+                    "type": "string",
+                    "cardinality": "single",
+                    "label": [
+                      "Runs",
+                      "Resolved_To",
+                      "Uses_Address"
+                    ]
+                  }
+                },
+                "Description": {
+                  "description": "Host Runs Software; Host Resolved_To IP; Host Uses_Address Address",
+                  "type": "string",
+                  "cardinality": "single"
+                },
+                "Relationship": {
+                  "description": "Runs, Resolved_To, Uses_Address",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "Runs",
+                    "Resolved_To",
+                    "Uses_Address"
+                  ]
+                },
+                "Discovery_Method": {
+                  "Information_Source_Type": {
+                    "description": "data source for this relationship",
+                    "type": "string",
+                    "cardinality": "set",
+                    "comparisonFunction": "none",
+                    "comparisonWeight": 1.0,
+                    "resolutionFunction": "appendList",
+                    "delimiter": "##"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Logs_In_From": {
+      "title": "Logs_In_From",
+      "vertexType": "Logs_In_From",
+      "description": "Account Logs_In_From Host",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Account"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "Host"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Indicator": {
+      "title": "Indicator",
+      "vertexType": "Indicator",
+      "description": "Indicator consists of Observables mapped to cyber secuity context",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Indicator"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Indicator']/*[local-name() = 'Title']",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Indicator']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "WHIRL",
+          "comparisonWeight": 5.8790593,
+          "resolutionFunction": "appendList"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Indicator']/*[local-name() = 'Producer']//*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      }
+    },
+    "Flow": {
+      "title": "Flow",
+      "vertexType": "Flow",
+      "description": "a flow of traffic between two addresses",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Flow"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Network_Flow_Label']/*[local-name() = 'Dest_Socket_Address' or local-name() = 'Src_Socket_Address']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none",
+          "pattern": "Src_Socket_Address_through_Dest_Socket_Address"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+          "type": "string",
+          "cardinality": "single",
+          "comparisonFunction": "exact",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+          "description": "Data source for this vertex",
+          "type": "string",
+          "cardinality": "set",
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "appendList"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ],
+            "path": "Observable/Object/Properties/Network_Flow_Label/Src_Socket_Address.object_reference-Observable/Object/Properties/IP_Address.object_reference-Observable/Object/Properties/Address_Value + : + Observable/Object/Properties/Network_Flow_Label/Src_Socket_Address.object_reference - Observable/Object/Properties/Port.object_reference - Observable/Object/Properties/Port_Value + : + Observable/Object/Properties/Network_Flow_Label/Dest_Socket_Address.object_reference-Observable/Object/Properties/IP_Address.object_reference - Observable/Object/Properties/Address_Value + : + Observable/Object/Properties/Network_Flow_Label/Dest_Socket_Address.object_reference - Observable/Object/Properties/Port.object_reference - Observable/Object/Properties/Port_Value"
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ],
+            "path": "Observable/Observable_Source/Information_Source_Type"
+          }
+        ],
+        "sbTree": [
+          {
+            "keys": [
+              "startTime"
+            ],
+            "path": "Observable/Object/Properties/Custom_Properties/Property.name=Start_Time"
+          }
+        ]
+      },
+      "comparisonRules": {
+        "description": "set of rules to compare and link two STIX formatted Flow observables",
+        "Observable": {
+          "attr": {
+            "id": {
+              "description": "a unique id for this Observable",
+              "type": "string",
+              "cardinality": "single"
+            }
+          },
+          "Title": {
+            "description": "title for this Observable",
+            "type": "string",
+            "cardinality": "single",
+            "default": "Flow",
+            "comparisonFunction": "none",
+            "comparisonWeight": 1.0,
+            "resolutionFunction": "none"
+          },
+          "Observable_Source": {
+            "Information_Source_Type": {
+              "description": "data source for this Flow",
+              "type": "string",
+              "cardinality": "set",
+              "comparisonFunction": "none",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "appendList",
+              "appendPosition": "Observable/Observable_Source/Information_Source_Type"
+            }
+          },
+          "Object": {
+            "attr": {
+              "id": {
+                "type": "string",
+                "cardinality": "single"
+              }
+            },
+            "Description": {
+              "description": "Observable description of Flow",
+              "type": "string",
+              "cardinality": "single",
+              "comparisonFunction": "exact",
+              "comparisonWeight": 1.0,
+              "resolutionFunction": "none"
+            },
+            "Properties": {
+              "attr": {
+                "type": {
+                  "description": "attribute to specify type of this object",
+                  "type": "string",
+                  "cardinality": "single",
+                  "enum": [
+                    "NetFlowObj:NetworkFlowObjectType"
+                  ],
+                  "comparisonFunction": "exact",
+                  "comparisonWeight": 1.0,
+                  "resolutionFunction": "none"
+                }
+              },
+              "Network_Flow_Label": {
+                "Dest_Socket_Address": {
+                  "attr": {
+                    "object_reference": {
+                      "description": "id reference to Destinaton Socket Address",
+                      "type": "string",
+                      "cardinality": "single",
+                      "label": [
+                        "Dest_Socket_Address"
+                      ]
+                    }
+                  }
+                },
+                "Src_Socket_Address": {
+                  "attr": {
+                    "object_reference": {
+                      "description": "id reference to Source Socket Address",
+                      "type": "string",
+                      "cardinality": "single",
+                      "label": [
+                        "Src_Socket_Address"
+                      ]
+                    }
+                  }
+                }
+              },
+              "Custom_Properties": {
+                "Property": {
+                  "description": "characteristics of this flow are represented with custom fields",
+                  "type": "string",
+                  "cardinality": "single",
+                  "attr": {
+                    "name": {
+                      "description": "name of custom field",
+                      "type": "string",
+                      "cardinality": "single",
+                      "comparisonFunction": "exact",
+                      "comparisonWeight": 1.0,
+                      "resolutionFunction": "none"
+                    }
+                  },
+                  "comparisonFunction": "TBD",
+                  "comparisonWeight": "TBD",
+                  "resolutionFunction": "TBD"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Resolved_To": {
+      "title": "Resolved_To",
+      "vertexType": "Resolved_To",
+      "description": "DNSName/Host Resolved_To IP",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "DNSName",
+            "Host"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "IP"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Contained_Within": {
+      "title": "Contained_Within",
+      "vertexType": "Contained_Within",
+      "description": "IP Contained_Within AddressRange",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "IP"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "AddressRange"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Incident": {
+      "title": "Incident",
+      "vertexType": "Incident",
+      "description": "Incident is an instance of Indicator with discovered information during response ivestigation",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Incident"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Incident']/*[local-name() = 'Title']",
+          "cardinality": "single"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Incident']/*[local-name() = 'Description']",
+          "cardinality": "set"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Incident']/*[local-name() = 'Producer']//*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "cardinality": "single"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      }
+    },
+    "Threat_Actor": {
+      "title": "Threat_Actor",
+      "vertexType": "Threat_Actor",
+      "description": "Threat_Actor characterizes malicious actors representing a cyber attack threat",
+      "properties": {
+        "vertexType": {
+          "type": "string",
+          "cardinality": "single",
+          "enum": [
+            "Threat_Actor"
+          ],
+          "comparisonFunction": "none",
+          "comparisonWeight": 1.0,
+          "resolutionFunction": "none"
+        },
+        "name": {
+          "xpath": ".[local-name() = 'Threat_Actor']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+          "cardinality": "single"
+        },
+        "description": {
+          "xpath": ".[local-name() = 'Threat_Actor']/*[local-name() = 'Description']",
+          "cardinality": "set"
+        },
+        "alias": {
+          "xpath": ".[local-name() = 'Threat_Actor']/*[local-name() = 'Identity']//*[local-name() = 'Name']",
+          "cardinality": "set"
+        },
+        "source": {
+          "xpath": ".[local-name() = 'Threat_Actor']/*[local-name() = 'Producer']//*[local-name() = 'Threat_Actor']/*[local-name() = 'Name']",
+          "cardinality": "single"
+        }
+      },
+      "type": "object",
+      "required": [
+        "vertexType",
+        "name",
+        "description"
+      ],
+      "indexes": {
+        "hash": [
+          {
+            "keys": [
+              "name"
+            ]
+          },
+          {
+            "keys": [
+              "vertexType"
+            ]
+          },
+          {
+            "keys": [
+              "source"
+            ]
+          }
+        ],
+        "fullText": [
+          {
+            "keys": [
+              "description"
+            ]
+          }
+        ]
+      }
+    },
+    "Requested_IP": {
+      "title": "Requested_IP",
+      "vertexType": "Requested_IP",
+      "description": "DNSRecord Requested_IP IP",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "DNSRecord"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "IP"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    },
+    "Has_AS": {
+      "title": "Has_AS",
+      "vertexType": "Has_AS",
+      "description": "Organization Has_AS AS",
+      "properties": {
+        "outVType": {
+          "type": "string",
+          "enum": [
+            "Organization"
+          ]
+        },
+        "inVType": {
+          "type": "string",
+          "enum": [
+            "AS"
+          ]
+        }
+      },
+      "required": [
+        "inVType",
+        "outVType"
+      ]
+    }
+  }
+}
