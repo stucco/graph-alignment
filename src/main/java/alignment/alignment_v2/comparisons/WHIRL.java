@@ -36,7 +36,7 @@ public class WHIRL {
 		for (String s : s1)	{
 			if (rsw.containsString(s)) continue;
 			s = s.toLowerCase();	//converting strings to low case letters
-			s = s.replaceAll ("[.,:;'!?]", "");	//removing chars
+			s = s.replaceAll ("\\W", " ").trim();	//removing chars
 			ps.add(s.toCharArray(), s.length());
 			ps.stem();
 			str = ps.toString();
@@ -50,8 +50,9 @@ public class WHIRL {
 			}
 		}
 		for (String s : s2)	{
+			if (rsw.containsString(s)) continue;
 			s = s.toLowerCase();
-			s = s.replaceAll ("[.,:;'!?]", "");
+			s = s.replaceAll ("\\W", " ").trim();
 			ps.add(s.toCharArray(), s.length());
 			ps.stem();
 			str = ps.toString();
@@ -75,6 +76,7 @@ public class WHIRL {
 			if (s2WordsCount.get(s) != null && s1WordsCount.get(s) != null)	{
 				count = 2;
 				weightOne = Math.log10(s1WordsCount.get(s) + 1.0) * Math.log10(2/count); 
+				System.out.println("weightOne = " + weightOne);
 				weightTwo = Math.log10(s2WordsCount.get(s) + 1.0) * Math.log10(2/count); 
 				dotProduct = dotProduct + s1WordsCount.get(s) * s2WordsCount.get(s);
 				//System.out.println("weightOne = " + weightOne);
