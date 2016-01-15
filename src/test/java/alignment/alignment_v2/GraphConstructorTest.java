@@ -36,7 +36,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		return ipLong;
 	}
 
-//	@Test 
+	@Test 
 	public void testVulnerabilityExploit() {
 
 		System.out.println("[RUNNING] GraphConstructorTest.testVulnerabilityExploit()");
@@ -113,7 +113,6 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		JSONObject graph = graphConstructor.getGraph();
 		JSONObject vertices = graph.getJSONObject("vertices");
 
-		System.out.println("Testing Exploit Vertex ... ");
 		Document stixDoc = parseXMLText(pack.toXMLString());
 		String ttpPath = "//*[@id = \"stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d\"]";
 		XPathFactory xpfac = XPathFactory.instance();
@@ -132,24 +131,23 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String etPath = "//*[@id = \"Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760\"]";
 		xp = xpfac.compile(etPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		
 		assertTrue(vertices.has("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760"));
 		vertex = vertices.getJSONObject("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760");
 		assertEquals(vertex.getString("vertexType"), "Vulnerability");
 		assertEquals(vertex.getString("name"), "CVE-2009-3699");
-		assertEquals(vertex.getString("source"), "Metasploit");
+		assertEquals(vertex.get("source").toString(), "[Metasploit]");
 		assertEquals(vertex.get("description").toString(), "[CVE-2009-3699]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
 		JSONArray edges = graph.getJSONArray("edges");
 		
-		System.out.println("Testing Exploit -> Vulnerability Edge ...");
+		System.out.println("Testing Exploit -> Exploits -> Vulnerability Edge ...");
 		boolean edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("CVE-2009-3699") && 
-				edge.getString("outV").equals("exploit/aix/rpc_cmsd_opcode21") && 
-				edge.getString("label").equals("Exploits")) {
+			if (edge.getString("inVertID").equals("CVE-2009-3699") && 
+				edge.getString("outVertID").equals("exploit/aix/rpc_cmsd_opcode21") && 
+				edge.getString("relation").equals("Exploits")) {
 				edgeExists = true;
 				break;
 			}
@@ -157,7 +155,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertTrue(edgeExists);
 	}
 	
-//	@Test 
+	@Test 
 	public void testMalwareIP() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testMalwareIP()");
@@ -250,7 +248,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		JSONObject vertex = vertices.getJSONObject("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
 		assertEquals(vertex.getString("vertexType"), "Malware");
 		assertEquals(vertex.getString("name"), "Scanner");
-		assertEquals(vertex.getString("source"), "1d4.us");
+		assertEquals(vertex.get("source").toString(), "[1d4.us]");
 		assertEquals(vertex.get("description").toString(), "[Scanner]");
 		
 		System.out.println("Testing IP Vertex ... ");
@@ -262,18 +260,18 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "103.36.125.189");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("103.36.125.189"));
-		assertEquals(vertex.getString("source"), "1d4.us");
+		assertEquals(vertex.get("source").toString(), "[1d4.us]");
 		assertEquals(vertex.get("description").toString(), "[103.36.125.189]");
 		
 		JSONArray edges = graph.getJSONArray("edges");
 		
-		System.out.println("Testing Malware -> IP Edge ...");
+		System.out.println("Testing Malware -> Uses_IP -> IP Edge ...");
 		boolean edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("103.36.125.189") && 
-				edge.getString("outV").equals("Scanner") && 
-				edge.getString("label").equals("Uses_IP")) {
+			if (edge.getString("inVertID").equals("103.36.125.189") && 
+				edge.getString("outVertID").equals("Scanner") && 
+				edge.getString("relation").equals("Uses_IP")) {
 				edgeExists = true;
 				break;
 			}
@@ -281,7 +279,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertTrue(edgeExists);
 	}		
 	
-//	@Test 
+	@Test 
 	public void testFlowAddressIpPort() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testFlowAddressIpPort()");
@@ -434,7 +432,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		JSONObject vertex = vertices.getJSONObject("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb");
 		assertEquals(vertex.getString("vertexType"), "Flow");
 		assertEquals(vertex.getString("name"), "10.10.10.1:56867_through_10.10.10.100:22");
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[10.10.10.1, port 56867 to 10.10.10.100, port 22]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 	
@@ -447,7 +445,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		vertex = vertices.getJSONObject("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f");
 		assertEquals(vertex.getString("vertexType"), "Address");
 		assertEquals(vertex.getString("name"), "10.10.10.1:56867");
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[10.10.10.1, port 56867]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
@@ -459,7 +457,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		vertex = vertices.getJSONObject("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd");
 		assertEquals(vertex.getString("vertexType"), "Address");
 		assertEquals(vertex.getString("name"), "10.10.10.100:22");
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[10.10.10.100, port 22]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
@@ -472,7 +470,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "10.10.10.1");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.1"));
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[10.10.10.1]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
@@ -485,7 +483,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "10.10.10.100");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.100"));
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[10.10.10.100]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
@@ -497,7 +495,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		vertex = vertices.getJSONObject("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "56867");
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[56867]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
@@ -509,84 +507,84 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		vertex = vertices.getJSONObject("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "22");
-		assertEquals(vertex.getString("source"), "Argus");
+		assertEquals(vertex.get("source").toString(), "[Argus]");
 		assertEquals(vertex.get("description").toString(), "[22]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
 		JSONArray edges = graph.getJSONArray("edges");
 
-		System.out.println("Testing Flow -> (Source) Address Edge ...");
+		System.out.println("Testing Flow -> Src_Socket_Address -> Address Edge ...");
 		boolean edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("10.10.10.1:56867") && 
-				edge.getString("outV").equals("10.10.10.1:56867_through_10.10.10.100:22") && 
-				edge.getString("label").equals("Src_Socket_Address")) {
+			if (edge.getString("inVertID").equals("10.10.10.1:56867") && 
+				edge.getString("outVertID").equals("10.10.10.1:56867_through_10.10.10.100:22") && 
+				edge.getString("relation").equals("Src_Socket_Address")) {
 				edgeExists = true;
 				break;
 			}
 		}
 		assertTrue(edgeExists);
 		
-		System.out.println("Testing Flow -> (Destination) Address Edge ...");
+		System.out.println("Testing Flow -> Dest_Socket_Address -> Address Edge ...");
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("10.10.10.100:22") && 
-				edge.getString("outV").equals("10.10.10.1:56867_through_10.10.10.100:22") && 
-				edge.getString("label").equals("Dest_Socket_Address")) {
+			if (edge.getString("inVertID").equals("10.10.10.100:22") && 
+				edge.getString("outVertID").equals("10.10.10.1:56867_through_10.10.10.100:22") && 
+				edge.getString("relation").equals("Dest_Socket_Address")) {
 				edgeExists = true;
 				break;
 			}
 		}
 		assertTrue(edgeExists);
 		
-		System.out.println("Testing (Source) Address -> IP Edge ...");
+		System.out.println("Testing (Source) Address -> Has_IP -> IP Edge ...");
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("10.10.10.1") && 
-				edge.getString("outV").equals("10.10.10.1:56867") && 
-				edge.getString("label").equals("Has_IP")) {
+			if (edge.getString("inVertID").equals("10.10.10.1") && 
+				edge.getString("outVertID").equals("10.10.10.1:56867") && 
+				edge.getString("relation").equals("Has_IP")) {
 				edgeExists = true;
 				break;
 			}
 		}
 		assertTrue(edgeExists);
 		
-		System.out.println("Testing (Destination) Address -> IP Edge ...");
+		System.out.println("Testing (Destination) Address -> Has_IP -> IP Edge ...");
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("10.10.10.100") && 
-				edge.getString("outV").equals("10.10.10.100:22") && 
-				edge.getString("label").equals("Has_IP")) {
+			if (edge.getString("inVertID").equals("10.10.10.100") && 
+				edge.getString("outVertID").equals("10.10.10.100:22") && 
+				edge.getString("relation").equals("Has_IP")) {
 				edgeExists = true;
 				break;
 			}
 		}
 		assertTrue(edgeExists);
 		
-		System.out.println("Testing (Source) Address -> Port Edge ...");
+		System.out.println("Testing (Source) Address -> Has_Port -> Port Edge ...");
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("56867") && 
-				edge.getString("outV").equals("10.10.10.1:56867") && 
-				edge.getString("label").equals("Has_Port")) {
+			if (edge.getString("inVertID").equals("56867") && 
+				edge.getString("outVertID").equals("10.10.10.1:56867") && 
+				edge.getString("relation").equals("Has_Port")) {
 				edgeExists = true;
 				break;
 			}
 		}
 		assertTrue(edgeExists);
 		
-		System.out.println("Testing (Destination) Address -> Port Edge ...");
+		System.out.println("Testing (Destination) Address -> Has_Port -> Port Edge ...");
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("22") && 
-				edge.getString("outV").equals("10.10.10.100:22") && 
-				edge.getString("label").equals("Has_Port")) {
+			if (edge.getString("inVertID").equals("22") && 
+				edge.getString("outVertID").equals("10.10.10.100:22") && 
+				edge.getString("relation").equals("Has_Port")) {
 				edgeExists = true;
 				break;
 			}
@@ -709,7 +707,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.getString("vertexType"), "Organization");
 		assertEquals(vertex.getString("name"), "O1.com");
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
-		assertEquals(vertex.getString("description"), "Organization O1.com located in US has a range of IP addresses");
+		assertEquals(vertex.get("description").toString(), "[Organization O1.com located in US has a range of IP addresses]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 	
 		
@@ -723,7 +721,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.getString("name"), "O1COMM");
 		assertEquals(vertex.getString("number"), "19864");
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
-		assertEquals(vertex.getString("description"), "AS O1COMM has ASN 19864");
+		assertEquals(vertex.get("description").toString(), "[AS O1COMM has ASN 19864]");
 		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 		
 		System.out.println("Testing AddressRange Vertex ... ");
@@ -739,30 +737,30 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.getString("endIP"), "69.19.190.255");
 		assertEquals(vertex.getLong("endIPInt"), ipToLong("69.19.190.255"));
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
-		assertEquals(vertex.getString("description"), "69.19.190.0 through 69.19.190.255");
+		assertEquals(vertex.get("description").toString(), "[69.19.190.0 through 69.19.190.255]");
 		
 		JSONArray edges = graph.getJSONArray("edges");
 
-		System.out.println("Testing Organization -> AS Edge ...");
+		System.out.println("Testing Organization -> Has_AS -> AS Edge ...");
 		boolean edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("O1COMM") && 
-				edge.getString("outV").equals("O1.com") && 
-				edge.getString("label").equals("Has_AS")) {
+			if (edge.getString("inVertID").equals("O1COMM") && 
+				edge.getString("outVertID").equals("O1.com") && 
+				edge.getString("relation").equals("Has_AS")) {
 				edgeExists = true;
 				break;
 			}
 		}
 		assertTrue(edgeExists);
 		
-		System.out.println("Testing AS -> AddressRange Edge ...");
+		System.out.println("Testing AS -> Contains -> AddressRange Edge ...");
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inV").equals("69.19.190.0 - 69.19.190.255") && 
-				edge.getString("outV").equals("O1COMM") && 
-				edge.getString("label").equals("Contains")) {
+			if (edge.getString("inVertID").equals("69.19.190.0 - 69.19.190.255") && 
+				edge.getString("outVertID").equals("O1COMM") && 
+				edge.getString("relation").equals("Contains")) {
 				edgeExists = true;
 				break;
 			}
@@ -770,7 +768,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertTrue(edgeExists);
 	}
 	
-//	@Test 
+	@Test 
 	public void testSoftware() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testSoftware()");
@@ -819,12 +817,25 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
-	//	System.out.println(pack.toXMLString());
 		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Software Vertex ... ");
+		String softwarePath = "//*[@id = \"stucco:software-69a621f6-d22c-4d9c-a758-bc465dd8235b\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(softwarePath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		JSONObject vertex = vertices.getJSONObject("stucco:software-69a621f6-d22c-4d9c-a758-bc465dd8235b");
+		assertEquals(vertex.getString("vertexType"), "Software");
+		assertEquals(vertex.getString("name"), "cpe:/a:1024cms:1024_cms:0.7:::");
+		assertEquals(vertex.get("source").toString(), "[CPE]");
+		assertEquals(vertex.get("description").toString(), "[1024cms.org 1024 CMS 0.7]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
 	}
 	
-//	@Test 
+	@Test 
 	public void testDNSRecordIpDNSName() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testDNSRecordIpDNSName()");
@@ -944,10 +955,125 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing DNSRecord ... ");
+		String softwarePath = "//*[@id = \"stucco:dnsRecord-559dd80d-97b6-4c08-97eb-37001d2c59cb\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(softwarePath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		JSONObject vertex = vertices.getJSONObject("stucco:dnsRecord-559dd80d-97b6-4c08-97eb-37001d2c59cb");
+		assertEquals(vertex.getString("vertexType"), "DNSRecord");
+		assertEquals(vertex.getString("name"), "DALE-PC.ORNL.GOV_resolved_to_89.79.77.77");
+		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
+		assertEquals(vertex.get("description").toString(), "[Requested domain name DALE-PC.ORNL.GOV resolved to IP address 89.79.77.77]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing IP ... ");
+		String ipPath = "//*[@id = \"stucco:ip-bd47ec2e-14a8-4126-8ae0-092b8276bf09\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:ip-bd47ec2e-14a8-4126-8ae0-092b8276bf09");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "89.79.77.77");
+		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
+		assertEquals(vertex.get("description").toString(), "[89.79.77.77]");
+		assertEquals(vertex.get("ipInt").toString(), "1498369357");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing IP ... ");
+		ipPath = "//*[@id = \"stucco:ip-fe34621f-26a0-48f1-b5e3-3fa641011d63\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:ip-fe34621f-26a0-48f1-b5e3-3fa641011d63");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "128.219.177.244");
+		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
+		assertEquals(vertex.get("description").toString(), "[128.219.177.244]");
+		assertEquals(vertex.get("ipInt").toString(), "2161881588");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+
+		System.out.println("Testing IP ... ");
+		ipPath = "//*[@id = \"stucco:ip-3183aead-8eb9-401e-8b30-63f917218e44\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:ip-3183aead-8eb9-401e-8b30-63f917218e44");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "68.87.73.245");
+		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
+		assertEquals(vertex.get("description").toString(), "[68.87.73.245]");
+		assertEquals(vertex.get("ipInt").toString(), "1146571253");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+
+		System.out.println("Testing DNSName ... ");
+		ipPath = "//*[@id = \"stucco:dnsName-d64a70b3-6371-4fce-a0bf-24d902a3dc6c\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:dnsName-d64a70b3-6371-4fce-a0bf-24d902a3dc6c");
+		assertEquals(vertex.getString("vertexType"), "DNSName");
+		assertEquals(vertex.getString("name"), "DALE-PC.ORNL.GOV");
+		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
+		assertEquals(vertex.get("description").toString(), "[DALE-PC.ORNL.GOV]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing DNSRecord -> Requested_DNSName -> DNSName Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("DALE-PC.ORNL.GOV") && 
+				edge.getString("outVertID").equals("DALE-PC.ORNL.GOV_resolved_to_89.79.77.77") &&
+				edge.getString("relation").equals("Requested_DNSName")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing DNSRecord -> Requested_IP -> Requested IP Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("89.79.77.77") && 
+				edge.getString("outVertID").equals("DALE-PC.ORNL.GOV_resolved_to_89.79.77.77") &&
+				edge.getString("relation").equals("Requested_IP")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing DNSRecord -> Served_By -> Server IP Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("128.219.177.244") && 
+				edge.getString("outVertID").equals("DALE-PC.ORNL.GOV_resolved_to_89.79.77.77") &&
+				edge.getString("relation").equals("Served_By")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing DNSRecord -> Requested_By -> Requested by IP Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("68.87.73.245") && 
+				edge.getString("outVertID").equals("DALE-PC.ORNL.GOV_resolved_to_89.79.77.77") &&
+				edge.getString("relation").equals("Requested_By")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 	
-//	@Test 
+	@Test 
 	public void testServicePort() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testServicePort()");
@@ -1013,10 +1139,51 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Service ... ");
+		String servicePath = "//*[@id = \"stucco:service-f7791dd0-03d7-48f2-a323-c02c97008c4b\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(servicePath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		JSONObject vertex = vertices.getJSONObject("stucco:service-f7791dd0-03d7-48f2-a323-c02c97008c4b");
+		assertEquals(vertex.getString("vertexType"), "Service");
+		assertEquals(vertex.getString("name"), "ssh");
+		assertEquals(vertex.get("source").toString(), "[service_list]");
+		assertEquals(vertex.get("description").toString(), "[The Secure Shell (SSH) Protocol]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing Port ... ");
+		String portPath = "//*[@id = \"stucco:port-cbd16bd3-38d6-49e5-86aa-39784a774c14\"]";
+		xpfac = XPathFactory.instance();
+		xp = xpfac.compile(portPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:port-cbd16bd3-38d6-49e5-86aa-39784a774c14");
+		assertEquals(vertex.getString("vertexType"), "Port");
+		assertEquals(vertex.getString("name"), "22");
+		assertEquals(vertex.get("source").toString(), "[service_list]");
+		assertEquals(vertex.get("description").toString(), "[22]");
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Service -> Runs_On -> Port Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("22") && 
+				edge.getString("outVertID").equals("ssh") &&
+				edge.getString("relation").equals("Runs_On")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 	
-//	@Test 
+	@Test 
 	public void testHTTPRequestIpPortDNSName() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testHTTPRequestIpPortDNSName()");
@@ -1144,14 +1311,111 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"    </stix:Observables>"+
 			"</stix:STIX_Package>";
 
+		
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing HTTPRequest ... ");
+		String servicePath = "//*[@id = \"stucco:httpRequest-59629f94-c963-4788-b897-b1e02bf92cab\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(servicePath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		JSONObject vertex = vertices.getJSONObject("stucco:httpRequest-59629f94-c963-4788-b897-b1e02bf92cab");
+		assertEquals(vertex.getString("vertexType"), "HTTPRequest");
+		assertEquals(vertex.getString("name"), "/tv2n/vpaid/8bc5b7b");
+		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
+		assertEquals(vertex.get("description").toString(), "[HTTP request of URL /tv2n/vpaid/8bc5b7b]");
+
+		System.out.println("Testing IP ... ");
+		String ipPath = "//*[@id = \"stucco:ip-cddd9469-b8a6-4d8b-97d9-830fc191490c\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:ip-cddd9469-b8a6-4d8b-97d9-830fc191490c");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "54.192.138.232");
+		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
+		assertEquals(vertex.get("description").toString(), "[54.192.138.232]");
+		assertEquals(vertex.get("ipInt").toString(), "918588136");
+
+		System.out.println("Testing IP ... ");
+		ipPath = "//*[@id = \"stucco:ip-86590b2c-5e14-4880-85ee-bc9d5c9a3302\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:ip-86590b2c-5e14-4880-85ee-bc9d5c9a3302");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "128.219.49.13");
+		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
+		assertEquals(vertex.get("description").toString(), "[128.219.49.13]");
+		assertEquals(vertex.get("ipInt").toString(), "2161848589");
+
+		System.out.println("Testing DNSName ... ");
+		String dnsPath = "//*[@id = \"stucco:dnsName-9e1fbf26-d46a-43cd-825a-145b31935344\"]";
+		xp = xpfac.compile(dnsPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:dnsName-9e1fbf26-d46a-43cd-825a-145b31935344");
+		assertEquals(vertex.getString("vertexType"), "DNSName");
+		assertEquals(vertex.getString("name"), "cdn455.telemetryverification.net");
+		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
+		assertEquals(vertex.get("description").toString(), "[cdn455.telemetryverification.net]");
+
+		System.out.println("Testing Port ... ");
+		String portPath = "//*[@id = \"stucco:port-290e65ae-45df-431b-b051-6121201e9a6e\"]";
+		xp = xpfac.compile(portPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:port-290e65ae-45df-431b-b051-6121201e9a6e");
+		assertEquals(vertex.getString("vertexType"), "Port");
+		assertEquals(vertex.getString("name"), "80");
+		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
+		assertEquals(vertex.get("description").toString(), "[80]");
+
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing HTTPRequest -> IP Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("128.219.49.13") && 
+				edge.getString("outVertID").equals("/tv2n/vpaid/8bc5b7b") &&
+				edge.getString("relation").equals("Requested_By")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing HTTPRequest -> Served_On -> Port Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("80") && 
+				edge.getString("outVertID").equals("/tv2n/vpaid/8bc5b7b") &&
+				edge.getString("relation").equals("Served_On")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing HTTPRequest -> Served_By -> DNSName Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("cdn455.telemetryverification.net") && 
+				edge.getString("outVertID").equals("/tv2n/vpaid/8bc5b7b") &&
+				edge.getString("relation").equals("Served_By")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 	
-//	@Test 
+	@Test 
 	public void testHostSoftware() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testHostSoftware()");
@@ -1215,15 +1479,54 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"        </cybox:Observable>"+
 			"    </stix:Observables>"+
 			"</stix:STIX_Package>";
-
+		
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Software ... ");
+		String softwarePath = "//*[@id = \"stucco:software-f159ef23-0b06-452c-81fa-0a266c1d1e02\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(softwarePath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		JSONObject vertex = vertices.getJSONObject("stucco:software-f159ef23-0b06-452c-81fa-0a266c1d1e02");
+		assertEquals(vertex.getString("vertexType"), "Software");
+		assertEquals(vertex.getString("name"), "cpe:::ftp:0.17-25:::");
+		assertEquals(vertex.get("source").toString(), "[PackageList]");
+		assertEquals(vertex.get("description").toString(), "[ftp version 0.17-25]");
+		
+		System.out.println("Testing Host ... ");
+		String servicePath = "//*[@id = \"stucco:hostname-e11a469e-a66a-42b5-835f-d6599cc592a6\"]";
+		xpfac = XPathFactory.instance();
+		xp = xpfac.compile(servicePath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:hostname-e11a469e-a66a-42b5-835f-d6599cc592a6");
+		assertEquals(vertex.getString("vertexType"), "Host");
+		assertEquals(vertex.getString("name"), "stucco1");
+		assertEquals(vertex.get("source").toString(), "[PackageList]");
+		assertEquals(vertex.get("description").toString(), "[stucco1]");
+
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Host -> Runs -> Software Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("cpe:::ftp:0.17-25:::") && 
+				edge.getString("outVertID").equals("stucco1") &&
+				edge.getString("relation").equals("Runs")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 	
-//	@Test 
+	@Test 
 	public void testHostSoftwareAccountIp() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testHostSoftwareAccountIp()");
@@ -1364,15 +1667,126 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"        </cybox:Observable>"+
 			"    </stix:Observables>"+
 			"</stix:STIX_Package>";
-
+		
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
+		JSONObject graph = graphConstructor.getGraph();
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Account ... ");
+		String accountPath = "//*[@id = \"stucco:account-c42d3219-bb0a-486e-b144-e3c8887a504e\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(accountPath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		JSONObject vertex = vertices.getJSONObject("stucco:account-c42d3219-bb0a-486e-b144-e3c8887a504e");
+		assertEquals(vertex.getString("vertexType"), "Account");
+		assertEquals(vertex.getString("name"), "StuccoUser");
+		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
+		assertEquals(vertex.get("description").toString(), "[StuccoUser]");
+		
+		System.out.println("Testing Host ... ");
+		String hostPath = "//*[@id = \"stucco:hostname-01b000b8-9326-43d5-b94a-60f299c9dd35\"]";
+		xpfac = XPathFactory.instance();
+		xp = xpfac.compile(hostPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:hostname-01b000b8-9326-43d5-b94a-60f299c9dd35");
+		assertEquals(vertex.getString("vertexType"), "Host");
+		assertEquals(vertex.getString("name"), "host_at_192.168.10.11");
+		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
+		assertEquals(vertex.get("description").toString(), "[host at 192.168.10.11]");
+		
+		System.out.println("Testing Host ... ");
+		hostPath = "//*[@id = \"stucco:hostname-67ae4885-0914-429c-ac61-fa8f1932ec53\"]";
+		xpfac = XPathFactory.instance();
+		xp = xpfac.compile(hostPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:hostname-67ae4885-0914-429c-ac61-fa8f1932ec53");
+		assertEquals(vertex.getString("vertexType"), "Host");
+		assertEquals(vertex.getString("name"), "StuccoHost");
+		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
+		assertEquals(vertex.get("description").toString(), "[StuccoHost]");
+		
+		System.out.println("Testing Software ... ");
+		String softwarePath = "//*[@id = \"stucco:software-cc2b74cc-7cf2-4383-be29-a41f67332aca\"]";
+		xpfac = XPathFactory.instance();
+		xp = xpfac.compile(softwarePath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:software-cc2b74cc-7cf2-4383-be29-a41f67332aca");
+		assertEquals(vertex.getString("vertexType"), "Software");
+		assertEquals(vertex.getString("name"), "cpe:::sshd::::");
+		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
+		assertEquals(vertex.get("description").toString(), "[sshd]");
+
+		System.out.println("Testing IP ... ");
+		String ipPath = "//*[@id = \"stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241\"]";
+		xp = xpfac.compile(ipPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		vertex = vertices.getJSONObject("stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241");
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "192.168.10.11");
+		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
+		assertEquals(vertex.get("description").toString(), "[192.168.10.11]");
+		assertEquals(vertex.get("ipInt").toString(), "3232238091");
+
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Account -> Logs_In_From -> Host Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("host_at_192.168.10.11") && 
+				edge.getString("outVertID").equals("StuccoUser") &&
+				edge.getString("relation").equals("Logs_In_From")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Account -> Logs_In_To -> Host Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("StuccoHost") && 
+				edge.getString("outVertID").equals("StuccoUser") &&
+				edge.getString("relation").equals("Logs_In_To")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Host -> Runs -> Software Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("cpe:::sshd::::") && 
+				edge.getString("outVertID").equals("StuccoHost") &&
+				edge.getString("relation").equals("Runs")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Host -> Resolved_To -> IP Edge ...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("192.168.10.11") && 
+				edge.getString("outVertID").equals("host_at_192.168.10.11") &&
+				edge.getString("relation").equals("Resolved_To")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 
-//	@Test 
+	@Test 
 	public void testVulnerabilityWithSolution() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testVulnerabilityWithSolution()");
@@ -1438,17 +1852,56 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"        </stix:Course_Of_Action>"+
 			"    </stix:Courses_Of_Action>"+
 			"</stix:STIX_Package>";
-
+		
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
 		JSONObject graph = graphConstructor.getGraph();
-		System.out.println(graph.toString(2));
-		assertTrue(true);
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Vulnerability Vertex ... ");
+		JSONObject vertex = vertices.getJSONObject("stucco:vulnerability-b73ca23e-66d6-4fd7-89b4-30859796b38e");
+		assertEquals(vertex.getString("vertexType"), "Vulnerability");
+		assertEquals(vertex.getString("name"), "CVE-2015-2098");
+		assertEquals(vertex.get("source").toString(), "[Bugtraq]");
+		assertEquals(vertex.get("description").toString(), "[WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities WebGate eDVR Manager is prone to multiple buffer-overflow vulnerabilities because it fails to perform boundary checks before copying user-supplied data to insufficiently sized memory buffer. The controls are identified by CLSID's: 359742AF-BF34-4379-A084-B7BF0E5F34B0 4E14C449-A61A-4BF7-8082-65A91298A6D8 5A216ADB-3009-4211-AB77-F1857A99482C An attacker can exploit these issues to execute arbitrary code in the context of the application, usually Internet Explorer, using the ActiveX control.Failed attacks will likely cause denial-of-service conditions.]");
+		assertEquals(vertex.get("shortDescription").toString(), "[WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities]");
+		assertEquals(vertex.get("publishedDate"), "2015-03-27T00:00:00.000-04:00");
+		String vulnerabilityPath = "//*[@id = \"stucco:vulnerability-b73ca23e-66d6-4fd7-89b4-30859796b38e\"]";
+		XPathFactory xpfac = XPathFactory.instance();
+		XPathExpression xp = xpfac.compile(vulnerabilityPath);
+		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+		
+		System.out.println("Testing Course_Of_Action Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:vulnerability-9e478710-0aa7-4fdc-b768-44c4d0f8812b");
+		assertEquals(vertex.getString("vertexType"), "Course_Of_Action");
+		assertEquals(vertex.getString("name"), "stucco:vulnerability-9e478710-0aa7-4fdc-b768-44c4d0f8812b");
+		assertEquals(vertex.get("description").toString(), "[\"Solution: Currently, we are not aware of any vendor-supplied patches. If you feel we are in error or are aware of more recent information, please mail us at: vuldb@securityfocus.com.\"]");
+		String coaPath = "//*[@id = \"stucco:vulnerability-9e478710-0aa7-4fdc-b768-44c4d0f8812b\"]";
+		xp = xpfac.compile(coaPath);
+		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
+		assertEquals(vertex.getString("sourceDocument"), new XMLOutputter().outputString(sourceElement));
+
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Vulnerability -> PotentialCOA -> Course_Of_Action Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:vulnerability-9e478710-0aa7-4fdc-b768-44c4d0f8812b") && 
+				edge.getString("outVertID").equals("CVE-2015-2098") &&
+				edge.getString("relation").equals("PotentialCOA")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 
-//	@Test 
+	@Test 
 	public void testAllStixElements() {
 		
 		System.out.println("[RUNNING] GraphConstructorTest.testAllStixElements()");
@@ -1460,21 +1913,56 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"    xmlns:coa=\"http://stix.mitre.org/CourseOfAction-1\""+
 			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\""+
 			"    xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\""+
-			"    xmlns:incident=\"http://stix.mitre.org/Incident-1\""+
 			"    xmlns:indicator=\"http://stix.mitre.org/Indicator-2\""+
 			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
 			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\""+
 			"    xmlns:ta=\"http://stix.mitre.org/ThreatActor-1\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\">"+
 			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
-			"        <cybox:Observable>"+
+			"        <cybox:Observable"+
+			"            id=\"stucco:observable-bb95c949-7720-4b16-a491-93e0453b2785\" xmlns:stucco=\"gov.ornl.stucco\">"+
 			"            <cybox:Title>Observable</cybox:Title>"+
 			"        </cybox:Observable>"+
 			"    </stix:Observables>"+
 			"    <stix:Indicators>"+
 			"        <stix:Indicator"+
+			"            id=\"stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca\""+
+			"            xmlns:stucco=\"gov.ornl.stucco\""+
 			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"indicator:IndicatorType\">"+
 			"            <indicator:Title>Indicator</indicator:Title>"+
 			"            <indicator:Description>Indicator description</indicator:Description>"+
+			"            <indicator:Observable idref=\"stucco:observable-bb95c949-7720-4b16-a491-93e0453b2785\"/>"+
+			"            <indicator:Indicated_TTP>"+
+			"                <stixCommon:TTP"+
+			"                    id=\"stucco:ttp-8da79cbe-750d-4426-b960-baf8e67ec714\" xsi:type=\"ttp:TTPType\">"+
+			"                    <ttp:Title>TTP</ttp:Title>"+
+			"                </stixCommon:TTP>"+
+			"            </indicator:Indicated_TTP>"+
+			"            <indicator:Suggested_COAs>"+
+			"                <indicator:Suggested_COA>"+
+			"                    <stixCommon:Course_Of_Action"+
+			"                        id=\"stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7\" xsi:type=\"coa:CourseOfActionType\">"+
+			"                        <coa:Title>Course_Of_Action</coa:Title>"+
+			"                        <coa:Description>Course_Of_Action description</coa:Description>"+
+			"                        <coa:Information_Source>"+
+			"                            <stixCommon:Identity>"+
+			"                                <stixCommon:Name>Source One</stixCommon:Name>"+
+			"                            </stixCommon:Identity>"+
+			"                            <stixCommon:Contributing_Sources>"+
+			"                                <stixCommon:Source>"+
+			"                                    <stixCommon:Identity>"+
+			"                                    <stixCommon:Name>Source Two</stixCommon:Name>"+
+			"                                    </stixCommon:Identity>"+
+			"                                </stixCommon:Source>"+
+			"                            </stixCommon:Contributing_Sources>"+
+			"                        </coa:Information_Source>"+
+			"                    </stixCommon:Course_Of_Action>"+
+			"                </indicator:Suggested_COA>"+
+			"            </indicator:Suggested_COAs>"+
+			"            <indicator:Related_Campaigns>"+
+			"                <indicator:Related_Campaign>"+
+			"                    <stixCommon:Campaign idref=\"stucco:campaign-a2dec921-6a3f-49e4-b415-402b376fff5c\"/>"+
+			"                </indicator:Related_Campaign>"+
+			"            </indicator:Related_Campaigns>"+
 			"            <indicator:Producer>"+
 			"                <stixCommon:Identity>"+
 			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
@@ -1489,19 +1977,22 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            </indicator:Producer>"+
 			"        </stix:Indicator>"+
 			"    </stix:Indicators>"+
-			"    <stix:TTPs>"+
-			"        <stix:TTP xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\">"+
-			"            <ttp:Title>TTP</ttp:Title>"+
-			"        </stix:TTP>"+
-			"    </stix:TTPs>"+
 			"    <stix:Exploit_Targets>"+
 			"        <stixCommon:Exploit_Target"+
+			"            id=\"stucco:et-52962ed3-1c7f-4cac-bedb-d49bb429b625\""+
+			"            xmlns:stucco=\"gov.ornl.stucco\""+
 			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\">"+
 			"            <et:Title>Exploit_Target</et:Title>"+
 			"            <et:Weakness>"+
 			"                <et:Description>Description of this weakness</et:Description>"+
-			"                <et:CWE_ID>CWE-997</et:CWE_ID>"+
+			"                <et:CWE_ID>CWE-93487297</et:CWE_ID>"+
 			"            </et:Weakness>"+
+			"            <et:Potential_COAs>"+
+			"                <et:Potential_COA>"+
+			"                    <stixCommon:Course_Of_Action"+
+			"                        id=\"stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7\" xsi:type=\"coa:CourseOfActionType\"/>"+
+			"                </et:Potential_COA>"+
+			"            </et:Potential_COAs>"+
 			"            <et:Information_Source>"+
 			"                <stixCommon:Identity>"+
 			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
@@ -1516,52 +2007,34 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            </et:Information_Source>"+
 			"        </stixCommon:Exploit_Target>"+
 			"    </stix:Exploit_Targets>"+
-			"    <stix:Incidents>"+
-			"        <stix:Incident"+
-			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"incident:IncidentType\">"+
-			"            <incident:Title>Incident</incident:Title>"+
-			"            <incident:Description>Indicator description</incident:Description>"+
-			"            <incident:Information_Source>"+
-			"                <stixCommon:Identity>"+
-			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
-			"                </stixCommon:Identity>"+
-			"                <stixCommon:Contributing_Sources>"+
-			"                    <stixCommon:Source>"+
-			"                        <stixCommon:Identity>"+
-			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
-			"                        </stixCommon:Identity>"+
-			"                    </stixCommon:Source>"+
-			"                </stixCommon:Contributing_Sources>"+
-			"            </incident:Information_Source>"+
-			"        </stix:Incident>"+
-			"    </stix:Incidents>"+
-			"    <stix:Courses_Of_Action>"+
-			"        <stix:Course_Of_Action"+
-			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"coa:CourseOfActionType\">"+
-			"            <coa:Title>Course_Of_Action</coa:Title>"+
-			"            <coa:Description>Indicator description</coa:Description>"+
-			"            <coa:Information_Source>"+
-			"                <stixCommon:Identity>"+
-			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
-			"                </stixCommon:Identity>"+
-			"                <stixCommon:Contributing_Sources>"+
-			"                    <stixCommon:Source>"+
-			"                        <stixCommon:Identity>"+
-			"                            <stixCommon:Name>Source Two</stixCommon:Name>"+
-			"                        </stixCommon:Identity>"+
-			"                    </stixCommon:Source>"+
-			"                </stixCommon:Contributing_Sources>"+
-			"            </coa:Information_Source>"+
-			"        </stix:Course_Of_Action>"+
-			"    </stix:Courses_Of_Action>"+
 			"    <stix:Campaigns>"+
 			"        <stix:Campaign"+
+			"            id=\"stucco:campaign-a2dec921-6a3f-49e4-b415-402b376fff5c\""+
+			"            xmlns:stucco=\"gov.ornl.stucco\""+
 			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"campaign:CampaignType\">"+
 			"            <campaign:Title>Campaign</campaign:Title>"+
-			"            <campaign:Description>Indicator description</campaign:Description>"+
+			"            <campaign:Description>Campaign description</campaign:Description>"+
 			"            <campaign:Names>"+
 			"                <campaign:Name>Campaigns Name</campaign:Name>"+
 			"            </campaign:Names>"+
+			"            <campaign:Attribution>"+
+			"                <campaign:Attributed_Threat_Actor>"+
+			"                    <stixCommon:Threat_Actor"+
+			"                        id=\"stucco:threat-9f055e12-d799-47d8-84a5-f018ee1ccb99\" xsi:type=\"ta:ThreatActorType\">"+
+			"                        <ta:Title>Threat_Actor</ta:Title>"+
+			"                        <ta:Identity>"+
+			"                            <stixCommon:Name>Actor's name</stixCommon:Name>"+
+			"                            <stixCommon:Related_Identities>"+
+			"                                <stixCommon:Related_Identity>"+
+			"                                    <stixCommon:Identity>"+
+			"                                    <stixCommon:Name>Related Name</stixCommon:Name>"+
+			"                                    </stixCommon:Identity>"+
+			"                                </stixCommon:Related_Identity>"+
+			"                            </stixCommon:Related_Identities>"+
+			"                        </ta:Identity>"+
+			"                    </stixCommon:Threat_Actor>"+
+			"                </campaign:Attributed_Threat_Actor>"+
+			"            </campaign:Attribution>"+
 			"            <campaign:Information_Source>"+
 			"                <stixCommon:Identity>"+
 			"                    <stixCommon:Name>Source One</stixCommon:Name>"+
@@ -1576,167 +2049,140 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"            </campaign:Information_Source>"+
 			"        </stix:Campaign>"+
 			"    </stix:Campaigns>"+
-			"    <stix:Threat_Actors>"+
-			"        <stix:Threat_Actor"+
-			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ta:ThreatActorType\">"+
-			"            <ta:Title>Threat_Actor</ta:Title>"+
-			"            <ta:Identity>"+
-			"                <stixCommon:Name>Actor's name</stixCommon:Name>"+
-			"                <stixCommon:Related_Identities>"+
-			"                    <stixCommon:Related_Identity>"+
-			"                        <stixCommon:Identity>"+
-			"                            <stixCommon:Name>Related Name</stixCommon:Name>"+
-			"                        </stixCommon:Identity>"+
-			"                    </stixCommon:Related_Identity>"+
-			"                </stixCommon:Related_Identities>"+
-			"            </ta:Identity>"+
-			"        </stix:Threat_Actor>"+
-			"    </stix:Threat_Actors>"+
 			"</stix:STIX_Package>";
-
-		STIXPackage pack = new STIXPackage().fromXMLString(stix);
-		assertTrue(validate(pack));
-		GraphConstructor graphConstructor = new GraphConstructor();
-		graphConstructor.constructGraph(pack.toXMLString());
-		assertTrue(true);
-	}
-
-	@Test 
-	public void testDataForAllignment() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testDataForAllignment()");
-		
-		String stix = 
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
-			"<stix:STIX_Package"+
-			"    id=\"stucco:caida-2a3dc54f-f53e-4ba9-b7db-139424f935a5\""+
-			"    timestamp=\"2015-12-14T21:09:52.024Z\""+
-			"    xmlns=\"http://xml/metadataSharing.xsd\""+
-			"    xmlns:ASObj=\"http://cybox.mitre.org/objects#ASObject-1\""+
-			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\""+
-			"    xmlns:WhoisObj=\"http://cybox.mitre.org/objects#WhoisObject-2\""+
-			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\""+
-			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\""+
-			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
-			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\" xmlns:stucco=\"gov.ornl.stucco\">"+
-			"    <stix:STIX_Header>"+
-			"        <stix:Title>IP-AS Links Dataset</stix:Title>"+
-			"        <stix:Information_Source>"+
-			"            <stixCommon:Identity>"+
-			"                <stixCommon:Name>CAIDA</stixCommon:Name>"+
-			"            </stixCommon:Identity>"+
-			"        </stix:Information_Source>"+
-			"    </stix:STIX_Header>"+
-			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
-			"        <cybox:Observable id=\"stucco:addressRange-6f73e483-e897-430c-b09f-96219fe457ac\">"+
-			"            <cybox:Title>AddressRange</cybox:Title>"+
-			"            <cybox:Observable_Source>"+
-			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"            </cybox:Observable_Source>"+
-			"            <cybox:Object id=\"stucco:addressRange-3630347008-3630347263\">"+
-			"                <cybox:Description>216.98.179.0 through 216.98.179.255</cybox:Description>"+
-			"                <cybox:Properties category=\"ipv4-addr\""+
-			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
-			"                    <AddressObj:Address_Value apply_condition=\"ANY\""+
-			"                        condition=\"InclusiveBetween\" delimiter=\" - \">216.98.179.0 - 216.98.179.255</AddressObj:Address_Value>"+
-			"                </cybox:Properties>"+
-			"            </cybox:Object>"+
-			"        </cybox:Observable>"+
-			"        <cybox:Observable id=\"stucco:addressRange-33f72b4c-e6f2-4d82-88d4-2a7711ce7bfe\">"+
-			"            <cybox:Title>AddressRange</cybox:Title>"+
-			"            <cybox:Observable_Source>"+
-			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"            </cybox:Observable_Source>"+
-			"            <cybox:Object id=\"stucco:addressRange-3630349312-3630349567\">"+
-			"                <cybox:Description>216.98.188.0 through 216.98.188.255</cybox:Description>"+
-			"                <cybox:Properties category=\"ipv4-addr\""+
-			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
-			"                    <AddressObj:Address_Value apply_condition=\"ANY\""+
-			"                        condition=\"InclusiveBetween\" delimiter=\" - \">216.98.188.0 - 216.98.188.255</AddressObj:Address_Value>"+
-			"                </cybox:Properties>"+
-			"            </cybox:Object>"+
-			"        </cybox:Observable>"+
-			"        <cybox:Observable id=\"stucco:as-7c852f47-dd54-4153-869e-e00b844fef38\">"+
-			"            <cybox:Title>AS</cybox:Title>"+
-			"            <cybox:Observable_Source>"+
-			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"            </cybox:Observable_Source>"+
-			"            <cybox:Object id=\"stucco:as-18vo_18548\">"+
-			"                <cybox:Description>AS 18VO has ASN 18548</cybox:Description>"+
-			"                <cybox:Properties"+
-			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ASObj:ASObjectType\">"+
-			"                    <ASObj:Number>18548</ASObj:Number>"+
-			"                    <ASObj:Name>18VO</ASObj:Name>"+
-			"                    <ASObj:Regional_Internet_Registry>ARIN</ASObj:Regional_Internet_Registry>"+
-			"                </cybox:Properties>"+
-			"                <cybox:Related_Objects>"+
-			"                    <cybox:Related_Object idref=\"stucco:addressRange-6f73e483-e897-430c-b09f-96219fe457ac\">"+
-			"                        <cybox:Description>AS 18VO with ASN 18548 contains IP address range 216.98.179.0 through 216.98.179.255</cybox:Description>"+
-			"                        <cybox:Discovery_Method>"+
-			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"                        </cybox:Discovery_Method>"+
-			"                        <cybox:Relationship>Contains</cybox:Relationship>"+
-			"                    </cybox:Related_Object>"+
-			"                    <cybox:Related_Object idref=\"stucco:addressRange-33f72b4c-e6f2-4d82-88d4-2a7711ce7bfe\">"+
-			"                        <cybox:Description>AS 18VO with ASN 18548 contains IP address range 216.98.188.0 through 216.98.188.255</cybox:Description>"+
-			"                        <cybox:Discovery_Method>"+
-			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"                        </cybox:Discovery_Method>"+
-			"                        <cybox:Relationship>Contains</cybox:Relationship>"+
-			"                    </cybox:Related_Object>"+
-			"                </cybox:Related_Objects>"+
-			"            </cybox:Object>"+
-			"        </cybox:Observable>"+
-			"        <cybox:Observable id=\"stucco:organization-8972a1d6-b59d-43de-83b8-851ee5871fcf\">"+
-			"            <cybox:Title>Organization</cybox:Title>"+
-			"            <cybox:Observable_Source>"+
-			"                <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"            </cybox:Observable_Source>"+
-			"            <cybox:Object id=\"stucco:organization-1_800_video_on__inc.\">"+
-			"                <cybox:Description>Organization 1 800 Video On, Inc. located in US has a range of IP addresses</cybox:Description>"+
-			"                <cybox:Properties"+
-			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WhoisObj:WhoisObjectType\">"+
-			"                    <WhoisObj:Registrants>"+
-			"                        <WhoisObj:Registrant>"+
-			"                            <WhoisObj:Address>US</WhoisObj:Address>"+
-			"                            <WhoisObj:Organization>1 800 Video On, Inc.</WhoisObj:Organization>"+
-			"                            <WhoisObj:Registrant_ID>18VO-ARIN</WhoisObj:Registrant_ID>"+
-			"                        </WhoisObj:Registrant>"+
-			"                    </WhoisObj:Registrants>"+
-			"                </cybox:Properties>"+
-			"                <cybox:Related_Objects>"+
-			"                    <cybox:Related_Object idref=\"stucco:as-7c852f47-dd54-4153-869e-e00b844fef38\">"+
-			"                        <cybox:Description>Organization 1 800 Video On, Inc. has AS</cybox:Description>"+
-			"                        <cybox:Discovery_Method>"+
-			"                            <cyboxCommon:Information_Source_Type>CAIDA</cyboxCommon:Information_Source_Type>"+
-			"                        </cybox:Discovery_Method>"+
-			"                        <cybox:Relationship>Has_AS</cybox:Relationship>"+
-			"                    </cybox:Related_Object>"+
-			"                </cybox:Related_Objects>"+
-			"            </cybox:Object>"+
-			"        </cybox:Observable>"+
-			"        <cybox:Observable id=\"stucco:as-cbfcb18b-4e0b-4e48-b05f-db95de633bed\">"+
-			"            <cybox:Title>AS</cybox:Title>"+
-			"            <cybox:Observable_Source>"+
-			"                <cyboxCommon:Information_Source_Type>DifferentSource</cyboxCommon:Information_Source_Type>"+
-			"            </cybox:Observable_Source>"+
-			"            <cybox:Object id=\"stucco:as-one-eleven_12285\">"+
-			"                <cybox:Description>18548</cybox:Description>"+
-			"                <cybox:Properties"+
-			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ASObj:ASObjectType\">"+
-			"                    <ASObj:Number>18548</ASObj:Number>"+
-			"                </cybox:Properties>"+
-			"            </cybox:Object>"+
-			"        </cybox:Observable>"+
-			"    </stix:Observables>"+
-			"</stix:STIX_Package>";
-
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		graphConstructor.constructGraph(pack.toXMLString());
 		JSONObject graph = graphConstructor.getGraph();
-		System.out.println(graph.toString(2));
-		assertTrue(true);
+		JSONObject vertices = graph.getJSONObject("vertices");
+		Document stixDoc = parseXMLText(pack.toXMLString());
+		
+		System.out.println("Testing Indicator Vertex ... ");
+		JSONObject vertex = vertices.getJSONObject("stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca");
+		assertEquals(vertex.getString("vertexType"), "Indicator");
+		assertEquals(vertex.getString("name"), "stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca");
+		assertEquals(vertex.get("description").toString(), "[\"Indicator description\"]");
+		assertTrue(vertex.has("sourceDocument"));
+		
+		System.out.println("Testing Observable Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:observable-bb95c949-7720-4b16-a491-93e0453b2785");
+		assertEquals(vertex.getString("vertexType"), "Observable");
+		assertEquals(vertex.getString("name"), "stucco:observable-bb95c949-7720-4b16-a491-93e0453b2785");
+		assertTrue(vertex.has("sourceDocument"));
+		
+		System.out.println("Testing TTP Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:ttp-8da79cbe-750d-4426-b960-baf8e67ec714");
+		assertEquals(vertex.getString("vertexType"), "TTP");
+		assertEquals(vertex.getString("name"), "stucco:ttp-8da79cbe-750d-4426-b960-baf8e67ec714");
+		assertTrue(vertex.has("sourceDocument"));
+		
+		System.out.println("Testing Course_Of_Action Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7");
+		assertEquals(vertex.getString("vertexType"), "Course_Of_Action");
+		assertEquals(vertex.getString("name"), "stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7");
+		assertEquals(vertex.get("description").toString(), "[\"Course_Of_Action description\"]");
+		assertTrue(vertex.has("sourceDocument"));
+		
+		System.out.println("Testing Exploit_Target (Weakness) Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:et-52962ed3-1c7f-4cac-bedb-d49bb429b625");
+		assertEquals(vertex.getString("vertexType"), "Weakness");
+		assertEquals(vertex.getString("name"), "CWE-93487297");
+		assertEquals(vertex.get("description").toString(), "[Description of this weakness]");
+		assertTrue(vertex.has("sourceDocument"));
+		
+		System.out.println("Testing Campaign Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:campaign-a2dec921-6a3f-49e4-b415-402b376fff5c");
+		assertEquals(vertex.getString("vertexType"), "Campaign");
+		assertEquals(vertex.getString("name"), "stucco:campaign-a2dec921-6a3f-49e4-b415-402b376fff5c");
+		assertEquals(vertex.get("description").toString(), "[\"Campaign description\"]");
+		assertTrue(vertex.has("sourceDocument"));
+		
+		System.out.println("Testing Threat_Actor Vertex ... ");
+		vertex = vertices.getJSONObject("stucco:threat-9f055e12-d799-47d8-84a5-f018ee1ccb99");
+		assertEquals(vertex.getString("vertexType"), "Threat_Actor");
+		assertEquals(vertex.getString("name"), "stucco:threat-9f055e12-d799-47d8-84a5-f018ee1ccb99");
+		assertTrue(vertex.has("sourceDocument"));
+
+		JSONArray edges = graph.getJSONArray("edges");
+
+		System.out.println("Testing Indicator -> IndicatedTTP -> TTP...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:ttp-8da79cbe-750d-4426-b960-baf8e67ec714") && 
+				edge.getString("outVertID").equals("stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca") &&
+				edge.getString("relation").equals("IndicatedTTP")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Indicator -> SuggestedCOA -> Course_Of_Action...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7") && 
+				edge.getString("outVertID").equals("stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca") &&
+				edge.getString("relation").equals("SuggestedCOA")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Indicator -> RelatedCampaign -> Campaign...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:campaign-a2dec921-6a3f-49e4-b415-402b376fff5c") && 
+				edge.getString("outVertID").equals("stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca") &&
+				edge.getString("relation").equals("RelatedCampaign")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Indicator -> Observable -> Observable ..");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:observable-bb95c949-7720-4b16-a491-93e0453b2785") && 
+				edge.getString("outVertID").equals("stucco:indicator-f6c15754-2fe0-4b1e-a43a-8fc1df4e49ca") &&
+				edge.getString("relation").equals("Observable")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Exploit_Target -> PotentialCOA -> Course_Of_Action...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7") && 
+				edge.getString("outVertID").equals("CWE-93487297") &&
+				edge.getString("relation").equals("PotentialCOA")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+
+		System.out.println("Testing Threat_Actor -> Attribution -> Threat_Actor...");
+		edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			if (edge.getString("inVertID").equals("stucco:threat-9f055e12-d799-47d8-84a5-f018ee1ccb99") && 
+				edge.getString("outVertID").equals("stucco:campaign-a2dec921-6a3f-49e4-b415-402b376fff5c") &&
+				edge.getString("relation").equals("Attribution")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
 	}
 }
