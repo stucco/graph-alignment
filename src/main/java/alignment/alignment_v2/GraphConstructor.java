@@ -1,5 +1,6 @@
 package alignment.alignment_v2;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -33,35 +34,36 @@ import org.slf4j.LoggerFactory;
 
 public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		
-	private String STIX_ONTOLOGY = "resources/ontology/stix_ontology.json";
-	private String VERTEX_TYPE_CONFIG = "resources/ontology/vertex_type_config.json";
-
+	/* xpath to select all the main elements to turn them into vertices */
+	private static String path = 
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Exploit_Targets']/*[local-name() = 'Exploit_Target'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'TTPs']/*[local-name() = 'TTP'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Observables']/*[local-name() = 'Observable'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Indicators']/*[local-name() = 'Indicator'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Incidents']/*[local-name() = 'Incident'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Courses_Of_Action']/*[local-name() = 'Course_Of_Action'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Campaigns']/*[local-name() = 'Campaign'] | " +
+			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Threat_Actors']/*[local-name() = 'Threat_Actor']";
+	private static String[] stuccoVertTypeArray = {"Account", "Address", "AddressRange", "AS", "DNSName", "DNSRecord", "Exploit", "Flow", 
+			"Host", "HTTPRequest", "IP", "Malware", "Organization", "Port", "Service", "Software", "Vulnerability", "Weakness"};
+	private static String[] stixVertTypeArray = {"Campaign", "Course_Of_Action", "Exploit_Target", "Incident", "Indicator", "Observable", 
+			"Threat_Actor", "TTP"};
 	private Document stixDoc = null;
-
 	/* vertices are stored as a key/value, or id/vertex, 
 	   because search jsonObject is faster and easier, than xml */
-	private JSONObject ontology = null;
-	private JSONObject vertexTypeConfig = null;
 	private JSONObject graph = null;
 	private JSONObject vertices = null;
 	private JSONArray edges = null;
-
-	private Logger logger;
+	
+	private Logger logger = null;
+	private ConfigFileLoader config = null;
 
 	public GraphConstructor() {
 		logger = LoggerFactory.getLogger(GraphConstructor.class);
+		config = new ConfigFileLoader();
 		graph = new JSONObject();
 		vertices = new JSONObject();
 		edges = new JSONArray();
-		
-		try {
-			/* required to map new incomming stix xml to vertesType (like is it IP, Port, etc ?) */
-			vertexTypeConfig = new JSONObject(new String(Files.readAllBytes(Paths.get(VERTEX_TYPE_CONFIG))));
-			/* required to construct a graph, to do all the comparisons, and stix xml editing */
-			ontology = new JSONObject(new String(Files.readAllBytes(Paths.get(STIX_ONTOLOGY))));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public JSONObject getGraph() {
@@ -72,12 +74,6 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 	   normalize it (split into main components: Observable, TTP, etc.), 
 	   and pass it to farther conversion to vertex */
 	public void constructGraph(String stix) {
-	//	STIXPackage stixPack = new STIXPackage().fromXMLString(stix);
-	//	System.out.println(stixPack.getObservables().getObservables());
-	//	List<Observable> observableList = (stixPack.getObservables() != null) ? stixPack.getObservables().getObservables() : null;
-	//	List indicatorList = (stixPack.getIndicators() != null) ? stixPack.getIndicators().getIndicators() : null;
-	//	System.out.println(indicatorList.size());
-
 		normalizeSTIXPackage(stix);
 		stixDoc = getSTIXDocument();
 		constructGraphFromDocument(stixDoc);
@@ -85,29 +81,29 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 	
 	/* takes normalized stix xml as a Document, using xpath to find elements and then tern them into vertices */
 	private void constructGraphFromDocument(Document stixDoc) {	
-		String path = null;
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = null;
-		
-		/* selecting all the main elements to turn them into vertices */
-		path = 
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Exploit_Targets']/*[local-name() = 'Exploit_Target'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'TTPs']/*[local-name() = 'TTP'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Observables']/*[local-name() = 'Observable'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Indicators']/*[local-name() = 'Indicator'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Incidents']/*[local-name() = 'Incident'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Courses_Of_Action']/*[local-name() = 'Course_Of_Action'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Campaigns']/*[local-name() = 'Campaign'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Threat_Actors']/*[local-name() = 'Threat_Actor']";
-			
 		xp = xpfac.compile(path);
-		List<Element> elementList = (List<Element>) xp.evaluate(stixDoc);
-		/* turning elements into vertices first, so if any of them are not valid or do not contain required fields we would not create edges for those vertices */
+		List<Element> elementList = setElementList(stixDoc);
+		/* turning elements into vertices first, so if any of them are not valid or 
+		   do not contain required fields we would not create edges for those vertices */
 		for (Element element : elementList) {
-			JSONObject newVertex = turnElementIntoVertex(element);
-			if (testRequiredFields(newVertex)) {
-				vertices.put(element.getAttributeValue("id"), newVertex);
+			if (vertices.has(element.getAttributeValue("id"))) {
+				continue;
 			}
+			JSONObject newVertex = null;
+			String vertexType = null;
+			/* if element is of stucco type (IP, Port, then convert it to vertex using ontology rules */
+			if ((vertexType = determineVertexType(element, stuccoVertTypeArray)) != null) {
+				newVertex = constructStuccoVertex(element, vertexType);
+				if (verifyStuccoVertex(newVertex)) {
+					vertices.put(element.getAttributeValue("id"), newVertex);
+				}
+			/* if element is of stix type (Indicator, Incident, etc.) then convert it to vertex using default rules */
+			} else if ((vertexType = determineVertexType(element, stixVertTypeArray)) != null) {
+				newVertex = constructStixVertex(element, vertexType);
+				vertices.put(element.getAttributeValue("id"), newVertex);
+			} 
 		}	
 			
 		if (vertices.length() != 0) {
@@ -116,47 +112,47 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		/* now working on edges */	
 		path = ".//*[@object_reference or @idref]";
 		xp = xpfac.compile(path);
-		for (Element element : elementList) {
-			String outVId = element.getAttributeValue("id");
+		for (Element outElement : elementList) {
+			String outVId = outElement.getAttributeValue("id");
 			/* if vertex with this id was not valid and not created, so we do not need to construct an edge for it */
 			if (!vertices.has(outVId)) {
 				continue;
 			}		
-			List<Element> inVList = (List<Element>) xp.evaluate(element);
-			for (Element inV : inVList) {			
+			List<Element> refList = (List<Element>) xp.evaluate(outElement);
+			for (Element ref : refList) {			
 				String inVId = null;
-				if ((inVId = inV.getAttributeValue("idref")) == null) {
-					inVId = inV.getAttributeValue("object_reference");
+				if ((inVId = ref.getAttributeValue("idref")) == null) {
+					inVId = ref.getAttributeValue("object_reference");
 				}
 					
 				/* again, if referenced element was invalid and not created, we do not need this edge */
 				if (!vertices.has(inVId)) {
 					continue;
 				} 
+				/* searching for relation in provided xml */
 				String relationship = null;
-				if ((relationship = inV.getParentElement().getChildTextNormalize("Relationship", inV.getNamespace())) != null) {
+				/* if relation found, then use it to contruct an edge */
+				if ((relationship = ref.getChildTextNormalize("Relationship", ref.getNamespace())) != null) {
 					JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
 					if (verifyEdge(outVId, inVId, newEdge)) {
 						edges.put(newEdge);
 					}
-				} else if ((relationship = inV.getChildTextNormalize("Relationship", inV.getNamespace())) != null) {
+				} else if ((relationship = ref.getParentElement().getChildTextNormalize("Relationship", ref.getNamespace())) != null) {
 					JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
 					if (verifyEdge(outVId, inVId, newEdge)) {
 						edges.put(newEdge);
 					}
 				} else {
-					System.out.println("No relationship ... need to come up with something");
-						relationship = determineRelationship(outVId, inV);
-						if (relationship != null) {
-							JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
-							if (verifyEdge(outVId, inVId, newEdge)) {
-								edges.put(newEdge);
-							} else {
-								logger.info("[WARNING] Found new relationship!!! Need to edit stix_ontology.json.");
-							}												
-						} else {													
-							logger.info("[WARNING] Found new relationship!!! Need to investigate and add to graph_type_config.json.");
-						}
+					/* if relation is not provided use graph_config to determine it, and then construct a new edge */
+					relationship = getRelationship(ref, outVId, inVId);
+					if (relationship != null) {
+						JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
+						edges.put(newEdge);
+					} else {													
+						logger.info("Could not determine relaiton berteen vertices:");
+						logger.info("		outVertType = " + vertices.getJSONObject(outVId).getString("vertexType"));
+						logger.info("		inVertType = " + vertices.getJSONObject(inVId).getString("vertexType"));
+					}
 				}
 			}
 		}
@@ -165,34 +161,37 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		}
 	}
 
-	private JSONObject turnElementIntoVertex(Element element) {
-		printElement(element);
-		String vertexType = determineVertexType(element);
-		logger.info(vertexType);
-		if (vertexType == null) {
-			vertexType = applyDefaultXPath(element);
-		} 
-		if (vertexType == null) {
-			return null;
+	/* making a set of main stix xml elements to differ them from stucco xml elements, 
+           since they are converted to vertices in a different way */
+	private List<Element> setElementList(Document stixDoc) {
+		Set<String> stixSet = new HashSet<String>();
+		stixSet.add("Observables");
+		stixSet.add("Indicators");
+		stixSet.add("TTPs");
+		stixSet.add("Exploit_Targets");
+		stixSet.add("Incidents");
+		stixSet.add("Courses_Of_Action");
+		stixSet.add("Campaigns");
+		stixSet.add("Threat_Actors");
+		List<Element> stixElementList = new ArrayList<Element>();
+		Element rootElement = stixDoc.getRootElement();
+		List<Element> children = rootElement.getChildren();
+		for (Element child : children) {
+			if (stixSet.contains(child.getName())) {
+				stixElementList.addAll(child.getChildren());	
+			}
 		}
 
-		return constructNewVertex(element, vertexType);
+		return stixElementList; 
 	}
 
-	private String applyDefaultXPath(Element element) {
-		XPathFactory xpfac = XPathFactory.instance();
-		XPathExpression xp = xpfac.compile(".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/@*[local-name()='type']");
-		Element foundElement = (Element) xp.evaluateFirst(element);
-		
-		return (foundElement == null) ? null : foundElement.getTextNormalize();
-	}
-
-	/* function to traverse vertex_type_config.json stored into vertexTypeConfig
+	/* function to traverse graph_config.json 
 	   to determine what is a vertexType of this stix element */
-	private String determineVertexType(Element element) {
-		for (Object keyObject : vertexTypeConfig.keySet()) {
-			String key = keyObject.toString();
-			JSONObject possibleType = vertexTypeConfig.getJSONObject(key);
+	private String determineVertexType(Element element, String[] vertTypeArray) {
+		JSONObject graphConfig = config.getGraphConfig();
+		for (int i = 0; i < vertTypeArray.length; i++) {
+			String key = vertTypeArray[i];
+			JSONObject possibleType = graphConfig.getJSONObject(key);
 			if (possibleType.has("path")) {
 				if (findIfPathExists(element, possibleType.getString("path"))) {
 					return key;
@@ -226,20 +225,52 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		
 		return (foundElement == null) ? false : foundElement.getTextNormalize().matches(pattern);
 	}	
+
+	/* making stix vertex (Course_Of_Action, Indicator, etc.) */
+	private JSONObject constructStixVertex(Element element, String vertexType) {
+		JSONObject vertex = new JSONObject();
+		vertex.put("vertexType", vertexType);
+		vertex.put("name", element.getAttributeValue("id"));
+		vertex.put("sourceDocument", new XMLOutputter().outputString(element));
+		List<String> description = getElementDescriptionList(element);
+		if (!description.isEmpty()) {
+			vertex.put("description", description);
+		}
+		return vertex;
+	}
+
+	/* collecting all the descriptions from xml element into list for default element to vertex convertion */
+	private List<String> getElementDescriptionList(Element element) {
+		List<String> descriptionList = new ArrayList<String>();
+		if (element.getName().equals("Description")) {
+			String content = element.getTextNormalize();
+			if (!content.isEmpty()) {
+				descriptionList.add(content);
+			}
+		} else {
+			List<Element> children = element.getChildren();
+			for (Element child : children) {
+				descriptionList.addAll(getElementDescriptionList(child));
+			}	
+		}
+
+		return descriptionList;
+	}
 	
-	/* founction to find properties's context based on provided paths in stix_ontology.json and 
+	/* function to find properties context based on provided paths in stucco_ontology.json and 
 	   add found properties to new json vertex */
-	private JSONObject constructNewVertex(Element element, String vertexType) {
+	private JSONObject constructStuccoVertex(Element element, String vertexType) {
 		JSONObject newVertex = new JSONObject();
-		String name = null;
-		JSONObject vertOntology = ontology.getJSONObject("definitions").getJSONObject(vertexType);
-		JSONObject properties = vertOntology.getJSONObject("properties");
+		JSONObject stuccoOntology = config.getStuccoOntology();
+		JSONObject properties = stuccoOntology.getJSONObject("definitions").getJSONObject(vertexType).getJSONObject("properties");
 		for (Object nameObject : properties.keySet()) {
-			String nameString = nameObject.toString();
-			JSONObject propertyInfo = properties.getJSONObject(nameString);
+			String name = nameObject.toString();
+			JSONObject propertyInfo = properties.getJSONObject(name);
 			if (propertyInfo.has("xpath")) {
 				Object content = getElementContent(element, propertyInfo);
-				newVertex.put(nameString, content);
+				if (content != null) {
+					newVertex.put(name, content);
+				}
 			}
 		}
 
@@ -250,6 +281,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		if (vertexType.equals("Software")) {
 			newVertex.put("name", cleanCpeName(newVertex.getString("name")));
 		}
+
 		return newVertex;
 	}
 
@@ -273,23 +305,20 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 				List<Element> foundElementList = (List<Element>) xp.evaluate(element);
 				if (foundElementList == null) {
 					return null;
-
 				}
 				/* this case is for composite propertyValue with pattern; like cpe with part, vendor, product, etc
 				   which require content of a set of elements arranged according a pattern */
 				String propertyValue = null;
 				for (Element foundElement : foundElementList) {
 					propertyValue = processElementContent(foundElement, propertyInfo);
-					if (pattern != null) {
-						pattern = pattern.replace(foundElement.getName(), propertyValue);
-					}
+					pattern = (pattern == null) ? null : pattern.replace(foundElement.getName(), propertyValue);
 				}
 				return (pattern == null) ? propertyValue : pattern;
 			}
 		} else { /* this is a case when cardinality = set */
 			/* testing for cardinality = set, and returning a set of resulting values */
 			List<Element> foundElementList = (List<Element>) xp.evaluate(element);
-			if (foundElementList == null) {
+			if (foundElementList.isEmpty()) {
 				return null;
 			}
 			if (pattern == null) {
@@ -297,7 +326,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 				for (Element foundElement : foundElementList) {
 					set.add(processElementContent(foundElement, propertyInfo));
 				}
-				return set;
+				return (set.isEmpty()) ? null : set;
 			} else {
 				//TODO double check on propertyValue with pattern and cardinality = set ...
 				// not sure how to handle those yet, but it should not happen ... here is a check for it
@@ -307,6 +336,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		}
 	}
 
+	/* turning element content into vertex properties, such as looking for description, name, etc. */
 	private String processElementContent(Element foundElement, JSONObject propertyInfo) {
 		String propertyValue = null;
 		if (foundElement.getAttribute("idref") != null) {
@@ -344,6 +374,177 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return propertyValue;
 	}
 
+	/* if during construction of vertex required element value is not present, but referenced, then 
+	   getting referenced element, and recursively looking for a desired value */
+	private String getReferencedElementName(String idref) {
+		if (vertices.has(idref)) {
+			JSONObject referencedVertex = vertices.getJSONObject(idref);
+			return referencedVertex.getString("name");
+		} else {
+			String xpath = "//*[@id = '" + idref + "']";
+			XPathFactory xpfac = XPathFactory.instance();
+			XPathExpression xp = xpfac.compile(xpath);
+			Element referencedElement = (Element) xp.evaluateFirst(stixDoc);
+			String referencedVertexType = determineVertexType(referencedElement, stuccoVertTypeArray);
+			if (referencedVertexType != null) {
+				JSONObject referencedVertex = constructStuccoVertex(referencedElement, referencedVertexType);
+				if (verifyStuccoVertex(referencedVertex)) {
+					vertices.put(idref, referencedVertex);
+					return referencedVertex.getString("name");
+				} 
+			}
+		}
+		return null;
+	}
+
+	/* finds a relationship based on provided, if relationship is not provided, 
+	   it is loocking for the path of referenced element to try to determine it based on rules from stucco_ontology;
+	   if related path is not found, then loocking in graph_config */
+	private String getRelationship(Element refElement, String outVId, String inVId) {
+		String outVertType = vertices.getJSONObject(outVId).getString("vertexType");
+		String inVertType = vertices.getJSONObject(inVId).getString("vertexType");
+		String refPath = refElement.getQualifiedName();
+		while (refElement.getParentElement() != null) {
+			refElement = refElement.getParentElement();
+			refPath = refElement.getQualifiedName() + "/" + refPath;
+		}
+		JSONObject outVertConfig = config.getGraphConfig().getJSONObject(outVertType);
+		if (outVertConfig.has("stuccoEdges")) {
+			JSONObject edges = outVertConfig.getJSONObject("stuccoEdges");
+			String relationship = getRelationshipHelper(edges, refPath, refElement.getName(), inVertType);
+			if (relationship != null) {
+				return relationship;
+			}
+		}
+		if (outVertConfig.has("stixEdges")) {
+			JSONObject edges = outVertConfig.getJSONObject("stixEdges");
+			String relationship = getRelationshipHelper(edges, refPath, refElement.getName(), inVertType);
+			if (relationship != null) {
+				return relationship;
+			}
+		}
+
+		return null;
+	}	
+		
+	private String getRelationshipHelper(JSONObject edges, String refPath, String refElementName, String inVertType) {
+		for (Object relation : edges.keySet()) {
+			JSONObject edgeConfig = edges.getJSONObject(relation.toString());
+			if (edgeConfig.has("outElementName")) {
+				if (refElementName.equals("Related_Object") || !refElementName.equals(edgeConfig.getString("outElementName"))) {
+					continue;	
+				}
+			}
+			if (edgeConfig.has("path")) {
+				if (!refPath.equals(edgeConfig.getString("path"))) {
+					continue;
+				}
+			}
+			boolean contains = false;
+			JSONArray inVTypeArray = edgeConfig.getJSONArray("inVType");
+			for (int i = 0; i < inVTypeArray.length(); i++) {
+				String inVType = inVTypeArray.getString(i);
+				if (inVType.equals(inVertType)) {
+					contains = true;
+					return relation.toString();
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private JSONObject constructNewEdge(String outVId, String inVId, String relationship) {
+		JSONObject newEdge = new JSONObject();
+		newEdge.put("inVertID", vertices.getJSONObject(inVId).getString("name"));
+		newEdge.put("outVertID", vertices.getJSONObject(outVId).getString("name"));
+		newEdge.put("relation", relationship);
+
+		return newEdge;
+	}	
+
+	/* testing if elements id equals idref, or if element contains child with id equals idref */
+	private boolean containsIDRef(Element element, String idref) {
+		String id = null;
+		if ((id = element.getAttributeValue("id")) != null) {
+			if (id.equals(idref)) {
+				return true;
+			}
+		}
+		List<Element> children = element.getChildren();
+		for (Element child : children) {
+			if (containsIDRef(child, idref)) {
+				return true;
+			} 
+		}
+		
+		return false;
+	}
+	
+	/* tests newVertex to insure all the required fields were found and added */	
+	private boolean verifyStuccoVertex(JSONObject newVertex) {
+		if (newVertex == null) {
+			logger.info("[WARNING] newVertex equals null");
+			return false;
+		}
+		String vertexType = newVertex.getString("vertexType");
+		JSONObject stuccoOntology = config.getStuccoOntology();
+		JSONArray requiredFields = stuccoOntology.getJSONObject("definitions").getJSONObject(vertexType).getJSONArray("required");
+		for (int i = 0; i < requiredFields.length(); i++) {
+			String requiredField = requiredFields.getString(i);
+			if (!newVertex.has(requiredField)) {
+				logger.info("[WARNING] newVertex is missing a required field: " + requiredField);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/* validating new edge between stucco elements based stucco_ontology */
+	private boolean verifyEdge(String outVId, String inVId, JSONObject newEdge) {
+		String outVType = vertices.getJSONObject(outVId).getString("vertexType");
+		String inVType = vertices.getJSONObject(inVId).getString("vertexType");
+		JSONObject edgeOntology = config.getStuccoOntology().getJSONObject("definitions").getJSONObject(newEdge.getString("relation"));
+		JSONObject properties = edgeOntology.getJSONObject("properties");
+		JSONArray propertyEnum = properties.getJSONObject("outVType").getJSONArray("enum");
+		boolean wrongOutVType = true;
+		for (int i = 0; i < propertyEnum.length(); i++) {
+			String propertyValue = propertyEnum.getString(i);
+			if (propertyValue.equals(outVType)) {
+				wrongOutVType = false;
+				break;
+			}
+		} 
+		if (wrongOutVType) {
+			logger.info(" - outVType does not match ontology requirements!!!");
+			logger.info("   Required one of: ");
+			for (int i = 0; i < propertyEnum.length(); i++) {
+				logger.info("		" + propertyEnum.getString(i));
+			}
+			logger.info("   But found : " + outVType);
+		}
+		boolean wrongInVType = true;
+		propertyEnum = properties.getJSONObject("inVType").getJSONArray("enum");
+		for (int i = 0; i < propertyEnum.length(); i++) {
+			String propertyValue = propertyEnum.getString(i);
+			if (propertyValue.equals(inVType)) {
+				wrongInVType = false;
+				break;
+			}
+		} 
+		if (wrongInVType) {
+			logger.info(" - inVType does not match ontology requirements!!!");
+			logger.info(" - Required one of: ");
+			for (int i = 0; i < propertyEnum.length(); i++) {
+				logger.info("		" + propertyEnum.getString(i));
+			}
+			logger.info("   But found : " + inVType);
+		}
+
+		return (wrongOutVType | wrongInVType) ? false : true;
+	}
+
 	/* helper function: turns ip string to long; required as a property for ip and addressRange vertices */
 	private long ipToLong(String ipString)	{
 		long ipLong = 0;
@@ -357,6 +558,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return ipLong;
 	}
 
+	
 	private String cleanCpeName(String propertyValue) {
 		String[] cpe = "Property:Vendor:Product:Version:Update:Edition:Language".split(":");
 		for (String cpeComponent : cpe) {
@@ -364,118 +566,5 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		}
 
 		return propertyValue;
-	}
-
-	private String getReferencedElementName(String idref) {
-		if (vertices.has(idref)) {
-			JSONObject referencedVertex = vertices.getJSONObject(idref);
-
-			return referencedVertex.getString("name");
-		} else {
-			String xpath = "//*[@id = '" + idref + "']";
-			XPathFactory xpfac = XPathFactory.instance();
-			XPathExpression xp = xpfac.compile(xpath);
-			Element referencedElement = (Element) xp.evaluateFirst(stixDoc);
-			printElement(referencedElement);
-			JSONObject referencedVertex = turnElementIntoVertex(referencedElement);
-			vertices.put(idref, referencedVertex);
-
-			return referencedVertex.getString("name");
-		}
-	}
-	
-	/* tests newVertex to insure all the required fields were found and added */	
-	private boolean testRequiredFields(JSONObject newVertex) {
-		if (newVertex == null) {
-			logger.info("[WARNING] newVertex equals null");
-			return false;
-		}
-		String vertexType = newVertex.getString("vertexType");
-		JSONArray requiredFields = ontology.getJSONObject("definitions").getJSONObject(vertexType).getJSONArray("required");
-		for (int i = 0; i < requiredFields.length(); i++) {
-			String requiredField = requiredFields.getString(i);
-			if (!newVertex.has(requiredField)) {
-				logger.info("[WARNING] newVertex is missing a required field: " + requiredField);
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/* finds a relationship based on provided, if relationship is not provided, 
-	   it isloocking for the path of referenced element to try to determine it based on rules from VERTEX_TYPE_CONFIG */
-	private String determineRelationship(String outVId, Element refElement) {
-		String refPath = refElement.getQualifiedName();
-		while (refElement.getParentElement() != null) {
-			refElement = refElement.getParentElement();
-			refPath = refElement.getQualifiedName() + "/" + refPath;
-		}
-		System.out.println("reference element path = " + refPath);
-		String vertexType = vertices.getJSONObject(outVId).getString("vertexType");
-		if (vertexTypeConfig.getJSONObject(vertexType).has("edges")) {	
-			JSONObject edges = vertexTypeConfig.getJSONObject(vertexType).getJSONObject("edges");
-			for (Object key : edges.keySet()) {						
-				String idrefPath = edges.getJSONObject(key.toString()).getString("path");
-				if (idrefPath.equals(refPath)) {
-					return key.toString();
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private JSONObject constructNewEdge(String outVId, String inVId, String relationship) {
-		JSONObject newEdge = new JSONObject();
-		newEdge.put("inV", vertices.getJSONObject(inVId).getString("name"));
-		newEdge.put("outV", vertices.getJSONObject(outVId).getString("name"));
-		newEdge.put("label", relationship);
-
-		return newEdge;
-	}	
-
-	/* function to verify that connected vertices are of correct types, or it will throw a warning ... will need to investigate later */
-	private boolean verifyEdge(String outVId, String inVId, JSONObject newEdge) {
-		String outVType = vertices.getJSONObject(outVId).getString("vertexType");
-		String inVType = vertices.getJSONObject(inVId).getString("vertexType");
-		JSONObject edgeOntology = ontology.getJSONObject("definitions").getJSONObject(newEdge.getString("label"));
-		JSONObject properties = edgeOntology.getJSONObject("properties");
-		JSONArray propertyEnum = properties.getJSONObject("outVType").getJSONArray("enum");
-		boolean wrongOutVType = true;
-		for (int i = 0; i < propertyEnum.length(); i++) {
-			String propertyValue = propertyEnum.getString(i);
-			if (propertyValue.equals(outVType)) {
-				wrongOutVType = false;
-				break;
-			}
-		} 
-		if (wrongOutVType) {
-			logger.info("[WARNING] outVType does not match ontology requirements!!!");
-			logger.info("[WARNING] Required one of: ");
-			for (int i = 0; i < propertyEnum.length(); i++) {
-				logger.info("[WARNING]		" + propertyEnum.getString(i));
-			}
-			logger.info("[WARNING] But was found : " + outVType);
-		}
-		boolean wrongInVType = true;
-		propertyEnum = properties.getJSONObject("inVType").getJSONArray("enum");
-		for (int i = 0; i < propertyEnum.length(); i++) {
-			String propertyValue = propertyEnum.getString(i);
-			if (propertyValue.equals(inVType)) {
-				wrongInVType = false;
-				break;
-			}
-		} 
-		if (wrongInVType) {
-			logger.info("[WARNING] inVType does not match ontology requirements!!!");
-			logger.info("[WARNING] Required one of: ");
-			for (int i = 0; i < propertyEnum.length(); i++) {
-				logger.info("[WARNING]		" + propertyEnum.getString(i));
-			}
-			logger.info("[WARNING] But was found : " + inVType);
-		}
-
-		return (wrongOutVType | wrongInVType) ? false : true;
 	}
 }
