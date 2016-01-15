@@ -36,7 +36,7 @@ public class WHIRL {
 		for (String s : s1)	{
 			if (rsw.containsString(s)) continue;
 			s = s.toLowerCase();	//converting strings to low case letters
-			s = s.replaceAll ("[.,:;'!?]", "");	//removing chars
+			s = s.replaceAll ("\\W", " ").trim();	//removing chars
 			ps.add(s.toCharArray(), s.length());
 			ps.stem();
 			str = ps.toString();
@@ -50,8 +50,9 @@ public class WHIRL {
 			}
 		}
 		for (String s : s2)	{
+			if (rsw.containsString(s)) continue;
 			s = s.toLowerCase();
-			s = s.replaceAll ("[.,:;'!?]", "");
+			s = s.replaceAll ("\\W", " ").trim();
 			ps.add(s.toCharArray(), s.length());
 			ps.stem();
 			str = ps.toString();
@@ -77,7 +78,6 @@ public class WHIRL {
 				weightOne = Math.log10(s1WordsCount.get(s) + 1.0) * Math.log10(2/count); 
 				weightTwo = Math.log10(s2WordsCount.get(s) + 1.0) * Math.log10(2/count); 
 				dotProduct = dotProduct + s1WordsCount.get(s) * s2WordsCount.get(s);
-				//System.out.println("weightOne = " + weightOne);
 			}
 			else if (s1WordsCount.get(s) == null)	{
 				count = 1;
@@ -90,11 +90,8 @@ public class WHIRL {
 				weightTwo = 0.0; 
 			}
 			similarity = similarity + (weightOne * weightTwo); 
-			//System.out.println("similarity = " + similarity);
-			//System.out.println(similarity);
 		}		
 		similarity = similarity / dotProduct;		
-		//	System.out.println("similarity = " + similarity);
 		return similarity;
 	}
 }
