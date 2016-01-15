@@ -3,13 +3,6 @@ package alignment.alignment_v2;
 import javax.xml.namespace.QName;
 import org.xml.sax.SAXException;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -22,24 +15,15 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.Collections;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import java.io.StringReader;
 import java.io.IOException;
-import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.json.*;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.Document;
@@ -54,42 +38,6 @@ import org.jdom2.output.Format;
 import org.jdom2.xpath.*;
 
 import org.mitre.stix.stix_1.STIXPackage;
-import org.mitre.cybox.cybox_2.Observable;
-import org.mitre.cybox.cybox_2.Observables;
-import org.mitre.stix.indicator_2.Indicator;
-import org.mitre.stix.stix_1.IndicatorsType;
-import org.mitre.stix.common_1.IndicatorBaseType;
-import org.mitre.stix.ttp_1.TTP;
-import org.mitre.stix.stix_1.TTPsType;
-import org.mitre.stix.common_1.TTPBaseType;
-import org.mitre.stix.exploittarget_1.ExploitTarget;
-import org.mitre.stix.common_1.ExploitTargetsType;
-import org.mitre.stix.common_1.ExploitTargetBaseType;
-
-import org.mitre.stix.incident_1.Incident;
-import org.mitre.stix.common_1.IncidentBaseType;
-import org.mitre.stix.stix_1.IncidentsType;
-import org.mitre.stix.courseofaction_1.CourseOfAction;
-import org.mitre.stix.stix_1.CoursesOfActionType;
-import org.mitre.stix.common_1.CourseOfActionBaseType;
-import org.mitre.stix.campaign_1.Campaign;
-import org.mitre.stix.stix_1.CampaignsType;
-import org.mitre.stix.common_1.CampaignBaseType;
-import org.mitre.stix.threatactor_1.ThreatActor;
-import org.mitre.stix.stix_1.ThreatActorsType;
-import org.mitre.stix.common_1.ThreatActorBaseType;
-import org.mitre.stix.report_1.Report;
-import org.mitre.stix.stix_1.RelatedPackageType;
-
-import java.math.BigInteger;
-import java.math.BigDecimal;
-
-import java.lang.Class;
-import java.lang.reflect.Field;
-import java.lang.IllegalAccessException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.NoSuchMethodException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,7 +154,7 @@ public class PreprocessSTIXwithJDOM2 {
 	 * @param documentText xml String 
 	 * @return document xml of jdom2 Document type 
 	*/ 
-	public Document parseXMLText(String documentText) {
+	public static Document parseXMLText(String documentText) {
 		try {
 			SAXBuilder saxBuilder = new SAXBuilder();
 			Document document = saxBuilder.build(new StringReader(documentText));
@@ -223,7 +171,7 @@ public class PreprocessSTIXwithJDOM2 {
 	/**
 	 * Prints jdom element 
 	 */
-	void printElement(Element element) {
+	public void printElement(Element element) {
 		XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
 		System.out.println(outputter.outputString(element));
 	}
@@ -232,7 +180,7 @@ public class PreprocessSTIXwithJDOM2 {
 	* Prints stixPackage from stix string (useful for debugging)
 	* @param stix stix document as String
 	*/ 
-	private void print(String stix) {
+	private static void print(String stix) {
 		STIXPackage testPackage = STIXPackage.fromXMLString(stix);
 		System.out.println(testPackage.toXMLString(true));
 	}
