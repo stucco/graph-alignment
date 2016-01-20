@@ -1,6 +1,7 @@
 package alignment.alignment_v2;
 
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +46,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Campaigns']/*[local-name() = 'Campaign'] | " +
 			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Threat_Actors']/*[local-name() = 'Threat_Actor']";
 	private static String[] stuccoVertTypeArray = {"Account", "Address", "AddressRange", "AS", "DNSName", "DNSRecord", "Exploit", "Flow", 
-			"Host", "HTTPRequest", "IP", "Malware", "Organization", "Port", "Service", "Software", "Vulnerability", "Weakness"};
+			"Host", "HTTPRequest", "IP", "Malware", "Organization", "Port", "Service", "Software", "Vulnerability"};
 	private static String[] stixVertTypeArray = {"Campaign", "Course_Of_Action", "Exploit_Target", "Incident", "Indicator", "Observable", 
 			"Threat_Actor", "TTP"};
 	private Document stixDoc = null;
@@ -159,6 +160,9 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		if (edges.length() != 0) {
 			graph.put("edges", edges);
 		}
+		
+		/* changing json key to match vertex name; it is simple to align it then */
+		substituteIdForName();
 	}
 
 	/* making a set of main stix xml elements to differ them from stucco xml elements, 
@@ -566,5 +570,24 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		}
 
 		return propertyValue;
+	}
+		
+	/* Using UUID is convenient while building a graph, but for alignment using name as an id is faster */
+	private void substituteIdForName() {
+		Map<String, String> idToNameMap = new HashMap<String, String>();
+		JSONObject verts = graph.getJSONObject("vertices");
+		for (Object key : verts.keySet()) {
+			String id = key.toString();
+			String name = verts.getJSONObject(id).getString("name");
+			if (!id.equals(name)) {
+				idToNameMap.put(id, name);
+			}
+		}
+
+		for (String id : idToNameMap.keySet()) {
+			JSONObject vert = verts.getJSONObject(id);
+			verts.put(idToNameMap.get(id), vert); 
+			verts.remove(id);
+		}
 	}
 }

@@ -118,8 +118,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(ttpPath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d"));
-		JSONObject vertex = vertices.getJSONObject("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d");
+		assertTrue(vertices.has("exploit/aix/rpc_cmsd_opcode21"));
+		JSONObject vertex = vertices.getJSONObject("exploit/aix/rpc_cmsd_opcode21");
 		assertEquals(vertex.getString("vertexType"), "Exploit");
 		assertEquals(vertex.getString("name"), "exploit/aix/rpc_cmsd_opcode21");
 		assertEquals(vertex.get("source").toString(), "[Metasploit]");
@@ -131,8 +131,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String etPath = "//*[@id = \"Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760\"]";
 		xp = xpfac.compile(etPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760"));
-		vertex = vertices.getJSONObject("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760");
+		assertTrue(vertices.has("CVE-2009-3699"));
+		vertex = vertices.getJSONObject("CVE-2009-3699");
 		assertEquals(vertex.getString("vertexType"), "Vulnerability");
 		assertEquals(vertex.getString("name"), "CVE-2009-3699");
 		assertEquals(vertex.get("source").toString(), "[Metasploit]");
@@ -244,8 +244,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(malwarePath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3"));
-		JSONObject vertex = vertices.getJSONObject("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
+		assertTrue(vertices.has("Scanner"));
+		JSONObject vertex = vertices.getJSONObject("Scanner");
 		assertEquals(vertex.getString("vertexType"), "Malware");
 		assertEquals(vertex.getString("name"), "Scanner");
 		assertEquals(vertex.get("source").toString(), "[1d4.us]");
@@ -255,8 +255,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String ipPath = "//*[@id = \"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\"]";
 		xp = xpfac.compile(malwarePath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229"));
-		vertex = vertices.getJSONObject("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229");
+		assertTrue(vertices.has("103.36.125.189"));
+		vertex = vertices.getJSONObject("103.36.125.189");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "103.36.125.189");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("103.36.125.189"));
@@ -428,8 +428,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(flowPath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb"));
-		JSONObject vertex = vertices.getJSONObject("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb");
+		assertTrue(vertices.has("10.10.10.1:56867_through_10.10.10.100:22"));
+		JSONObject vertex = vertices.getJSONObject("10.10.10.1:56867_through_10.10.10.100:22");
 		assertEquals(vertex.getString("vertexType"), "Flow");
 		assertEquals(vertex.getString("name"), "10.10.10.1:56867_through_10.10.10.100:22");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -441,8 +441,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String addressPath = "//*[@id = \"stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f\"]";
 		xp = xpfac.compile(addressPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f"));
-		vertex = vertices.getJSONObject("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f");
+		assertTrue(vertices.has("10.10.10.1:56867"));
+		vertex = vertices.getJSONObject("10.10.10.1:56867");
 		assertEquals(vertex.getString("vertexType"), "Address");
 		assertEquals(vertex.getString("name"), "10.10.10.1:56867");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -453,8 +453,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		addressPath = "//*[@id = \"stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd\"]";
 		xp = xpfac.compile(addressPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd"));
-		vertex = vertices.getJSONObject("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd");
+		assertTrue(vertices.has("10.10.10.100:22"));
+		vertex = vertices.getJSONObject("10.10.10.100:22");
 		assertEquals(vertex.getString("vertexType"), "Address");
 		assertEquals(vertex.getString("name"), "10.10.10.100:22");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -465,8 +465,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String ipPath = "//*[@id = \"stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489"));
-		vertex = vertices.getJSONObject("stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489");
+		assertTrue(vertices.has("10.10.10.1"));
+		vertex = vertices.getJSONObject("10.10.10.1");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "10.10.10.1");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.1"));
@@ -478,8 +478,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		ipPath = "//*[@id = \"stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a"));
-		vertex = vertices.getJSONObject("stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a");
+		assertTrue(vertices.has("10.10.10.100"));
+		vertex = vertices.getJSONObject("10.10.10.100");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "10.10.10.100");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.100"));
@@ -491,8 +491,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String portPath = "//*[@id = \"stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09\"]";
 		xp = xpfac.compile(portPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09"));
-		vertex = vertices.getJSONObject("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09");
+		assertTrue(vertices.has("56867"));
+		vertex = vertices.getJSONObject("56867");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "56867");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -503,8 +503,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		portPath = "//*[@id = \"stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26\"]";
 		xp = xpfac.compile(portPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26"));
-		vertex = vertices.getJSONObject("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26");
+		assertTrue(vertices.has("22"));
+		vertex = vertices.getJSONObject("22");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "22");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -702,8 +702,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(organizationPath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598"));
-		JSONObject vertex = vertices.getJSONObject("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598");
+		assertTrue(vertices.has("O1.com"));
+		JSONObject vertex = vertices.getJSONObject("O1.com");
 		assertEquals(vertex.getString("vertexType"), "Organization");
 		assertEquals(vertex.getString("name"), "O1.com");
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
@@ -715,8 +715,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String asPath = "//*[@id = \"stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f\"]";
 		xp = xpfac.compile(asPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f"));
-		vertex = vertices.getJSONObject("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f");
+		assertTrue(vertices.has("O1COMM"));
+		vertex = vertices.getJSONObject("O1COMM");
 		assertEquals(vertex.getString("vertexType"), "AS");
 		assertEquals(vertex.getString("name"), "O1COMM");
 		assertEquals(vertex.getString("number"), "19864");
@@ -728,8 +728,8 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String addressRangePath = "//*[@id = \"stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95\"]";
 		xp = xpfac.compile(asPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		assertTrue(vertices.has("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95"));
-		vertex = vertices.getJSONObject("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95");
+		assertTrue(vertices.has("69.19.190.0 - 69.19.190.255"));
+		vertex = vertices.getJSONObject("69.19.190.0 - 69.19.190.255");
 		assertEquals(vertex.getString("vertexType"), "AddressRange");
 		assertEquals(vertex.getString("name"), "69.19.190.0 - 69.19.190.255");
 		assertEquals(vertex.getString("startIP"), "69.19.190.0");
@@ -827,7 +827,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(softwarePath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		JSONObject vertex = vertices.getJSONObject("stucco:software-69a621f6-d22c-4d9c-a758-bc465dd8235b");
+		JSONObject vertex = vertices.getJSONObject("cpe:/a:1024cms:1024_cms:0.7:::");
 		assertEquals(vertex.getString("vertexType"), "Software");
 		assertEquals(vertex.getString("name"), "cpe:/a:1024cms:1024_cms:0.7:::");
 		assertEquals(vertex.get("source").toString(), "[CPE]");
@@ -964,7 +964,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(softwarePath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		JSONObject vertex = vertices.getJSONObject("stucco:dnsRecord-559dd80d-97b6-4c08-97eb-37001d2c59cb");
+		JSONObject vertex = vertices.getJSONObject("DALE-PC.ORNL.GOV_resolved_to_89.79.77.77");
 		assertEquals(vertex.getString("vertexType"), "DNSRecord");
 		assertEquals(vertex.getString("name"), "DALE-PC.ORNL.GOV_resolved_to_89.79.77.77");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -975,7 +975,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String ipPath = "//*[@id = \"stucco:ip-bd47ec2e-14a8-4126-8ae0-092b8276bf09\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:ip-bd47ec2e-14a8-4126-8ae0-092b8276bf09");
+		vertex = vertices.getJSONObject("89.79.77.77");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "89.79.77.77");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -987,7 +987,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		ipPath = "//*[@id = \"stucco:ip-fe34621f-26a0-48f1-b5e3-3fa641011d63\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:ip-fe34621f-26a0-48f1-b5e3-3fa641011d63");
+		vertex = vertices.getJSONObject("128.219.177.244");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "128.219.177.244");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -999,7 +999,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		ipPath = "//*[@id = \"stucco:ip-3183aead-8eb9-401e-8b30-63f917218e44\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:ip-3183aead-8eb9-401e-8b30-63f917218e44");
+		vertex = vertices.getJSONObject("68.87.73.245");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "68.87.73.245");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -1011,7 +1011,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		ipPath = "//*[@id = \"stucco:dnsName-d64a70b3-6371-4fce-a0bf-24d902a3dc6c\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:dnsName-d64a70b3-6371-4fce-a0bf-24d902a3dc6c");
+		vertex = vertices.getJSONObject("DALE-PC.ORNL.GOV");
 		assertEquals(vertex.getString("vertexType"), "DNSName");
 		assertEquals(vertex.getString("name"), "DALE-PC.ORNL.GOV");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -1148,7 +1148,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(servicePath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		JSONObject vertex = vertices.getJSONObject("stucco:service-f7791dd0-03d7-48f2-a323-c02c97008c4b");
+		JSONObject vertex = vertices.getJSONObject("ssh");
 		assertEquals(vertex.getString("vertexType"), "Service");
 		assertEquals(vertex.getString("name"), "ssh");
 		assertEquals(vertex.get("source").toString(), "[service_list]");
@@ -1160,7 +1160,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		xpfac = XPathFactory.instance();
 		xp = xpfac.compile(portPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:port-cbd16bd3-38d6-49e5-86aa-39784a774c14");
+		vertex = vertices.getJSONObject("22");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "22");
 		assertEquals(vertex.get("source").toString(), "[service_list]");
@@ -1325,7 +1325,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(servicePath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		JSONObject vertex = vertices.getJSONObject("stucco:httpRequest-59629f94-c963-4788-b897-b1e02bf92cab");
+		JSONObject vertex = vertices.getJSONObject("/tv2n/vpaid/8bc5b7b");
 		assertEquals(vertex.getString("vertexType"), "HTTPRequest");
 		assertEquals(vertex.getString("name"), "/tv2n/vpaid/8bc5b7b");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1335,7 +1335,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String ipPath = "//*[@id = \"stucco:ip-cddd9469-b8a6-4d8b-97d9-830fc191490c\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:ip-cddd9469-b8a6-4d8b-97d9-830fc191490c");
+		vertex = vertices.getJSONObject("54.192.138.232");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "54.192.138.232");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1346,7 +1346,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		ipPath = "//*[@id = \"stucco:ip-86590b2c-5e14-4880-85ee-bc9d5c9a3302\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:ip-86590b2c-5e14-4880-85ee-bc9d5c9a3302");
+		vertex = vertices.getJSONObject("128.219.49.13");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "128.219.49.13");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1357,7 +1357,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String dnsPath = "//*[@id = \"stucco:dnsName-9e1fbf26-d46a-43cd-825a-145b31935344\"]";
 		xp = xpfac.compile(dnsPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:dnsName-9e1fbf26-d46a-43cd-825a-145b31935344");
+		vertex = vertices.getJSONObject("cdn455.telemetryverification.net");
 		assertEquals(vertex.getString("vertexType"), "DNSName");
 		assertEquals(vertex.getString("name"), "cdn455.telemetryverification.net");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1367,7 +1367,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String portPath = "//*[@id = \"stucco:port-290e65ae-45df-431b-b051-6121201e9a6e\"]";
 		xp = xpfac.compile(portPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:port-290e65ae-45df-431b-b051-6121201e9a6e");
+		vertex = vertices.getJSONObject("80");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "80");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1493,7 +1493,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(softwarePath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		JSONObject vertex = vertices.getJSONObject("stucco:software-f159ef23-0b06-452c-81fa-0a266c1d1e02");
+		JSONObject vertex = vertices.getJSONObject("cpe:::ftp:0.17-25:::");
 		assertEquals(vertex.getString("vertexType"), "Software");
 		assertEquals(vertex.getString("name"), "cpe:::ftp:0.17-25:::");
 		assertEquals(vertex.get("source").toString(), "[PackageList]");
@@ -1504,7 +1504,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		xpfac = XPathFactory.instance();
 		xp = xpfac.compile(servicePath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:hostname-e11a469e-a66a-42b5-835f-d6599cc592a6");
+		vertex = vertices.getJSONObject("stucco1");
 		assertEquals(vertex.getString("vertexType"), "Host");
 		assertEquals(vertex.getString("name"), "stucco1");
 		assertEquals(vertex.get("source").toString(), "[PackageList]");
@@ -1681,7 +1681,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		XPathFactory xpfac = XPathFactory.instance();
 		XPathExpression xp = xpfac.compile(accountPath);
 		Element sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		JSONObject vertex = vertices.getJSONObject("stucco:account-c42d3219-bb0a-486e-b144-e3c8887a504e");
+		JSONObject vertex = vertices.getJSONObject("StuccoUser");
 		assertEquals(vertex.getString("vertexType"), "Account");
 		assertEquals(vertex.getString("name"), "StuccoUser");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1692,7 +1692,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		xpfac = XPathFactory.instance();
 		xp = xpfac.compile(hostPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:hostname-01b000b8-9326-43d5-b94a-60f299c9dd35");
+		vertex = vertices.getJSONObject("host_at_192.168.10.11");
 		assertEquals(vertex.getString("vertexType"), "Host");
 		assertEquals(vertex.getString("name"), "host_at_192.168.10.11");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1703,7 +1703,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		xpfac = XPathFactory.instance();
 		xp = xpfac.compile(hostPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:hostname-67ae4885-0914-429c-ac61-fa8f1932ec53");
+		vertex = vertices.getJSONObject("StuccoHost");
 		assertEquals(vertex.getString("vertexType"), "Host");
 		assertEquals(vertex.getString("name"), "StuccoHost");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1714,7 +1714,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		xpfac = XPathFactory.instance();
 		xp = xpfac.compile(softwarePath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:software-cc2b74cc-7cf2-4383-be29-a41f67332aca");
+		vertex = vertices.getJSONObject("cpe:::sshd::::");
 		assertEquals(vertex.getString("vertexType"), "Software");
 		assertEquals(vertex.getString("name"), "cpe:::sshd::::");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1724,7 +1724,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		String ipPath = "//*[@id = \"stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241\"]";
 		xp = xpfac.compile(ipPath);
 		sourceElement = (Element) xp.evaluateFirst(stixDoc.getRootElement());
-		vertex = vertices.getJSONObject("stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241");
+		vertex = vertices.getJSONObject("192.168.10.11");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "192.168.10.11");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1853,6 +1853,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 			"    </stix:Courses_Of_Action>"+
 			"</stix:STIX_Package>";
 		
+
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
 		assertTrue(validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
@@ -1862,7 +1863,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		Document stixDoc = parseXMLText(pack.toXMLString());
 		
 		System.out.println("Testing Vulnerability Vertex ... ");
-		JSONObject vertex = vertices.getJSONObject("stucco:vulnerability-b73ca23e-66d6-4fd7-89b4-30859796b38e");
+		JSONObject vertex = vertices.getJSONObject("CVE-2015-2098");
 		assertEquals(vertex.getString("vertexType"), "Vulnerability");
 		assertEquals(vertex.getString("name"), "CVE-2015-2098");
 		assertEquals(vertex.get("source").toString(), "[Bugtraq]");
@@ -2085,11 +2086,11 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		assertEquals(vertex.get("description").toString(), "[\"Course_Of_Action description\"]");
 		assertTrue(vertex.has("sourceDocument"));
 		
-		System.out.println("Testing Exploit_Target (Weakness) Vertex ... ");
+		System.out.println("Testing Exploit_Target Vertex ... ");
 		vertex = vertices.getJSONObject("stucco:et-52962ed3-1c7f-4cac-bedb-d49bb429b625");
-		assertEquals(vertex.getString("vertexType"), "Weakness");
-		assertEquals(vertex.getString("name"), "CWE-93487297");
-		assertEquals(vertex.get("description").toString(), "[Description of this weakness]");
+		assertEquals(vertex.getString("vertexType"), "Exploit_Target");
+		assertEquals(vertex.getString("name"), "stucco:et-52962ed3-1c7f-4cac-bedb-d49bb429b625");
+		assertEquals(vertex.get("description").toString(), "[\"Description of this weakness\"]");
 		assertTrue(vertex.has("sourceDocument"));
 		
 		System.out.println("Testing Campaign Vertex ... ");
@@ -2164,7 +2165,7 @@ public class GraphConstructorTest extends PreprocessSTIXwithJDOM2 {
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
 			if (edge.getString("inVertID").equals("stucco:coa-ba3d4963-caa5-4f65-b224-8f0d5ab38aa7") && 
-				edge.getString("outVertID").equals("CWE-93487297") &&
+				edge.getString("outVertID").equals("stucco:et-52962ed3-1c7f-4cac-bedb-d49bb429b625") &&
 				edge.getString("relation").equals("PotentialCOA")) {
 				edgeExists = true;
 				break;
