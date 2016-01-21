@@ -87,7 +87,7 @@ public class AlignTest {
 	@Test 
 	public void tesLoadASWithMultipleAddressRanges() throws Exception {
 
-		System.out.println("Running: alignment.alignment_v2.AlignTest.testLoadASWithMultipleAddressRanges()");
+		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadASWithMultipleAddressRanges()");
 
 		String graphString = 
 			"{"+
@@ -231,7 +231,7 @@ public class AlignTest {
 	@Test
 	public void testEdgeLoad() throws Exception {
 
-		System.out.println("Running: alignment.alignment_v2.AlignTest.testEdgeLoad()");
+		System.out.println("[Running] alignment.alignment_v2.AlignTest.testEdgeLoad()");
 
 		String graphString = 
 			"{"+
@@ -301,12 +301,12 @@ public class AlignTest {
 	@Test 
 	public void testLoadDuplicate() throws Exception {
 
-		System.out.println("Running: alignment.alignment_v2.AlignTest.testLoadDuplicate()");
+		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadDuplicate()");
 
 		String vertex =	
 			"{"+
 			"\"vertices\": {"+
-			"  \"stucco:vulnerability-95a58902-594d-4c46-8bb8-dca5834f6682\": {"+
+			"  \"CVE-2015-2098\": {"+
 			"    \"sourceDocument\": \"<stixCommon:Exploit_Target xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" id=\\\"stucco:vulnerability-95a58902-594d-4c46-8bb8-dca5834f6682\\\" xsi:type=\\\"et:ExploitTargetType\\\"><et:Title xmlns:et=\\\"http://stix.mitre.org/ExploitTarget-1\\\">Vulnerability<\\/et:Title><et:Vulnerability xmlns:et=\\\"http://stix.mitre.org/ExploitTarget-1\\\"><et:Description>WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities WebGate eDVR Manager is prone to multiple buffer-overflow vulnerabilities because it fails to perform boundary checks before copying user-supplied data to insufficiently sized memory buffer. The controls are identified by CLSID's: 359742AF-BF34-4379-A084-B7BF0E5F34B0 4E14C449-A61A-4BF7-8082-65A91298A6D8 5A216ADB-3009-4211-AB77-F1857A99482C An attacker can exploit these issues to execute arbitrary code in the context of the application, usually Internet Explorer, using the ActiveX control.Failed attacks will likely cause denial-of-service conditions.<\\/et:Description><et:Short_Description>WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities<\\/et:Short_Description><et:CVE_ID>CVE-2015-2098<\\/et:CVE_ID><et:OSVDB_ID>72838<\\/et:OSVDB_ID><et:Source>Bugtraq<\\/et:Source><et:Published_DateTime>2015-03-27T00:00:00.000-04:00<\\/et:Published_DateTime><et:References><stixCommon:Reference>http://support.microsoft.com/kb/240797<\\/stixCommon:Reference><stixCommon:Reference>Second<\\/stixCommon:Reference><stixCommon:Reference>Third<\\/stixCommon:Reference><\\/et:References><\\/et:Vulnerability><et:Potential_COAs xmlns:et=\\\"http://stix.mitre.org/ExploitTarget-1\\\"><et:Potential_COA><stixCommon:Course_Of_Action idref=\\\"stucco:vulnerability-9d31d334-93f5-4819-ac1e-8ea8ce957cdf\\\" xsi:type=\\\"coa:CourseOfActionType\\\" /><\\/et:Potential_COA><\\/et:Potential_COAs><\\/stixCommon:Exploit_Target>\","+
 			"    \"vertexType\": \"Vulnerability\","+
 			"    \"name\": \"CVE-2015-2098\","+
@@ -319,7 +319,7 @@ public class AlignTest {
 		String duplicate =	
 			"{"+
 			"\"vertices\": {"+
-			"  \"stucco:vulnerability-9d31d334-93f5-4819-ac1e-8ea8ce957cdf\": {"+
+			"  \"CVE-nnnn-nnnn\": {"+
 			"    \"sourceDocument\": \"<stixCommon:Exploit_Target xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" id=\\\"stucco:vulnerability-95a58902-594d-4c46-8bb8-dca5834f6682\\\" xsi:type=\\\"et:ExploitTargetType\\\"><et:Title xmlns:et=\\\"http://stix.mitre.org/ExploitTarget-1\\\">Vulnerability<\\/et:Title><et:Vulnerability xmlns:et=\\\"http://stix.mitre.org/ExploitTarget-1\\\"><et:Description>WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities WebGate eDVR Manager is prone to multiple buffer-overflow vulnerabilities because it fails to perform boundary checks before copying user-supplied data to insufficiently sized memory buffer. The controls are identified.<\\/et:Description><et:Short_Description>WebGate eDVR Manager ActiveX Controls CVE-2015-2098 Multiple Buffer Overflow Vulnerabilities<\\/et:Short_Description><et:CVE_ID>CVE-nnnn-nnnn<\\/et:CVE_ID><et:OSVDB_ID>72838453<\\/et:OSVDB_ID><et:Source>NVD<\\/et:Source><et:Published_DateTime>2015-03-28T00:30:00.000-04:00<\\/et:Published_DateTime><et:References><stixCommon:Reference>http://support.microsoft.com/kb/240797<\\/stixCommon:Reference><stixCommon:Reference>Second<\\/stixCommon:Reference><stixCommon:Reference>Third<\\/stixCommon:Reference><\\/et:References><\\/et:Vulnerability><et:Potential_COAs xmlns:et=\\\"http://stix.mitre.org/ExploitTarget-1\\\"><et:Potential_COA><stixCommon:Course_Of_Action idref=\\\"stucco:vulnerability-9d31d334-93f5-4819-ac1e-8ea8ce957cdf\\\" xsi:type=\\\"coa:CourseOfActionType\\\" /><\\/et:Potential_COA><\\/et:Potential_COAs><\\/stixCommon:Exploit_Target>\","+
 			"    \"vertexType\": \"Vulnerability\","+
 			"    \"name\": \"CVE-nnnn-nnnn\","+
@@ -337,7 +337,7 @@ public class AlignTest {
 		align.load(new JSONObject(vertex));
 		
 		JSONObject vert = db.getVertByName("CVE-2015-2098");
-		JSONObject originalVert = new JSONObject(vertex).getJSONObject("vertices").getJSONObject("stucco:vulnerability-95a58902-594d-4c46-8bb8-dca5834f6682");
+		JSONObject originalVert = new JSONObject(vertex).getJSONObject("vertices").getJSONObject("CVE-2015-2098");
 		assertTrue(compareJSONObjects(vert, originalVert));
 
 		align.load(new JSONObject(duplicate));
@@ -348,7 +348,7 @@ public class AlignTest {
 	@Test
 	public void testLoadIndicatorDuplicateTest() throws Exception {
 		
-		System.out.println("Running: alignment.alignment_v2.AlignTest.testLoadIndicatorDuplicateTest()");
+		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadIndicatorDuplicateTest()");
 		
 		String graphSectionOne = 
 			"{"+
@@ -464,5 +464,165 @@ public class AlignTest {
 		System.out.println("Testing TTP duplicate ...");
 		vert = db.getVertByName("TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70");
 		assertNull(vert);	
+	}
+	
+	@Test
+	public void testLoadNestedIndicatorsTest() throws Exception {
+		
+		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadNestedIndicatorsTest()");
+		
+		String graphSectionOne = 
+			"{"+
+			"  \"vertices\": {"+
+			"    \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\": {"+
+			"      \"vertexType\": \"Indicator\","+
+			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\\\" /><\\/indicator:Indicated_TTP><indicator:Suggested_COAs xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><indicator:Suggested_COA><stixCommon:Course_Of_Action xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"coa:CourseOfActionType\\\" idref=\\\"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\\\" /><\\/indicator:Suggested_COA><\\/indicator:Suggested_COAs><indicator:Related_Indicators xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><indicator:Related_Indicator><stixCommon:Indicator xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"indicator:IndicatorType\\\" idref=\\\"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\\\" /><\\/indicator:Related_Indicator><\\/indicator:Related_Indicators><\\/stix:Indicator>\","+
+			"      \"name\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\""+
+			"    },"+
+			"    \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\": {"+
+			"      \"vertexType\": \"TTP\","+
+			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
+			"      \"name\": \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\""+
+			"    },"+
+			"    \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\": {"+
+			"      \"vertexType\": \"Course_Of_Action\","+
+			"      \"sourceDocument\": \"<stix:Course_Of_Action xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"coa:CourseOfActionType\\\" id=\\\"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\\\"><coa:Title xmlns:coa=\\\"http://stix.mitre.org/CourseOfAction-1\\\">COA Title<\\/coa:Title><\\/stix:Course_Of_Action>\","+
+			"      \"name\": \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\""+
+			"    },"+
+			"    \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025b\": {"+
+			"      \"vertexType\": \"Indicator\","+
+			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025b\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\\\" /><\\/indicator:Indicated_TTP><\\/stix:Indicator>\","+
+			"      \"name\": \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025b\""+
+			"    },"+
+			"    \"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\": {"+
+			"      \"vertexType\": \"TTP\","+
+			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
+			"      \"name\": \"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\""+
+			"    },"+
+			"    \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\": {"+
+			"      \"vertexType\": \"TTP\","+
+			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
+			"      \"name\": \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\""+
+			"    },"+
+			"    \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\": {"+
+			"      \"vertexType\": \"Indicator\","+
+			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\\\" /><\\/indicator:Indicated_TTP><\\/stix:Indicator>\","+
+			"      \"name\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\""+
+			"    }"+
+			"  },"+
+			"  \"edges\": ["+
+			"    {"+
+			"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\","+
+			"      \"inVertID\": \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\","+
+			"      \"relation\": \"IndicatedTTP\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\","+
+			"      \"inVertID\": \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\","+
+			"      \"relation\": \"SuggestedCOA\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\","+
+			"      \"inVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\","+
+			"      \"relation\": \"RelatedIndicator\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025b\","+
+			"      \"inVertID\": \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\","+
+			"      \"relation\": \"IndicatedTTP\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\","+
+			"      \"inVertID\": \"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\","+
+			"      \"relation\": \"IndicatedTTP\""+
+			"    }"+
+			"  ]"+
+			"}";
+		
+		String graphSectionTwo = 
+			"{"+
+			"  \"vertices\": {"+
+			"    \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\": {"+
+			"      \"vertexType\": \"Indicator\","+
+			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\\\" /><\\/indicator:Indicated_TTP><indicator:Suggested_COAs xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><indicator:Suggested_COA><stixCommon:Course_Of_Action xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"coa:CourseOfActionType\\\" idref=\\\"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\\\" /><\\/indicator:Suggested_COA><\\/indicator:Suggested_COAs><indicator:Related_Indicators xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><indicator:Related_Indicator><stixCommon:Indicator xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"indicator:IndicatorType\\\" idref=\\\"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\\\" /><\\/indicator:Related_Indicator><\\/indicator:Related_Indicators><\\/stix:Indicator>\","+
+			"      \"name\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\""+
+			"    },"+
+			"    \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cc\": {"+
+			"      \"vertexType\": \"TTP\","+
+			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
+			"      \"name\": \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cc\""+
+			"    },"+
+			"    \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c5\": {"+
+			"      \"vertexType\": \"Course_Of_Action\","+
+			"      \"sourceDocument\": \"<stix:Course_Of_Action xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"coa:CourseOfActionType\\\" id=\\\"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\\\"><coa:Title xmlns:coa=\\\"http://stix.mitre.org/CourseOfAction-1\\\">COA Title<\\/coa:Title><\\/stix:Course_Of_Action>\","+
+			"      \"name\": \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c5\""+
+			"    },"+
+			"    \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025c\": {"+
+			"      \"vertexType\": \"Indicator\","+
+			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025b\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\\\" /><\\/indicator:Indicated_TTP><\\/stix:Indicator>\","+
+			"      \"name\": \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025c\""+
+			"    },"+
+			"    \"TTP-512ead41-e81e-468c-a3c0-09c3218aede8\": {"+
+			"      \"vertexType\": \"TTP\","+
+			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
+			"      \"name\": \"TTP-512ead41-e81e-468c-a3c0-09c3218aede8\""+
+			"    },"+
+			"    \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b7\": {"+
+			"      \"vertexType\": \"TTP\","+
+			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
+			"      \"name\": \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b7\""+
+			"    },"+
+			"    \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7b\": {"+
+			"      \"vertexType\": \"Indicator\","+
+			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\\\" /><\\/indicator:Indicated_TTP><\\/stix:Indicator>\","+
+			"      \"name\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7b\""+
+			"    }"+
+			"  },"+
+			"  \"edges\": ["+
+			"    {"+
+			"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\","+
+			"      \"inVertID\": \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cc\","+
+			"      \"relation\": \"IndicatedTTP\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\","+
+			"      \"inVertID\": \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c5\","+
+			"      \"relation\": \"SuggestedCOA\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\","+
+			"      \"inVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7b\","+
+			"      \"relation\": \"RelatedIndicator\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025c\","+
+			"      \"inVertID\": \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b7\","+
+			"      \"relation\": \"IndicatedTTP\""+
+			"    },"+
+			"    {"+
+			"      \"outVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7b\","+
+			"      \"inVertID\": \"TTP-512ead41-e81e-468c-a3c0-09c3218aede8\","+
+			"      \"relation\": \"IndicatedTTP\""+
+			"    }"+
+			"  ]"+
+			"}";
+		
+		Align align = new Align();
+		align.setSearchForDuplicates(true);
+		align.setAlignVertProps(true);
+		InMemoryDBConnectionJson db = align.getConnection();
+		align.load(new JSONObject(graphSectionOne));
+		align.load(new JSONObject(graphSectionTwo));
+		List<String> indicatorList = db.getVertIDsByProperty("vertexType", "Indicator");
+		assertTrue(indicatorList.size() == 1);
+		List<String> ttpList = db.getVertIDsByProperty("vertexType", "TTP");
+		assertTrue(ttpList.size() == 1);
+		List<String> coaList = db.getVertIDsByProperty("vertexType", "Course_Of_Action");
+		assertTrue(coaList.size() == 1);
+		String indicatorName = db.getVertByID(indicatorList.get(0)).getString("name");
+		List<String> indicatedTTP = db.getInVertIDsByRelation(indicatorName, "IndicatedTTP");
+		assertTrue(indicatedTTP.size() == 1);
+		List<String> suggestedCOA = db.getInVertIDsByRelation(indicatorName, "SuggestedCOA");
+		assertTrue(suggestedCOA.size() == 1);
 	}
 }
