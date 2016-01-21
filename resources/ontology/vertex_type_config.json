@@ -1,0 +1,135 @@
+{
+  "Account": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"UserAccountObj:UserAccountObjectType\"]"
+  },
+  "HTTPRequest": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"HTTPSessionObj:HTTPSessionObjectType\"]",
+    "edges": {
+      "Served_By": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:Host/HTTPSessionObj:Domain_Name"
+      },
+      "Served_On": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:Host/HTTPSessionObj:Port"
+      },
+      "Requested_By": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:From"
+      }
+    }
+  },
+  "Organization": {
+    "path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"WhoisObj:WhoisObjectType\"]/*[local-name() = 'Registrants']/*[local-name() = 'Registrant']/*[local-name() = 'Organization']"
+  },
+  "DNSRecord": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"DNSRecordObj:DNSRecordObjectType\"]",
+    "edges": {
+      "Requested_DNSName": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/DNSRecordObj:Domain_Name"
+      },
+      "Requested_IP": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/DNSRecordObj:IP_Address"
+      }
+    }
+  },
+  "Address": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"SocketAddressObj:SocketAddressObjectType\"]/*[local-name()='IP_Address' or local-name()='Port']",
+    "edges": {
+      "Has_IP": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/SocketAddressObj:IP_Address"
+      },
+      "Has_Port": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/SocketAddressObj:Port"
+      }    
+    }
+  },
+  "AddressRange": {
+    "regex": {
+    	"path": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and @*[local-name()='type']=\"AddressObj:AddressObjectType\"]/*[local-name()='Address_Value']",
+      	"pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5]).+([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+    }
+  },
+  "IP": {
+    "regex": {
+    	"path": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and @*[local-name()='type']=\"AddressObj:AddressObjectType\"]/*[local-name()='Address_Value']",
+      	"pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+    }
+  },
+  "Port": {
+    "path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"PortObj:PortObjectType\"]/*[local-name()='Port_Value']"
+  },
+  "Service": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"ProcessObj:ProcessObjectType\"]",
+    "edges": {
+      "Runs_On": {
+          "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/ProcessObj:Port_List/ProcessObj:Port"
+      }
+    }
+  },
+  "Host": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"HostnameObj:HostnameObjectType\"]"
+  },
+  "Vulnerability": {
+    "path": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']"
+  },
+  "Weakness": {
+    "path": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']"
+  },
+  "DNSName": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"DomainNameObj:DomainNameObjectType\"]/*[local-name()='Value']"
+  },
+  "Flow": {
+    "path": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and  @*[local-name()='type']=\"NetFlowObj:NetworkFlowObjectType\"]/*[local-name()='Network_Flow_Label']/*[local-name()='Src_Socket_Address' or local-name()='Dest_Socket_Address']",
+    "edges": {
+      "Src_Socket_Address": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/NetFlowObj:Network_Flow_Label/NetFlowObj:Src_Socket_Address"
+      },
+      "Dest_Socket_Address": {
+        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/NetFlowObj:Network_Flow_Label/NetFlowObj:Dest_Socket_Address"
+      }    
+    }
+  },
+  "AS": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"ASObj:ASObjectType\"]/*[local-name()='Number' or local-name()='Name']",  
+  },
+  "Software": {
+  	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"ProductObj:ProductObjectType\"]/*[local-name()='Product']"
+  },
+  "Malware": {
+    "path": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']",
+    "edges": {
+      "Uses_IP": {
+        "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable"
+      }
+    }
+  },
+  "Exploit": {
+    "path": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']",
+    "edges": {
+      "Exploits": {
+          "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Exploit_Targets/ttp:Exploit_Target/stixCommon:Exploit_Target"
+      }
+    }
+  },
+  "Indicator": {
+    "path": ".[local-name() = 'Indicator']"
+  },
+  "Incident": {
+    "path": ".[local-name() = 'Incident']"
+  },
+  "Course_Of_Action": {
+     "path": ".[local-name() = 'Course_Of_Action']"
+  },
+  "Campaign": {
+    "path": ".[local-name() = 'Campaign']"
+  },
+  "Threat_Actor": {
+    "path": ".[local-name() = 'Threat_Actor']"
+  }
+}
+
+
+
+
+
+
+
+
