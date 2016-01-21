@@ -11,9 +11,6 @@ import java.util.regex.Pattern;
 
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -27,8 +24,6 @@ import org.jdom2.Content;
 import org.jdom2.xpath.*;
 
 import org.mitre.stix.stix_1.STIXPackage;
-import org.mitre.cybox.cybox_2.Observable;
-import org.mitre.stix.indicator_2.Indicator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,15 +102,12 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 			} 
 		}	
 			
-		if (vertices.length() != 0) {
-			graph.put("vertices", vertices);
-		}
-		/* now working on edges */	
+		/* now working on edges; looking for all referenced elements */	
 		path = ".//*[@object_reference or @idref]";
 		xp = xpfac.compile(path);
 		for (Element outElement : elementList) {
 			String outVId = outElement.getAttributeValue("id");
-			/* if vertex with this id was not valid and not created, so we do not need to construct an edge for it */
+			/* if out vertex with this id was not valid and not created, so we do not need to construct an edge for it */
 			if (!vertices.has(outVId)) {
 				continue;
 			}		
@@ -126,7 +118,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 					inVId = ref.getAttributeValue("object_reference");
 				}
 					
-				/* again, if referenced element was invalid and not created, we do not need this edge */
+				/* again, if in vertex (referenced element) was invalid and not created, we do not need this edge */
 				if (!vertices.has(inVId)) {
 					continue;
 				} 
@@ -157,12 +149,16 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 				}
 			}
 		}
+		
+		/* changing json key to match vertex name; it is simpler to align it then */
+		substituteIdForName();
+		if (vertices.length() != 0) {
+			graph.put("vertices", vertices);
+		}
+
 		if (edges.length() != 0) {
 			graph.put("edges", edges);
 		}
-		
-		/* changing json key to match vertex name; it is simple to align it then */
-		substituteIdForName();
 	}
 
 	/* making a set of main stix xml elements to differ them from stucco xml elements, 
@@ -267,13 +263,17 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		JSONObject newVertex = new JSONObject();
 		JSONObject stuccoOntology = config.getStuccoOntology();
 		JSONObject properties = stuccoOntology.getJSONObject("definitions").getJSONObject(vertexType).getJSONObject("properties");
-		for (Object nameObject : properties.keySet()) {
-			String name = nameObject.toString();
-			JSONObject propertyInfo = properties.getJSONObject(name);
+		for (Object key : properties.keySet()) {
+			String propertyName = key.toString();
+			JSONObject propertyInfo = properties.getJSONObject(propertyName);
 			if (propertyInfo.has("xpath")) {
 				Object content = getElementContent(element, propertyInfo);
 				if (content != null) {
-					newVertex.put(name, content);
+					newVertex.put(propertyName, content);
+				}
+			} else {
+				if (!propertyName.equals("vertexType")) {
+					logger.error("Could not find xpath for " + vertexType + ", property: " + propertyName + "!");
 				}
 			}
 		}
@@ -281,7 +281,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		newVertex.put("sourceDocument", new XMLOutputter().outputString(element));
 		newVertex.put("vertexType", vertexType);
 
-		/* cleaning pattern that left after composing software name and missing cpe some components */
+		/* cleaning pattern that left after composing software name and with missing cpe components */
 		if (vertexType.equals("Software")) {
 			newVertex.put("name", cleanCpeName(newVertex.getString("name")));
 		}
@@ -334,7 +334,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 			} else {
 				//TODO double check on propertyValue with pattern and cardinality = set ...
 				// not sure how to handle those yet, but it should not happen ... here is a check for it
-				logger.info("[WARNING] More than one value was found with pattern and set cardinality!!!");
+				logger.info("More than one value was found with pattern and set cardinality!!!");
 				return null;
 			}		
 		}
@@ -361,6 +361,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		if (propertyValue.isEmpty()) {
 			return null;
 		}
+		/* regex required in cases like differ IP and AddressRange, where besides value everything else is the same */
 		if (propertyInfo.has("regex")) {
 			String regexPattern = propertyInfo.getString("regex");
 			Pattern p = Pattern.compile(regexPattern);
@@ -369,6 +370,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 				propertyValue = m.group(1);
 			}
 		}
+		/* required in cases like convert IP to long, etc. */
 		if (propertyInfo.has("applyFunction")) {
 			if (propertyInfo.getString("applyFunction").equals("ipToLong")) {
 				long ipInt = ipToLong(propertyValue); 
@@ -402,7 +404,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 	}
 
 	/* finds a relationship based on provided, if relationship is not provided, 
-	   it is loocking for the path of referenced element to try to determine it based on rules from stucco_ontology;
+	   it is loocking for the path of referenced element to try to determine it based on rules from stucc_ontology;
 	   if related path is not found, then loocking in graph_config */
 	private String getRelationship(Element refElement, String outVId, String inVId) {
 		String outVertType = vertices.getJSONObject(outVId).getString("vertexType");
@@ -467,7 +469,8 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return newEdge;
 	}	
 
-	/* testing if elements id equals idref, or if element contains child with id equals idref */
+	/* testing if elements id equals idref, or if element contains child with id equals idref;
+	   required to construct an edges */
 	private boolean containsIDRef(Element element, String idref) {
 		String id = null;
 		if ((id = element.getAttributeValue("id")) != null) {
@@ -488,7 +491,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 	/* tests newVertex to insure all the required fields were found and added */	
 	private boolean verifyStuccoVertex(JSONObject newVertex) {
 		if (newVertex == null) {
-			logger.info("[WARNING] newVertex equals null");
+			logger.info("newVertex equals null");
 			return false;
 		}
 		String vertexType = newVertex.getString("vertexType");
@@ -497,7 +500,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		for (int i = 0; i < requiredFields.length(); i++) {
 			String requiredField = requiredFields.getString(i);
 			if (!newVertex.has(requiredField)) {
-				logger.info("[WARNING] newVertex is missing a required field: " + requiredField);
+				logger.info("newVertex is missing a required field: " + requiredField);
 				return false;
 			}
 		}
@@ -572,22 +575,22 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return propertyValue;
 	}
 		
-	/* Using UUID is convenient while building a graph, but for alignment using name as an id is faster */
+	/* Using UUID as a json key to vertex is convenient while turning xml into a graph, 
+           but for alignment using name as a json key for vertex is faster */
 	private void substituteIdForName() {
 		Map<String, String> idToNameMap = new HashMap<String, String>();
-		JSONObject verts = graph.getJSONObject("vertices");
-		for (Object key : verts.keySet()) {
+		for (Object key : vertices.keySet()) {
 			String id = key.toString();
-			String name = verts.getJSONObject(id).getString("name");
+			String name = vertices.getJSONObject(id).getString("name");
 			if (!id.equals(name)) {
 				idToNameMap.put(id, name);
 			}
 		}
 
 		for (String id : idToNameMap.keySet()) {
-			JSONObject vert = verts.getJSONObject(id);
-			verts.put(idToNameMap.get(id), vert); 
-			verts.remove(id);
+			JSONObject vert = vertices.getJSONObject(id);
+			vertices.put(idToNameMap.get(id), vert); 
+			vertices.remove(id);
 		}
 	}
 }
