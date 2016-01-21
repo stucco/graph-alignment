@@ -2,7 +2,6 @@ package alignment.alignment_v2;
 
 import java.io.IOException;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -38,16 +37,19 @@ public class Align {
 	private ConfigFileLoader config = null;
 	private InMemoryDBConnectionJson connection = null;
 	private Compare compare = null;
+	private JSONArray edgesToLoad = null;
 	private JSONObject newGraphSection = null;
 	private JSONObject vertsToLoad = null;
-	private JSONArray edgesToLoad = null;
+	private JSONObject indicatorsToLoad = null;
 	private Map<String, JSONObject> existingIndicatorsMap = null;
+	private Map<String, String> duplicateIDMap = null;
 
 	public Align() {
 		logger = LoggerFactory.getLogger(Align.class);
 		connection = new InMemoryDBConnectionJson();
 		config = new ConfigFileLoader();
 		compare = new Compare();
+		duplicateIDMap = new HashMap<String, String>();
 	}
 
 	public void setSearchForDuplicates(boolean search) {
@@ -65,35 +67,25 @@ public class Align {
 
 	public boolean load(JSONObject newGraphSection) throws Exception {
 		this.newGraphSection = newGraphSection;
-		vertsToLoad = newGraphSection.optJSONObject("vertices");
-		edgesToLoad = newGraphSection.optJSONArray("edges");
-		if (vertsToLoad == null) {
-			vertsToLoad = new JSONObject();
-		}
-		if (edgesToLoad == null) {
-			edgesToLoad = new JSONArray();
-		}
-
-		// removing Indicators, since in most cases they serve as a connector between 
-		// different types of STIX components, and needs to be aligned bases on a subgraph comparison
-		// and not just by itself
-		JSONObject indicators = new JSONObject();
-		Set<String> ids = vertsToLoad.keySet();
-		List<String> indicatorIds = new ArrayList();
-		for (String key : vertsToLoad.keySet()) {
-			String id = key.toString();
+		vertsToLoad = (newGraphSection.has("vertices")) ? newGraphSection.getJSONObject("vertices") : new JSONObject();
+		edgesToLoad = (newGraphSection.has("edges")) ? newGraphSection.getJSONArray("edges") : new JSONArray();
+		
+		/* removing Indicators, since in most cases they serve as a connector between 
+		   different types of STIX components, and needs to be aligned bases on a subgraph comparison
+		   and not just by itself */
+		indicatorsToLoad = new JSONObject();
+		for (String id : vertsToLoad.keySet()) {
 			JSONObject vertex = vertsToLoad.getJSONObject(id);
 			if (vertex.getString("vertexType").equals("Indicator")) {
-				indicators.put(id, vertex);
-				indicatorIds.add(id);
+				indicatorsToLoad.put(id, vertex);
 			}
 		}
-		for (String id : indicatorIds) {
+		for (String id : indicatorsToLoad.keySet()) {
 			vertsToLoad.remove(id);
 		}
 
-		boolean loadedVertices = false;
 		/* loading vertices */
+		boolean loadedVertices = false;
 		if (vertsToLoad != null) {
 			for (int currTry = 0; currTry < VERTEX_RETRIES; currTry++) {
 				vertsToLoad = loadVertices(vertsToLoad);
@@ -105,15 +97,29 @@ public class Align {
 				}
 			}
 		}
+		
+		/* if duplicates were found, then we need to update verts and edges ids according to duplicates */
+		for (String key : duplicateIDMap.keySet()) {
+			updateEdges(key, duplicateIDMap.get(key));
+			updateVertices(key, duplicateIDMap.get(key));
+		}
+		duplicateIDMap = new HashMap<String, String>();	
 
-		boolean loadedIndicatorVertices = false;
+		/* looking for indicator duplicates within newGraphSection, if found, combine elements and rerouting edges */
+		findIndicatorDuplicatesInNewGraphSection();
+		for (String key : duplicateIDMap.keySet()) {
+			combineIndicators(key, duplicateIDMap.get(key));
+		}
+		duplicateIDMap = new HashMap<String, String>();	
+
 		/* loading indicators */
-		vertsToLoad = indicators;
-		if (vertsToLoad != null) {
+		loadExistingIndicatorsMap();
+		boolean loadedIndicatorVertices = false;
+		if (indicatorsToLoad.length() != 0) {
 			for (int currTry = 0; currTry < VERTEX_RETRIES; currTry++) {
-				vertsToLoad = loadVertices(vertsToLoad);
-				if (vertsToLoad.length() == 0) {
-					loadedVertices = true;
+				indicatorsToLoad = loadVertices(indicatorsToLoad);
+				if (indicatorsToLoad.length() == 0) {
+					loadedIndicatorVertices = true;
 					break;
 				} else if (currTry == VERTEX_RETRIES) {
 					logger.error("Could not add Indicator Vertex!  Vertex is out of retry attempts!");
@@ -121,8 +127,13 @@ public class Align {
 			}
 		}
 		
-		boolean loadedEdges = false;
+		/* updating edges if any indicator duplicates were found in existing db */
+		for (String key : duplicateIDMap.keySet()) {
+			updateEdges(key, duplicateIDMap.get(key));
+		}
+
 		/* loading edges */
+		boolean loadedEdges = false;
 		if (edgesToLoad != null) {
 			for (int currTry = 0; currTry < EDGE_RETRIES; currTry++) {
 				edgesToLoad = loadEdges(edgesToLoad);
@@ -134,7 +145,8 @@ public class Align {
 				}
 			}
 		}
-		return (loadedVertices && loadedEdges) ? true : false;
+
+		return (loadedVertices && loadedIndicatorVertices && loadedEdges) ? true : false;
 	}
 
 	private JSONObject loadVertices(JSONObject vertices) throws Exception {
@@ -146,13 +158,11 @@ public class Align {
 			String vertId = connection.getVertIDByName(newVertName);
 			boolean newVert = (vertId == null);
 			if (newVert && SEARCH_FOR_DUPLICATES) {
-				String vertexType = newVertex.getString("vertexType");
 				String duplicateId = findDuplicateVertex(newVertex);
 				newVert = (duplicateId == null);
 				if (duplicateId != null) {
 					JSONObject duplicateVertex = connection.getVertByID(duplicateId);
-					updateEdges(newVertex.getString("name"), duplicateVertex.getString("name")); 
-					updateVertices(newVertex.getString("name"), duplicateVertex.getString("name")); 
+					duplicateIDMap.put(newVertex.getString("name"), duplicateVertex.getString("name"));
 					if (ALIGN_VERT_PROPS) {
 						// do the aligning of new vert properties
 						JSONObject existingVert = connection.getVertByID(duplicateId);
@@ -176,7 +186,74 @@ public class Align {
 				}
 			} 
 		}
+	
 		return vertsToRetry;
+	}
+		
+	/* looking for indicator duplicates withing newGraphSection before looking at db;
+	   it is faster, if duplicates exists, plus indicator comparison is done based on 
+	   related vertices, and all the vertices and indicators are loaded before edges
+	   that are connecting them, so duplicate indicators in the same new graph would
+	   not be connected to related vertices at a time of loading  */
+	private void findIndicatorDuplicatesInNewGraphSection() {
+		Map<String, Map<String, List<String>>> indicatorRelationsMap = new HashMap<String, Map<String, List<String>>>();
+		for (Object key : indicatorsToLoad.keySet()) {	
+			String name = key.toString();			
+			Map<String, List<String>> relationsMap = setInVertIDsMap(name);
+			relationsMap.putAll(setOutVertIDsMap(name));
+			indicatorRelationsMap.put(name, relationsMap);
+		}
+		
+		List<String> duplicateIDs = new ArrayList<String>();
+		double threshold = 0.5;
+		for (String name1 : indicatorRelationsMap.keySet()) {
+			Map<String, List<String>> relationsMap1 = indicatorRelationsMap.get(name1);
+			double bestScore = 0.0;
+			String bestID = null;
+			for (String name2 : indicatorRelationsMap.keySet()) {
+				if (name1.equals(name2)) {
+					continue;
+				}
+				double score = 0.0;
+				Map<String, List<String>> relationsMap2 = indicatorRelationsMap.get(name2);
+				for (String relation : relationsMap1.keySet()) {
+					int match = 0;
+					Set<String> relatedVertSet1 = new HashSet<String>(relationsMap1.get(relation));
+					if (relationsMap2.containsKey(relation)) {
+						Set<String> relatedVertSet2 = new HashSet<String>(relationsMap2.get(relation));
+						for (String vertId : relatedVertSet1) {
+							if (relatedVertSet2.contains(vertId)) {
+								match++;
+							}
+						}
+						score = score + ((match == 0) ? 0.0 : (double)Math.min(relatedVertSet1.size(), relatedVertSet2.size())/match);
+					}
+				}
+				score = (score * 0.75) + (compare.compareVertices(indicatorsToLoad.getJSONObject(name1), indicatorsToLoad.getJSONObject(name2), null) * 0.25);
+				if (score >= threshold && score >= bestScore) {
+					bestID = name2;
+				}
+			}
+			if (bestID != null) {
+				duplicateIDMap.put(name1, bestID);	
+			}
+		}
+		
+	}
+
+	/* if duplicate indicators in newGraphSection were found, them we need to combine their contents */
+	private void combineIndicators(String newID, String duplicateID) {
+		JSONObject indicator = indicatorsToLoad.optJSONObject(newID);
+		JSONObject indicatorDuplicate = indicatorsToLoad.optJSONObject(duplicateID);
+		if (indicator != null && indicatorDuplicate != null) {
+			alignVertProps(indicator, indicatorDuplicate);
+			updateEdges(newID, duplicateID);
+			updateVertices(newID, duplicateID);
+			indicatorsToLoad.remove(newID);
+			if (duplicateIDMap.containsKey(duplicateID)) {
+				combineIndicators(duplicateID, duplicateIDMap.get(duplicateID));
+			}
+		}
 	}
 
 	private JSONArray loadEdges(JSONArray edges) throws Exception {
@@ -185,6 +262,9 @@ public class Align {
 			JSONObject edge = edges.getJSONObject(i);
 			String outVertID = edge.getString("outVertID");
 			String inVertID = edge.getString("inVertID");
+			if (outVertID.equals(inVertID)) {
+				continue;
+			}
 			String relation = edge.getString("relation");
 			List<String> edgeIDsByVert = connection.getEdgeIDsByVert(inVertID, outVertID, relation);
 			// TODO class InMemoryDBConnection returns List of ids for the same outVertID, inVertID, and relation ....
@@ -232,10 +312,6 @@ public class Align {
 	/* to find indicator duplicate we have to compare new subgraph containing new indicator with
 	   existing subgraphs with indicators, since indicator is a connector between multiple stix components */
 	private String findIndicatorDuplicate(JSONObject indicator) throws Exception {
-		if (existingIndicatorsMap == null) {
-			existingIndicatorsMap = new HashMap();
-		}
-		loadExistingIndicatorsMap();
 		double threshold = 0.75;
 		JSONObject newVerts = newGraphSection.optJSONObject("vertices");
 
@@ -244,29 +320,37 @@ public class Align {
 
 		String duplicateId = null;
 		double bestDuplicateScore = 0.0;
-		int count = 0;
 		for (String id : existingIndicatorsMap.keySet()) {
 			JSONObject existingIndicator = existingIndicatorsMap.get(id);
+			int commonRelationsCount = 0;
 			double totalScore = 0.0;
+			
 			/* searching for duplicates between vertices that are pointing to existing indicator and new indicator */
 			if (!inVertIDsMap.isEmpty()) {
 				for (String relation : inVertIDsMap.keySet()) {
 					List<String> newInVertIDsList = inVertIDsMap.get(relation);	
 					List<String> existingInVertIDsList = connection.getInVertIDsByRelation(existingIndicator.getString("name"), relation);
-					double relationTotalScore = 0.0;
+					if (existingInVertIDsList == null) {
+						continue;
+					} else if (existingInVertIDsList.isEmpty()) {	
+						continue;
+					} else {
+						commonRelationsCount++;
+					}
+					int match = 0;
 					for (String newInVertID : newInVertIDsList) {
-						JSONObject newInVert = newVerts.getJSONObject(newInVertID);
-						double bestScore = 0.0;
+						JSONObject newInVert = (newVerts.has(newInVertID)) ? newVerts.getJSONObject(newInVertID) : indicatorsToLoad.optJSONObject(newInVertID);
 						for (String existingInVertID : existingInVertIDsList) {
 							JSONObject existingInVert = connection.getVertByName(existingInVertID);
 							double score = compare.compareVertices(newInVert, existingInVert, null);
-							if (score >= threshold && score > bestScore) {
-								bestScore = score;
+							if (score >= threshold) {
+								match++;
+								break;
 							}
 						}	
-						relationTotalScore = relationTotalScore + bestScore;	
 					}
-					totalScore = totalScore + ((relationTotalScore == 0.0) ? 0.0 : Math.min(newInVertIDsList.size(), existingInVertIDsList.size())/relationTotalScore);
+					int min = Math.min(newInVertIDsList.size(), existingInVertIDsList.size());
+					totalScore = totalScore + ((min == 0) ? 0.0 : (double)match/min);
 				}
 			}
 			/* searching for duplicates between vertices that existing indicator is pointing to and new indicator */
@@ -274,20 +358,29 @@ public class Align {
 				for (String relation : outVertIDsMap.keySet()) {
 					List<String> newOutVertIDsList = outVertIDsMap.get(relation);	
 					List<String> existingOutVertIDsList = connection.getOutVertIDsByRelation(existingIndicator.getString("name"), relation);
+					if (existingOutVertIDsList == null) {
+						continue;
+					} else if (existingOutVertIDsList.isEmpty()) {
+						continue; 
+					} else {
+						commonRelationsCount++;
+					}
+					int match = 0;
 					double relationTotalScore = 0.0;
 					for (String newOutVertID : newOutVertIDsList) {
-						JSONObject newOutVert = newVerts.getJSONObject(newOutVertID);
+						JSONObject newOutVert = (newVerts.has(newOutVertID)) ? newVerts.getJSONObject(newOutVertID) : indicatorsToLoad.optJSONObject(newOutVertID);
 						double bestScore = 0.0;
 						for (String existingOutVertID : existingOutVertIDsList) {
 							JSONObject existingOutVert = connection.getVertByName(existingOutVertID);
 							double score = compare.compareVertices(newOutVert, existingOutVert, null);
-							if (score >= threshold && score > bestScore) {
-								bestScore = score;
+							if (score >= threshold) {
+								match++;
+								break;
 							}
 						}	
-						relationTotalScore = relationTotalScore + bestScore;	
 					}
-					totalScore = totalScore + ((relationTotalScore == 0.0) ? 0.0 : Math.min(newOutVertIDsList.size(), existingOutVertIDsList.size())/relationTotalScore);
+					int min = Math.min(newOutVertIDsList.size(), existingOutVertIDsList.size());
+					totalScore = totalScore + ((min == 0) ? 0.0 : (double)match/min);
 				}
 
 			}
@@ -298,13 +391,15 @@ public class Align {
 				}
 			}
 		}
-		JSONObject duplicate = connection.getVertByID(duplicateId);
 
 		return duplicateId;
 	}
 
 	/* loading all the indicators from existing graph to find duplicate */
 	private void loadExistingIndicatorsMap() {
+		if (existingIndicatorsMap == null) {
+			existingIndicatorsMap = new HashMap();
+		} 
 		List<String> existingIndicatorsIdList = connection.getVertIDsByProperty("vertexType", "Indicator");
 		for (String id : existingIndicatorsIdList) {
 			JSONObject existingIndicator = connection.getVertByID(id);
@@ -333,22 +428,22 @@ public class Align {
 	/* mapping new relatin between new indicator to related outVertex id from new graph */
 	private Map<String, List<String>> setOutVertIDsMap(String id) {
 		JSONArray edges = newGraphSection.optJSONArray("edges");
-		Map<String, List<String>> inVertIDsMap = new HashMap<String, List<String>>();
+		Map<String, List<String>> outVertIDsMap = new HashMap<String, List<String>>();
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
 			if (edge.getString("inVertID").equals(id)) {
-				List<String> inVertIDsList = (inVertIDsMap.containsKey(edge.get("relation"))) ? inVertIDsMap.get(edge.get("relation")) : new ArrayList<String>();
-				inVertIDsList.add(edge.getString("outVertID"));
-				inVertIDsMap.put(edge.getString("relation"), inVertIDsList);
+				List<String> outVertIDsList = (outVertIDsMap.containsKey(edge.get("relation"))) ? outVertIDsMap.get(edge.get("relation")) : new ArrayList<String>();
+				outVertIDsList.add(edge.getString("outVertID"));
+				outVertIDsMap.put(edge.getString("relation"), outVertIDsList);
 			}
 		}
 		
-		return inVertIDsMap;
+		return outVertIDsMap;
 	}
-	
+
 	/* if duplicate vertex found, updating edgesToLoad to match duplicate name, 
 	   since in most cases stix element's names are unique UUID */
-	void updateEdges(String oldID, String newID) {
+	private void updateEdges(String oldID, String newID) {
 		for (int i = 0; i < edgesToLoad.length(); i++) {
 			JSONObject edge = edgesToLoad.getJSONObject(i);
 			String inVertID = edge.getString("inVertID");
@@ -362,23 +457,20 @@ public class Align {
 		}
 	}
 
-	/* if duplicate vertex found, updating vertsToLoad from vertex name duplicate name, 
+	/* if duplicate vertex found, updating vertsToLoad from vertex name to duplicate name, 
            since in most cases stix element's names are unique UUID */
 	void updateVertices(String oldID, String newID) {
-		vertsToLoad = newGraphSection.optJSONObject("vertices");
-		for (Object key : vertsToLoad.keySet()) {
-			String id = key.toString();
-			if (id.equals(oldID)) {
-				JSONObject vert = vertsToLoad.getJSONObject(id);
-				vert.put("name", newID);
-				vertsToLoad.put(newID, vert);
-				vertsToLoad.remove(id);
-			}
-		}
+		Set<String> vertsToRemoveSet = new HashSet<String>();
+		JSONObject vert = (indicatorsToLoad.has(oldID)) ? indicatorsToLoad.getJSONObject(oldID) : newGraphSection.getJSONObject("vertices").optJSONObject(oldID);	
+		vert.put("name", newID);
+		vertsToLoad.put(newID, vert);
+		vertsToLoad.remove(oldID);
+		newGraphSection.getJSONObject("vertices").put(newID, vert);
+		newGraphSection.getJSONObject("vertices").remove(oldID);
 	}
 
 	/* function to set an edges between new IPs and existing AddressRanges */
-	private List<JSONObject> findNewEdges(JSONObject vert) throws IOException, Exception{
+	private List<JSONObject> findNewEdges(JSONObject vert) throws Exception, IOException {
 		List<JSONObject> edges = new ArrayList();
 		String vertexType = vert.getString("vertexType");
 		if (vertexType.equals("AddressRange")) {
