@@ -29,7 +29,7 @@ import org.apache.commons.lang.math.NumberUtils;
 
 import javax.xml.bind.DatatypeConverter;
 
-public class Compare extends PreprocessSTIXwithJDOM2 {
+public class Compare extends PreprocessSTIX {
 
 	private CosineSimilarity cs = null;
 	private WHIRL whirl = null;

@@ -18,16 +18,16 @@ public class InMemoryDBConnectionJson {
 
 	private InMemoryDBConnection connect = null;
 
-	public void printVerts() {
-		connect.printVerts();
-	}
-
-	public void printEdges() {
-		connect.printEdges();
-	}
-
 	public InMemoryDBConnectionJson(){
 		connect = new InMemoryDBConnection();
+	}
+
+	public int getVertCount() {
+		return connect.getVertCount();
+	}
+
+	public int getEdgeCount() {
+		return connect.getEdgeCount();
 	}
 
 	public JSONObject getVertByID(String vertID){
@@ -42,10 +42,28 @@ public class InMemoryDBConnectionJson {
 		return connect.getVertIDByName(vertName);
 	}
 	
-	public List<String> getVertIDsByProperty(String propertyName, String propertyValue) {
-		return connect.getVertIDsByProperty(propertyName, propertyValue);
+	public JSONArray getInEdges(String outVertID) throws Exception {
+		List<Map<String, Object>> inEdges = connect.getInEdges(outVertID);
+		JSONArray array = new JSONArray();
+		for (Map<String, Object> inEdge : inEdges) {
+			JSONObject edge = new JSONObject(inEdge);
+			array.put(edge);
+		}
+
+		return array;
 	}
-	
+
+	public JSONArray getOutEdges(String inVertID) throws Exception {
+		List<Map<String, Object>> outEdges = connect.getInEdges(inVertID);
+		JSONArray array = new JSONArray();
+		for (Map<String, Object> outEdge : outEdges) {
+			JSONObject edge = new JSONObject(outEdge);
+			array.put(edge);
+		}
+
+		return array;
+	}
+
 	public List<String> getInVertIDsByRelation(String outVertID, String relation) throws Exception{//TODO: real exception: "invalid argument"?
 		return connect.getInVertIDsByRelation(outVertID, relation);
 	}
@@ -106,5 +124,21 @@ public class InMemoryDBConnectionJson {
 	//see Align class	
 	public Map<String, Object> jsonVertToMap(JSONObject v){
 		return connect.jsonVertToMap(v);
+	}
+
+	public void save() {
+		connect.save();
+	}
+
+	public void saveVertices(String filePath) {
+		connect.saveVertices(filePath);
+	}
+
+	public void saveEdges(String filePath) {
+		connect.saveEdges(filePath);
+	}
+
+	public void load(boolean reset) {
+		connect.load(reset);
 	}
 }
