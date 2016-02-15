@@ -41,13 +41,13 @@
     "path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"SocketAddressObj:SocketAddressObjectType\"]/*[local-name()='IP_Address' or local-name()='Port']",
     "stuccoEdges": {
       "Has_IP": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/SocketAddressObj:IP_Address",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/SocketAddressObj:IP_Address",
         "inVType": [
           "IP"
         ]
       },
       "Has_Port": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/SocketAddressObj:Port",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/SocketAddressObj:Port",
         "inVType": [
           "Port"
         ]  
@@ -175,13 +175,13 @@
     "path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"DNSRecordObj:DNSRecordObjectType\"]",
     "stuccoEdges": {
       "Requested_DNSName": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/DNSRecordObj:Domain_Name",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/DNSRecordObj:Domain_Name",
         "inVType": [
           "DNSName"
         ]
       },
       "Requested_IP": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/DNSRecordObj:IP_Address",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/DNSRecordObj:IP_Address",
         "inVType": [
           "IP"
         ]
@@ -225,19 +225,19 @@
     "path": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']",
     "stuccoEdges": {
       "Uses_Address": {
-        "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
+        "path": "ttp:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
         "inVType": [
           "Address"
         ]
       },
       "Uses_IP": {
-        "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
+        "path": "ttp:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
         "inVType": [
           "IP"
         ]
       },
       "Exploits": {
-          "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Exploit_Targets/ttp:Exploit_Target/stixCommon:Exploit_Target",
+          "path": "ttp:TTP/ttp:Exploit_Targets/ttp:Exploit_Target/stixCommon:Exploit_Target",
           "inVType": [
             "Vulnerability",
             "Weakness" 
@@ -263,13 +263,13 @@
     "path": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and  @*[local-name()='type']=\"NetFlowObj:NetworkFlowObjectType\"]/*[local-name()='Network_Flow_Label']/*[local-name()='Src_Socket_Address' or local-name()='Dest_Socket_Address']",
     "stuccoEdges": {
       "Src_Socket_Address": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/NetFlowObj:Network_Flow_Label/NetFlowObj:Src_Socket_Address",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/NetFlowObj:Network_Flow_Label/NetFlowObj:Src_Socket_Address",
         "inVType": [
           "Address"
         ]
       },
       "Dest_Socket_Address": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/NetFlowObj:Network_Flow_Label/NetFlowObj:Dest_Socket_Address",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/NetFlowObj:Network_Flow_Label/NetFlowObj:Dest_Socket_Address",
         "inVType": [
           "Address"  
         ]
@@ -333,19 +333,19 @@
   	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"HTTPSessionObj:HTTPSessionObjectType\"]",
     "stuccoEdges": {
       "Served_By": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:Host/HTTPSessionObj:Domain_Name",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:Host/HTTPSessionObj:Domain_Name",
         "inVType": [
           "DNSName"     
         ]
       },
       "Served_On": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:Host/HTTPSessionObj:Port",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:Host/HTTPSessionObj:Port",
         "inVType": [
           "Port"
         ]
       },
       "Requested_By": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:From",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/HTTPSessionObj:HTTP_Request_Response/HTTPSessionObj:HTTP_Client_Request/HTTPSessionObj:HTTP_Request_Header/HTTPSessionObj:Parsed_Header/HTTPSessionObj:From",
         "inVType": [
           "IP"  
         ]
@@ -412,13 +412,13 @@
     "path": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']",
     "stuccoEdges": {
       "Uses_Address": {
-        "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
+        "path": "ttp:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
         "inVType": [
           "Address"
         ]
       },
       "Uses_IP": {
-        "path": "stix:STIX_Package/stix:TTPs/stix:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
+        "path": "ttp:TTP/ttp:Resources/ttp:Infrastructure/ttp:Observable_Characterization/cybox:Observable",
         "inVType": [
           "IP"
         ]
@@ -505,7 +505,7 @@
   	"path": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties' and @*[local-name()='type']=\"ProcessObj:ProcessObjectType\"]",
     "stuccoEdges": {
       "Runs_On": {
-        "path": "stix:STIX_Package/stix:Observables/cybox:Observable/cybox:Object/cybox:Properties/ProcessObj:Port_List/ProcessObj:Port",
+        "path": "cybox:Observable/cybox:Object/cybox:Properties/ProcessObj:Port_List/ProcessObj:Port",
         "inVType": [
           "Port"
         ]

@@ -9,50 +9,33 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.io.IOException;
-
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.Namespace;
 import org.jdom2.Attribute;
-import org.jdom2.AttributeType;
 import org.jdom2.Content;
 import org.jdom2.xpath.*;
-
-import org.mitre.stix.stix_1.STIXPackage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
+public class GraphConstructor {
 		
-	/* xpath to select all the main elements to turn them into vertices */
-	private static String path = 
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Exploit_Targets']/*[local-name() = 'Exploit_Target'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'TTPs']/*[local-name() = 'TTP'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Observables']/*[local-name() = 'Observable'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Indicators']/*[local-name() = 'Indicator'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Incidents']/*[local-name() = 'Incident'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Courses_Of_Action']/*[local-name() = 'Course_Of_Action'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Campaigns']/*[local-name() = 'Campaign'] | " +
-			"/*[local-name() = 'STIX_Package']/*[local-name() = 'Threat_Actors']/*[local-name() = 'Threat_Actor']";
+	private Logger logger = null;
+	private ConfigFileLoader config = null;
+
 	private static String[] stuccoVertTypeArray = {"Account", "Address", "AddressRange", "AS", "DNSName", "DNSRecord", "Exploit", "Flow", 
 			"Host", "HTTPRequest", "IP", "Malware", "Organization", "Port", "Service", "Software", "Vulnerability"};
 	private static String[] stixVertTypeArray = {"Campaign", "Course_Of_Action", "Exploit_Target", "Incident", "Indicator", "Observable", 
 			"Threat_Actor", "TTP"};
-	private Document stixDoc = null;
+	private Map<String, Element> stixElements = null;
 	/* vertices are stored as a key/value, or id/vertex, 
 	   because search jsonObject is faster and easier, than xml */
 	private JSONObject graph = null;
 	private JSONObject vertices = null;
 	private JSONArray edges = null;
-	
-	private Logger logger = null;
-	private ConfigFileLoader config = null;
 
 	public GraphConstructor() {
 		logger = LoggerFactory.getLogger(GraphConstructor.class);
@@ -62,28 +45,18 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		edges = new JSONArray();
 	}
 
-	public JSONObject getGraph() {
+	public JSONObject constructGraph(Map<String, Element> stixElements) {
+		this.stixElements = stixElements;
+		constructGraph();
+
 		return graph;
 	}
-
-	/* function to take stix xml as a string, 
-	   normalize it (split into main components: Observable, TTP, etc.), 
-	   and pass it to farther conversion to vertex */
-	public void constructGraph(String stix) {
-		normalizeSTIXPackage(stix);
-		stixDoc = getSTIXDocument();
-		constructGraphFromDocument(stixDoc);
-	}
 	
-	/* takes normalized stix xml as a Document, using xpath to find elements and then tern them into vertices */
-	private void constructGraphFromDocument(Document stixDoc) {	
-		XPathFactory xpfac = XPathFactory.instance();
-		XPathExpression xp = null;
-		xp = xpfac.compile(path);
-		List<Element> elementList = setElementList(stixDoc);
+	private void constructGraph() {	
 		/* turning elements into vertices first, so if any of them are not valid or 
 		   do not contain required fields we would not create edges for those vertices */
-		for (Element element : elementList) {
+		for (String id : stixElements.keySet()) {
+			Element element = stixElements.get(id);
 			if (vertices.has(element.getAttributeValue("id"))) {
 				continue;
 			}
@@ -92,9 +65,13 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 			/* if element is of stucco type (IP, Port, then convert it to vertex using ontology rules */
 			if ((vertexType = determineVertexType(element, stuccoVertTypeArray)) != null) {
 				newVertex = constructStuccoVertex(element, vertexType);
-				if (verifyStuccoVertex(newVertex)) {
-					vertices.put(element.getAttributeValue("id"), newVertex);
+				//TODO: think some more about required fields ... some verts would be invalid, and we can luse some important connections
+				//	if (verifyStuccoVertex(newVertex)) {
+				if (!newVertex.has("name")) {
+					newVertex.put("name", element.getAttributeValue("id"));
 				}
+				vertices.put(element.getAttributeValue("id"), newVertex);
+				
 			/* if element is of stix type (Indicator, Incident, etc.) then convert it to vertex using default rules */
 			} else if ((vertexType = determineVertexType(element, stixVertTypeArray)) != null) {
 				newVertex = constructStixVertex(element, vertexType);
@@ -103,14 +80,18 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		}	
 			
 		/* now working on edges; looking for all referenced elements */	
-		path = ".//*[@object_reference or @idref]";
-		xp = xpfac.compile(path);
-		for (Element outElement : elementList) {
+		XPathFactory xpfac = XPathFactory.instance();
+		String path = ".//*[@object_reference or @idref]";
+		XPathExpression xp = xpfac.compile(path);
+
+		for (String id : stixElements.keySet()) {
+			Element outElement = stixElements.get(id);
 			String outVId = outElement.getAttributeValue("id");
 			/* if out vertex with this id was not valid and not created, so we do not need to construct an edge for it */
 			if (!vertices.has(outVId)) {
 				continue;
 			}		
+			/* searching outElement for referencies */
 			List<Element> refList = (List<Element>) xp.evaluate(outElement);
 			for (Element ref : refList) {			
 				String inVId = null;
@@ -124,7 +105,8 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 				} 
 				/* searching for relation in provided xml */
 				String relationship = null;
-				/* if relation found, then use it to contruct an edge */
+				/* if relation found, then use it to contruct an edge;
+				   some times in stix relation can be provided in children elements, sometimes in siblings, so searching them all */
 				if ((relationship = ref.getChildTextNormalize("Relationship", ref.getNamespace())) != null) {
 					JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
 					if (verifyEdge(outVId, inVId, newEdge)) {
@@ -159,30 +141,6 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		if (edges.length() != 0) {
 			graph.put("edges", edges);
 		}
-	}
-
-	/* making a set of main stix xml elements to differ them from stucco xml elements, 
-           since they are converted to vertices in a different way */
-	private List<Element> setElementList(Document stixDoc) {
-		Set<String> stixSet = new HashSet<String>();
-		stixSet.add("Observables");
-		stixSet.add("Indicators");
-		stixSet.add("TTPs");
-		stixSet.add("Exploit_Targets");
-		stixSet.add("Incidents");
-		stixSet.add("Courses_Of_Action");
-		stixSet.add("Campaigns");
-		stixSet.add("Threat_Actors");
-		List<Element> stixElementList = new ArrayList<Element>();
-		Element rootElement = stixDoc.getRootElement();
-		List<Element> children = rootElement.getChildren();
-		for (Element child : children) {
-			if (stixSet.contains(child.getName())) {
-				stixElementList.addAll(child.getChildren());	
-			}
-		}
-
-		return stixElementList; 
 	}
 
 	/* function to traverse graph_config.json 
@@ -257,8 +215,8 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return descriptionList;
 	}
 	
-	/* function to find properties context based on provided paths in stucco_ontology.json and 
-	   add found properties to new json vertex */
+	/* function to find properties context based on provided paths in stucco_ontology.json 
+	   and add found properties to new json vertex */
 	private JSONObject constructStuccoVertex(Element element, String vertexType) {
 		JSONObject newVertex = new JSONObject();
 		JSONObject stuccoOntology = config.getStuccoOntology();
@@ -281,7 +239,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		newVertex.put("sourceDocument", new XMLOutputter().outputString(element));
 		newVertex.put("vertexType", vertexType);
 
-		/* cleaning pattern that left after composing software name and with missing cpe components */
+		/* cleaning pattern that left after composing software name with missing cpe components */
 		if (vertexType.equals("Software")) {
 			newVertex.put("name", cleanCpeName(newVertex.getString("name")));
 		}
@@ -380,32 +338,31 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return propertyValue;
 	}
 
-	/* if during construction of vertex required element value is not present, but referenced, then 
-	   getting referenced element, and recursively looking for a desired value */
+	/* if during construction of vertex, required element value is not present, but referenced, then 
+	   we are getting referenced element and recursively looking for a desired value */
 	private String getReferencedElementName(String idref) {
 		if (vertices.has(idref)) {
 			JSONObject referencedVertex = vertices.getJSONObject(idref);
 			return referencedVertex.getString("name");
 		} else {
-			String xpath = "//*[@id = '" + idref + "']";
-			XPathFactory xpfac = XPathFactory.instance();
-			XPathExpression xp = xpfac.compile(xpath);
-			Element referencedElement = (Element) xp.evaluateFirst(stixDoc);
-			String referencedVertexType = determineVertexType(referencedElement, stuccoVertTypeArray);
-			if (referencedVertexType != null) {
-				JSONObject referencedVertex = constructStuccoVertex(referencedElement, referencedVertexType);
-				if (verifyStuccoVertex(referencedVertex)) {
-					vertices.put(idref, referencedVertex);
-					return referencedVertex.getString("name");
-				} 
+			if (stixElements.containsKey(idref)) {
+				Element referencedElement = stixElements.get(idref);
+				String referencedVertexType = determineVertexType(referencedElement, stuccoVertTypeArray);
+				if (referencedVertexType != null) {
+					JSONObject referencedVertex = constructStuccoVertex(referencedElement, referencedVertexType);
+					if (verifyStuccoVertex(referencedVertex)) {
+						vertices.put(idref, referencedVertex);
+						return referencedVertex.getString("name");
+					} 
+				}
 			}
 		}
 		return null;
 	}
 
 	/* finds a relationship based on provided, if relationship is not provided, 
-	   it is loocking for the path of referenced element to try to determine it based on rules from stucc_ontology;
-	   if related path is not found, then loocking in graph_config */
+	   it is looking for the path of referenced element to try to determine it based on rules from stucc_ontology;
+	   if related path is not found, then looking in graph_config */
 	private String getRelationship(Element refElement, String outVId, String inVId) {
 		String outVertType = vertices.getJSONObject(outVId).getString("vertexType");
 		String inVertType = vertices.getJSONObject(inVId).getString("vertexType");
@@ -414,6 +371,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 			refElement = refElement.getParentElement();
 			refPath = refElement.getQualifiedName() + "/" + refPath;
 		}
+		/* first, we are looking if refPath matches any of stucco adges, such as IP -> Contained_Within -> AddressRange, etc. */
 		JSONObject outVertConfig = config.getGraphConfig().getJSONObject(outVertType);
 		if (outVertConfig.has("stuccoEdges")) {
 			JSONObject edges = outVertConfig.getJSONObject("stuccoEdges");
@@ -422,6 +380,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 				return relationship;
 			}
 		}
+		/* if none of stuccoEdges matches, then we need to determine a proper stixEdges, line Indicator -> SuggestedCOA -> Course_Of_Action */
 		if (outVertConfig.has("stixEdges")) {
 			JSONObject edges = outVertConfig.getJSONObject("stixEdges");
 			String relationship = getRelationshipHelper(edges, refPath, refElement.getName(), inVertType);
@@ -508,7 +467,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 		return true;
 	}
 
-	/* validating new edge between stucco elements based stucco_ontology */
+	/* validating new edge between stucco elements based on stucco_ontology */
 	private boolean verifyEdge(String outVId, String inVId, JSONObject newEdge) {
 		String outVType = vertices.getJSONObject(outVId).getString("vertexType");
 		String inVType = vertices.getJSONObject(inVId).getString("vertexType");
@@ -576,7 +535,7 @@ public class GraphConstructor extends PreprocessSTIXwithJDOM2 {
 	}
 		
 	/* Using UUID as a json key to vertex is convenient while turning xml into a graph, 
-           but for alignment using name as a json key for vertex is faster */
+       but for alignment using name as a json key for vertex is faster */
 	private void substituteIdForName() {
 		Map<String, String> idToNameMap = new HashMap<String, String>();
 		for (Object key : vertices.keySet()) {
