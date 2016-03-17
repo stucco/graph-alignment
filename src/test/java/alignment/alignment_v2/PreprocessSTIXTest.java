@@ -14,6 +14,7 @@ import javax.xml.namespace.QName;
 import org.xml.sax.SAXException; 
 
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
@@ -30,7 +31,8 @@ import org.mitre.stix.common_1.ExploitTargetsType;
 import org.mitre.stix.incident_1.Incident;
 import org.mitre.stix.threatactor_1.ThreatActor;
 import org.mitre.stix.common_1.TTPBaseType;
-import org.mitre.stix.common_1.CampaignBaseType;;
+import org.mitre.stix.common_1.CampaignBaseType;
+import org.mitre.stix.common_1.IndicatorBaseType;
 
 public class PreprocessSTIXTest extends PreprocessSTIX {
 	
@@ -146,7 +148,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 				"    </stix:Indicators> " +
 				"    <stix:TTPs> " +
 				"	<stix:TTP id=\"stucco:TTP-12345\" " +
-            	"	     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+        "	     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
 				"            <ttp:Description>TTP - Description</ttp:Description> " +
 				"            <ttp:Behavior> " +
 				"                <ttp:Malware> " +
@@ -475,10 +477,221 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 			String normalizedCoaString = new XMLOutputter().outputString(coa);
 			CourseOfAction normalizedCoa = new CourseOfAction().fromXMLString(normalizedCoaString);
 			assertTrue(normalizedCoa.validate());
-			assertTrue(expectedCoa.equals(normalizedCoa));			
+			assertTrue(expectedCoa.equals(normalizedCoa));		
 
 		} catch (SAXException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception");
+		}
+	}
+
+	/**
+	 * Tests normalize stix: nested Indicators and nested Observables
+	 */
+	@Test
+	public void test_normalizeSTIX_Indicator_Observable() {
+
+		System.out.println("alignment.alignment_v2.test_normalizeSTIX_Indicator_Observable()");
+		try {
+			String testStixString =
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package " +
+				"    xmlns:PortObj=\"http://cybox.mitre.org/objects#PortObject-2\" " +
+				"    xmlns:ProcessObj=\"http://cybox.mitre.org/objects#ProcessObject-2\" " +
+				"    xmlns:UnixProcessObj=\"http://cybox.mitre.org/objects#UnixProcessObject-2\" " +
+				"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " +
+				"    xmlns:indicator=\"http://stix.mitre.org/Indicator-2\" " +
+				"    xmlns:stix=\"http://stix.mitre.org/stix-1\" xmlns:stixCommon=\"http://stix.mitre.org/common-1\"> " +
+				"    <stix:Indicators> " +
+				"        <stix:Indicator " +
+				"            id=\"stucco:Indicator-3dfd38e7-12cb-4e5a-b5e7-54b369ebcd7a\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"indicator:IndicatorType\"> " +
+				"            <indicator:Title>Indicator</indicator:Title> " +
+				"            <indicator:Related_Indicators> " +
+				"                <indicator:Related_Indicator> " +
+				"                    <stixCommon:Relationship>Some Relationship</stixCommon:Relationship> " +
+				"                    <stixCommon:Indicator " +
+				"                        id=\"stucco:Indicator-450a49ab-584a-4059-a7e7-cc715dc2d225\" xsi:type=\"indicator:IndicatorType\"> " +
+				"                        <indicator:Title>Inner Indicator</indicator:Title> " +
+				"                        <indicator:Observable id=\"stucco:Observable-67029ece-7402-46ba-83fa-ba27e81dc7c7\"> " +
+				"                            <cybox:Title>Service Observable</cybox:Title> " +
+				"                            <cybox:Object> " +
+				"                                <cybox:Properties xsi:type=\"UnixProcessObj:UnixProcessObjectType\"> " +
+				"                                    <ProcessObj:PID>pid</ProcessObj:PID> " +
+				"                                    <ProcessObj:Name>Unix Process Name</ProcessObj:Name> " +
+				"                                    <ProcessObj:Port_List> " +
+				"                                    <ProcessObj:Port> " +
+				"                                    <PortObj:Port_Value>80</PortObj:Port_Value> " +
+				"                                    </ProcessObj:Port> " +
+				"                                    </ProcessObj:Port_List> " +
+				"                                    <UnixProcessObj:Session_ID>123</UnixProcessObj:Session_ID> " +
+				"                                </cybox:Properties> " +
+				"                            </cybox:Object> " +
+				"                        </indicator:Observable> " +
+				"                    </stixCommon:Indicator> " +
+				"                </indicator:Related_Indicator> " +
+				"            </indicator:Related_Indicators> " +
+				"        </stix:Indicator> " +
+				"    </stix:Indicators> " +
+				"</stix:STIX_Package> ";
+
+			String expectedStixString =
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " +
+				"    xmlns:PortObj=\"http://cybox.mitre.org/objects#PortObject-2\" " +
+				"    xmlns:ProcessObj=\"http://cybox.mitre.org/objects#ProcessObject-2\" " +
+				"    xmlns:UnixProcessObj=\"http://cybox.mitre.org/objects#UnixProcessObject-2\" " +
+				"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " +
+				"    xmlns:indicator=\"http://stix.mitre.org/Indicator-2\" " +
+				"    xmlns:stix=\"http://stix.mitre.org/stix-1\" xmlns:stixCommon=\"http://stix.mitre.org/common-1\"> " +
+				"    <stix:Observables cybox_major_version=\"1.0\" cybox_minor_version=\"2.0\"> " +
+				"        <cybox:Observable " +
+				"            id=\"stucco:Observable-67029ece-7402-46ba-83fa-ba27e81dc7c7\" xmlns:stucco=\"gov.ornl.stucco\"> " +
+				"            <cybox:Title>Service Observable</cybox:Title> " +
+				"            <cybox:Object> " +
+				"                <cybox:Properties " +
+				"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixProcessObj:UnixProcessObjectType\"> " +
+				"                    <ProcessObj:PID>pid</ProcessObj:PID> " +
+				"                    <ProcessObj:Name>Process Name</ProcessObj:Name> " +
+				"                    <ProcessObj:Port_List> " +
+				"                        <ProcessObj:Port> " +
+				"                            <PortObj:Port_Value>80</PortObj:Port_Value> " +
+				"                        </ProcessObj:Port> " +
+				"                    </ProcessObj:Port_List> " +
+				"                    <UnixProcessObj:Session_ID>123</UnixProcessObj:Session_ID> " +
+				"                </cybox:Properties> " +
+				"                <cybox:Related_Objects> " +
+				"                    <cybox:Related_Object idref=\"stucco:Observable-4b786f4b-807a-427a-abf2-64b4f825121b\"/> " +
+				"                </cybox:Related_Objects> " +
+				"            </cybox:Object> " +
+				"        </cybox:Observable> " +
+				"        <cybox:Observable " +
+				"            id=\"stucco:Observable-4b786f4b-807a-427a-abf2-64b4f825121b\" xmlns:stucco=\"gov.ornl.stucco\"> " +
+				"            <cybox:Object> " +
+				"                <cybox:Properties " +
+				"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ProcessObj:ProcessObjectType\"> " +
+				"                    <ProcessObj:PID>pid</ProcessObj:PID> " +
+				"                    <ProcessObj:Name>Process name</ProcessObj:Name> " +
+				"                    <ProcessObj:Port_List> " +
+				"                        <ProcessObj:Port object_reference=\"stucco:Observable-443412ee-a026-47f1-9227-24397986c4d8\"/> " +
+				"                    </ProcessObj:Port_List> " +
+				"                </cybox:Properties> " +
+				"            </cybox:Object> " +
+				"        </cybox:Observable> " +
+				"        <cybox:Observable " +
+				"            id=\"stucco:Observable-443412ee-a026-47f1-9227-24397986c4d8\" xmlns:stucco=\"gov.ornl.stucco\"> " +
+				"            <cybox:Object> " +
+				"                <cybox:Properties " +
+				"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"PortObj:PortObjectType\"> " +
+				"                    <PortObj:Port_Value>80</PortObj:Port_Value> " +
+				"                </cybox:Properties> " +
+				"            </cybox:Object> " +
+				"        </cybox:Observable> " +
+				"    </stix:Observables> " +
+				"    <stix:Indicators> " +
+				"        <stix:Indicator " +
+				"            id=\"stucco:Indicator-3dfd38e7-12cb-4e5a-b5e7-54b369ebcd7a\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"indicator:IndicatorType\"> " +
+				"            <indicator:Title>Indicator</indicator:Title> " +
+				"            <indicator:Related_Indicators> " +
+				"                <indicator:Related_Indicator> " +
+				"                    <stixCommon:Relationship>Some Relationship</stixCommon:Relationship> " +
+				"                    <stixCommon:Indicator " +
+				"                        idref=\"stucco:Indicator-450a49ab-584a-4059-a7e7-cc715dc2d225\" xsi:type=\"indicator:IndicatorType\"/> " +
+				"                </indicator:Related_Indicator> " +
+				"            </indicator:Related_Indicators> " +
+				"        </stix:Indicator> " +
+				"        <stix:Indicator " +
+				"            id=\"stucco:Indicator-450a49ab-584a-4059-a7e7-cc715dc2d225\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"indicator:IndicatorType\"> " +
+				"            <indicator:Title>Inner Indicator</indicator:Title> " +
+				"            <indicator:Observable idref=\"stucco:Observable-67029ece-7402-46ba-83fa-ba27e81dc7c7\"/> " +
+				"        </stix:Indicator> " +
+				"    </stix:Indicators> " +
+				"</stix:STIX_Package> ";
+
+			/* normalize stix package */
+			System.out.println();
+			System.out.println("Testing Normalized STIX Package");
+			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(testStixString);
+
+			STIXPackage expectedElements = new STIXPackage().fromXMLString(expectedStixString);
+			List<IndicatorBaseType> indicators = expectedElements.getIndicators().getIndicators();
+			String outerIndicatorId = "Indicator-3dfd38e7-12cb-4e5a-b5e7-54b369ebcd7a";
+			QName id = indicators.get(0).getId();
+			Indicator outerIndicator = null;
+			Indicator innerIndicator = null;
+			if (outerIndicatorId.equals(id.getLocalPart())) {
+				outerIndicator = (Indicator) indicators.get(0);
+				innerIndicator = (Indicator) indicators.get(1);
+			} else {
+				outerIndicator = (Indicator) indicators.get(1);
+				innerIndicator = (Indicator) indicators.get(0);
+			}
+
+			System.out.println("Testing Indicator ... ");
+			Element normalizedElement = stixElements.get("stucco:Indicator-3dfd38e7-12cb-4e5a-b5e7-54b369ebcd7a");
+			Indicator normalizedIndicator = new Indicator().fromXMLString(new XMLOutputter().outputString(normalizedElement));
+			assertTrue(normalizedIndicator.validate());
+			assertTrue(outerIndicator.equals(normalizedIndicator));
+			stixElements.remove("stucco:Indicator-3dfd38e7-12cb-4e5a-b5e7-54b369ebcd7a");
+
+			System.out.println("Testing Indicator ... ");
+			normalizedElement = stixElements.get("stucco:Indicator-450a49ab-584a-4059-a7e7-cc715dc2d225");
+			normalizedIndicator = new Indicator().fromXMLString(new XMLOutputter().outputString(normalizedElement));
+			assertTrue(normalizedIndicator.validate());
+			assertTrue(innerIndicator.equals(normalizedIndicator));
+			stixElements.remove("stucco:Indicator-450a49ab-584a-4059-a7e7-cc715dc2d225");
+
+			System.out.println("Testing Unix Account ... ");
+			normalizedElement = stixElements.get("stucco:Observable-67029ece-7402-46ba-83fa-ba27e81dc7c7");
+			Element object = normalizedElement.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			Element properties = object.getChild("Properties", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			Element pid = properties.getChild("PID", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
+			assertEquals(pid.getText(), "pid");
+			Element name = properties.getChild("Name", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
+			assertEquals(name.getText(), "Unix Process Name");
+			Element portList = properties.getChild("Port_List", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
+			Element portParent = portList.getChild("Port", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
+			Element port = portParent.getChild("Port_Value", Namespace.getNamespace("PortObj", "http://cybox.mitre.org/objects#PortObject-2"));
+			String portValue = port.getText();
+			assertEquals(portValue, "80");
+			Element sessionId = properties.getChild("Session_ID", Namespace.getNamespace("UnixProcessObj", "http://cybox.mitre.org/objects#UnixProcessObject-2"));
+			assertEquals(sessionId.getText(), "123");
+
+			System.out.println("Testing Unix Account -> Account relation ... ");
+			Element relatedObjects = object.getChild("Related_Objects", Namespace.getNamespace("cybox","http://cybox.mitre.org/cybox-2"));
+			Element relatedObject = relatedObjects.getChild("Related_Object", Namespace.getNamespace("cybox","http://cybox.mitre.org/cybox-2"));
+			String accountIdref = relatedObject.getAttributeValue("idref");
+			assertTrue(stixElements.containsKey(accountIdref));
+
+			System.out.println("Testing Account ... ");
+			normalizedElement = stixElements.get(accountIdref);
+			object = normalizedElement.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			properties = object.getChild("Properties", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			pid = properties.getChild("PID", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
+			assertEquals(pid.getText(), "pid");
+			name = properties.getChild("Name", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
+			assertEquals(name.getText(), "Unix Process Name");
+			portList = properties.getChild("Port_List", Namespace.getNamespace("ProcessObj", "http://cybox.mitre.org/objects#ProcessObject-2"));
+			port = portList.getChild("Port", Namespace.getNamespace("ProcessObj", "http://cybox.mitre.org/objects#ProcessObject-2"));
+			String portIdref = port.getAttributeValue("object_reference");
+			assertTrue(stixElements.containsKey(portIdref));
+
+			System.out.println("Testing Port ... ");
+			normalizedElement = stixElements.get(portIdref);
+			object = normalizedElement.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			properties = object.getChild("Properties", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			port = properties.getChild("Port_Value", Namespace.getNamespace("PortObj", "http://cybox.mitre.org/objects#PortObject-2"));
+			portValue = port.getText();
+			assertEquals(portValue, "80");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception");

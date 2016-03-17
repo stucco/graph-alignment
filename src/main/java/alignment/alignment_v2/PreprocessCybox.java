@@ -20,7 +20,7 @@ import org.jdom2.Attribute;
 import org.jdom2.Content;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory; 
 
 abstract class PreprocessCybox {
 
@@ -52,47 +52,47 @@ abstract class PreprocessCybox {
 		objectSet.add("PortObj");
 		objectMap.put("HTTPSessionObj", Collections.unmodifiableSet(objectSet));
 		objectSet = new HashSet<String>();
-    objectSet.add("ProductObj");
-    objectMap.put("ProductObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("AddressObj");
-    objectSet.add("SocketAddressObj");
-    objectSet.add("PortObj");
-    objectMap.put("SocketAddressObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("AddressObj");
-    objectSet.add("DNSRecordObj");
-    objectSet.add("URIObj");
-    objectMap.put("DNSRecordObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("AddressObj");
-    objectMap.put("AddressObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("HostnameObj");
-    objectMap.put("HostnameObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("DomainNameObj");
-    objectMap.put("DomainNameObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("WhoisObj");
-    objectSet.add("AddressObj");
-    objectSet.add("URIObj");
-    objectMap.put("WhoisObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("PortObj");
-    objectMap.put("PortObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
-    objectSet.add("ProcessObj");
-    objectSet.add("NetworkConnectionObj");
-    objectSet.add("AddressObj");
-    objectSet.add("DNSRecordObj");
-    objectSet.add("SocketAddressObj");
-    objectSet.add("DNSQueryObj");
-    objectSet.add("HTTPSessionObj");
-    objectSet.add("URIObj");
-    objectSet.add("PortObj");
-    objectMap.put("ProcessObj", Collections.unmodifiableSet(objectSet));
-    objectSet = new HashSet<String>();
+		objectSet.add("ProductObj");
+		objectMap.put("ProductObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("AddressObj");
+		objectSet.add("SocketAddressObj");
+		objectSet.add("PortObj");
+		objectMap.put("SocketAddressObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("AddressObj");
+		objectSet.add("DNSRecordObj");
+		objectSet.add("URIObj");
+		objectMap.put("DNSRecordObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("AddressObj");
+		objectMap.put("AddressObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("HostnameObj");
+		objectMap.put("HostnameObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("DomainNameObj");
+		objectMap.put("DomainNameObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("WhoisObj");
+		objectSet.add("AddressObj");
+		objectSet.add("URIObj");
+		objectMap.put("WhoisObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("PortObj");
+		objectMap.put("PortObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
+		objectSet.add("ProcessObj");
+		objectSet.add("NetworkConnectionObj");
+		objectSet.add("AddressObj");
+		objectSet.add("DNSRecordObj");
+		objectSet.add("SocketAddressObj");
+		objectSet.add("DNSQueryObj");
+		objectSet.add("HTTPSessionObj");
+		objectSet.add("URIObj");
+		objectSet.add("PortObj");
+		objectMap.put("ProcessObj", Collections.unmodifiableSet(objectSet));
+		objectSet = new HashSet<String>();
 		stuccoNsMap = Collections.unmodifiableMap(objectMap);
 
 		/* object namespace mapped to its required type attribute */
@@ -144,17 +144,8 @@ abstract class PreprocessCybox {
 		referencingElements = Collections.unmodifiableSet(set);
 	}
 
-	private static String print(Element e) {
-		XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-    System.out.println(xmlOutputter.outputString(e));
-    
-    return xmlOutputter.outputString(e);
-	}
-
+	/* extracting Address, IP, Port, DNSRecord, etc, making them self sustain objects, and adding referensing id */
 	public static Map<String, Element> normalizeCybox(Element element) {
-		if (!element.getName().equals("Observable")) {
-			return null;
-		}
 		Map<String, Element> normalizedElements = new HashMap<String, Element>();
 		String type = getObjectType(element);
 		Map<Element, List<Element>> stuccoObjectsMap = extractStuccoObjects(element, type);
@@ -204,19 +195,7 @@ abstract class PreprocessCybox {
 		return map;
 	}
 
-	private static String getPath(Element element) {
-		Element parent = element.getParentElement();
-		String parentName = parent.getName();
-		Element grandParent = parent.getParentElement();
-		String grandParentName = grandParent.getName();
-		Element grandGrandParent = grandParent.getParentElement();
-		String grandGrandParentName = grandGrandParent.getName();
-
-		return grandGrandParentName + "/" + grandParentName + "/" + parentName;
-	}
-
 	private static Element buildStuccoObject(Element element, String ns) {
-	//	print(element);
 		String type = typeMap.get(ns);
 		Element properties = new Element("Properties",  Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
 		properties.setAttribute("type", type, Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance"));
@@ -249,7 +228,7 @@ abstract class PreprocessCybox {
 			if (element.getAttribute("id") != null) {
 				element.removeAttribute("id");
 			}
-			element.removeContent();
+			element.removeContent(); 
 			element.setAttribute("object_reference", id.getValue());
 		} else {
 			Element parent = element;
