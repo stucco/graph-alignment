@@ -135,7 +135,10 @@ public class PreprocessSTIX extends PreprocessCybox {
 			if (stixParentElementSet.contains(outerElement.getQualifiedName())) { 
 				/* this round extracts Observable from Observables and etc. */
 				List<Element> elementList = outerElement.getChildren();
-				for (Element element : elementList) {
+				Iterator<Element> elementListIterator = elementList.iterator();
+				while (elementListIterator.hasNext()) {
+					Element element = elementListIterator.next();
+					elementListIterator.remove();
 					/* now we need to normalize namespaces of extracted elements, 
 					   and travers their children to pull out imbeded Observables, COAs, etc.. */
 					normalizeNamespaces(element, namespaceMap);
@@ -239,8 +242,6 @@ public class PreprocessSTIX extends PreprocessCybox {
 
 	/**
 	 * Validates STIXPackage according to xsd
-	 * @param stixPackage that should be validated
-	 * @return boolean value of validity of document
 	 */
 	static boolean validate(STIXPackage stixPackage) {
 		try	{
