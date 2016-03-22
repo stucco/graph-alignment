@@ -7,13 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.Pattern; 
 
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 import org.jdom2.output.XMLOutputter;
+import org.jdom2.output.Format;
 import org.jdom2.Element;
+import org.jdom2.Namespace;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.xpath.*;
@@ -40,13 +42,13 @@ public class GraphConstructor {
 	public GraphConstructor() {
 		logger = LoggerFactory.getLogger(GraphConstructor.class);
 		config = new ConfigFileLoader();
-		graph = new JSONObject();
-		vertices = new JSONObject();
-		edges = new JSONArray();
 	}
 
 	public JSONObject constructGraph(Map<String, Element> stixElements) {
 		this.stixElements = stixElements;
+		graph = new JSONObject();
+		vertices = new JSONObject();
+		edges = new JSONArray();
 		constructGraph();
 
 		return graph;
@@ -56,34 +58,33 @@ public class GraphConstructor {
 		/* turning elements into vertices first, so if any of them are not valid or 
 		   do not contain required fields we would not create edges for those vertices */
 		for (String id : stixElements.keySet()) {
-			Element element = stixElements.get(id);
-			if (vertices.has(element.getAttributeValue("id"))) {
+			if (vertices.has(id)) {
 				continue;
 			}
+			Element element = stixElements.get(id);
 			JSONObject newVertex = null;
 			String vertexType = null;
 			/* if element is of stucco type (IP, Port, then convert it to vertex using ontology rules */
 			if ((vertexType = determineVertexType(element, stuccoVertTypeArray)) != null) {
 				newVertex = constructStuccoVertex(element, vertexType);
-				//TODO: think some more about required fields ... some verts would be invalid, and we can luse some important connections
-				//	if (verifyStuccoVertex(newVertex)) {
+				//TODO: think some more about required fields ... some verts would be invalid, and we can luse important connections
 				if (!newVertex.has("name")) {
 					newVertex.put("name", element.getAttributeValue("id"));
 				}
 				vertices.put(element.getAttributeValue("id"), newVertex);
-				
 			/* if element is of stix type (Indicator, Incident, etc.) then convert it to vertex using default rules */
 			} else if ((vertexType = determineVertexType(element, stixVertTypeArray)) != null) {
 				newVertex = constructStixVertex(element, vertexType);
 				vertices.put(element.getAttributeValue("id"), newVertex);
-			} 
+			} else {
+				logger.info("Unckown type!" + new XMLOutputter().outputString(element));
+			}
 		}	
 			
 		/* now working on edges; looking for all referenced elements */	
 		XPathFactory xpfac = XPathFactory.instance();
 		String path = ".//*[@object_reference or @idref]";
 		XPathExpression xp = xpfac.compile(path);
-
 		for (String id : stixElements.keySet()) {
 			Element outElement = stixElements.get(id);
 			String outVId = outElement.getAttributeValue("id");
@@ -93,7 +94,7 @@ public class GraphConstructor {
 			}		
 			/* searching outElement for referencies */
 			List<Element> refList = (List<Element>) xp.evaluate(outElement);
-			for (Element ref : refList) {			
+			for (Element ref : refList) {	
 				String inVId = null;
 				if ((inVId = ref.getAttributeValue("idref")) == null) {
 					inVId = ref.getAttributeValue("object_reference");
@@ -105,35 +106,37 @@ public class GraphConstructor {
 				} 
 				/* searching for relation in provided xml */
 				String relationship = null;
-				/* if relation found, then use it to contruct an edge;
+				/* if relation found (element with tag "Relation" some times provides it), then use it to contruct an edge;
 				   some times in stix relation can be provided in children elements, sometimes in siblings, so searching them all */
 				if ((relationship = ref.getChildTextNormalize("Relationship", ref.getNamespace())) != null) {
 					JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
 					if (verifyEdge(outVId, inVId, newEdge)) {
 						edges.put(newEdge);
+						continue;
 					}
-				} else if ((relationship = ref.getParentElement().getChildTextNormalize("Relationship", ref.getNamespace())) != null) {
+				}
+				if ((relationship = ref.getParentElement().getChildTextNormalize("Relationship", ref.getNamespace())) != null) {
 					JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
 					if (verifyEdge(outVId, inVId, newEdge)) {
 						edges.put(newEdge);
+						continue;
 					}
-				} else {
-					/* if relation is not provided use graph_config to determine it, and then construct a new edge */
-					relationship = getRelationship(ref, outVId, inVId);
-					if (relationship != null) {
-						JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
-						edges.put(newEdge);
-					} else {													
-						logger.info("Could not determine relaiton berteen vertices:");
-						logger.info("		outVertType = " + vertices.getJSONObject(outVId).getString("vertexType"));
-						logger.info("		inVertType = " + vertices.getJSONObject(inVId).getString("vertexType"));
-					}
-				}
+				} 
+				/* if relation is not provided use graph_config to determine it, and then construct a new edge */
+				relationship = getRelationship(ref, outVId, inVId);
+				if (relationship != null) {
+					JSONObject newEdge = constructNewEdge(outVId, inVId, relationship);
+					edges.put(newEdge);
+				} else {													
+					logger.info("Could not determine relaiton berteen vertices:");
+					logger.info("		outVertType = " + vertices.getJSONObject(outVId).getString("vertexType"));
+					logger.info("		inVertType = " + vertices.getJSONObject(inVId).getString("vertexType"));
+				}				
 			}
 		}
 		
 		/* changing json key to match vertex name; it is simpler to align it then */
-		substituteIdForName();
+	//	substituteIdForName();
 		if (vertices.length() != 0) {
 			graph.put("vertices", vertices);
 		}
@@ -184,45 +187,13 @@ public class GraphConstructor {
 		return (foundElement == null) ? false : foundElement.getTextNormalize().matches(pattern);
 	}	
 
-	/* making stix vertex (Course_Of_Action, Indicator, etc.) */
-	private JSONObject constructStixVertex(Element element, String vertexType) {
-		JSONObject vertex = new JSONObject();
-		vertex.put("vertexType", vertexType);
-		vertex.put("name", element.getAttributeValue("id"));
-		vertex.put("sourceDocument", new XMLOutputter().outputString(element));
-		List<String> description = getElementDescriptionList(element);
-		if (!description.isEmpty()) {
-			vertex.put("description", description);
-		}
-		return vertex;
-	}
-
-	/* collecting all the descriptions from xml element into list for default element to vertex convertion */
-	private List<String> getElementDescriptionList(Element element) {
-		List<String> descriptionList = new ArrayList<String>();
-		if (element.getName().equals("Description")) {
-			String content = element.getTextNormalize();
-			if (!content.isEmpty()) {
-				descriptionList.add(content);
-			}
-		} else {
-			List<Element> children = element.getChildren();
-			for (Element child : children) {
-				descriptionList.addAll(getElementDescriptionList(child));
-			}	
-		}
-
-		return descriptionList;
-	}
-	
 	/* function to find properties context based on provided paths in stucco_ontology.json 
 	   and add found properties to new json vertex */
 	private JSONObject constructStuccoVertex(Element element, String vertexType) {
 		JSONObject newVertex = new JSONObject();
-		JSONObject stuccoOntology = config.getStuccoOntology();
-		JSONObject properties = stuccoOntology.getJSONObject("definitions").getJSONObject(vertexType).getJSONObject("properties");
-		for (Object key : properties.keySet()) {
-			String propertyName = key.toString();
+		JSONObject properties = config.getVertexOntology(vertexType).getJSONObject("properties");
+		for (Object property : properties.keySet()) {
+			String propertyName = property.toString();
 			JSONObject propertyInfo = properties.getJSONObject(propertyName);
 			if (propertyInfo.has("xpath")) {
 				Object content = getElementContent(element, propertyInfo);
@@ -236,6 +207,10 @@ public class GraphConstructor {
 			}
 		}
 
+		JSONObject observableTypeInfo = getObservableTypeInfo(element);
+		if (observableTypeInfo != null) {
+			newVertex.put("observableType", observableTypeInfo.getString("typeName"));
+		}
 		newVertex.put("sourceDocument", new XMLOutputter().outputString(element));
 		newVertex.put("vertexType", vertexType);
 
@@ -253,6 +228,7 @@ public class GraphConstructor {
 		String pattern = null;
 		if (propertyInfo.has("pattern")) {
 			pattern = propertyInfo.getString("pattern");
+		//	System.out.println("Pattern = "+ pattern);
 		} 
 		String xpath = propertyInfo.getString("xpath");
 		XPathFactory xpfac = XPathFactory.instance();
@@ -273,6 +249,9 @@ public class GraphConstructor {
 				String propertyValue = null;
 				for (Element foundElement : foundElementList) {
 					propertyValue = processElementContent(foundElement, propertyInfo);
+					if (propertyValue == null) {
+						return null;
+					}
 					pattern = (pattern == null) ? null : pattern.replace(foundElement.getName(), propertyValue);
 				}
 				return (pattern == null) ? propertyValue : pattern;
@@ -316,7 +295,7 @@ public class GraphConstructor {
 		//		Split[] propertyValueList = propertyValue.split(delimiter);
 		//	}
 
-		if (propertyValue.isEmpty()) {
+		if (propertyValue == null) {
 			return null;
 		}
 		/* regex required in cases like differ IP and AddressRange, where besides value everything else is the same */
@@ -350,14 +329,103 @@ public class GraphConstructor {
 				String referencedVertexType = determineVertexType(referencedElement, stuccoVertTypeArray);
 				if (referencedVertexType != null) {
 					JSONObject referencedVertex = constructStuccoVertex(referencedElement, referencedVertexType);
-					if (verifyStuccoVertex(referencedVertex)) {
+			//		if (verifyStuccoVertex(referencedVertex)) {
 						vertices.put(idref, referencedVertex);
 						return referencedVertex.getString("name");
-					} 
+			//		} 
+				} else {
+					logger.info("Could not find vertexType!");
 				}
 			}
 		}
 		return null;
+	}
+
+	/* making stix vertex (Course_Of_Action, Indicator, etc.) */
+	private JSONObject constructStixVertex(Element element, String vertexType) {
+		JSONObject vertex = new JSONObject();
+		vertex.put("vertexType", vertexType);
+		JSONObject observableTypeInfo = getObservableTypeInfo(element);
+		if (observableTypeInfo != null) {
+			vertex.put("observableType", observableTypeInfo.getString("typeName"));
+			vertex.put("name", getObservableName(element, observableTypeInfo));
+		} else {
+			vertex.put("name", element.getAttributeValue("id"));
+		}
+		vertex.put("sourceDocument", new XMLOutputter().outputString(element));
+		List<String> description = getElementDescriptionList(element);
+		if (!description.isEmpty()) {
+			vertex.put("description", description);
+		}
+		return vertex;
+	}
+
+	/* collecting all the descriptions from xml element into list for default element to vertex convertion */
+	private List<String> getElementDescriptionList(Element element) {
+		List<String> descriptionList = new ArrayList<String>();
+		if (element.getName().equals("Description")) {
+			String content = element.getTextNormalize();
+			if (!content.isEmpty()) {
+				descriptionList.add(content);
+			}
+		} else {
+			List<Element> children = element.getChildren();
+			for (Element child : children) {
+				descriptionList.addAll(getElementDescriptionList(child));
+			}	
+		}
+
+		return descriptionList;
+	}
+
+	private JSONObject getObservableTypeInfo(Element element) {
+		String name = element.getName();
+		if (!name.equals("Observable")) {
+			return null;
+		}
+		Element object = element.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+		if (object == null) {
+			Element observableComposition = element.getChild("Observable_Composition", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			if (observableComposition != null) {
+				return config.getObservableType("ObservableComposition");
+			} 
+			Element event = element.getChild("Event", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+			if (event != null) {
+				return config.getObservableType("Event");
+			}
+			
+			return null;
+		}
+		Element properties = object.getChild("Properties", Namespace.getNamespace("cybox","http://cybox.mitre.org/cybox-2"));
+		if (properties == null) {
+			return null;
+		}
+		String type = properties.getAttributeValue("type", Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")).split(":")[1];
+		if (type != null) {
+			return config.getObservableType(type);
+		}
+		return null;
+	}
+
+	private String getObservableName(Element element, JSONObject observableTypeInfo) {
+		String namePath = observableTypeInfo.optString("namePath");
+		if (namePath == null || namePath.isEmpty()) {
+			return element.getAttributeValue("id");
+		} else {
+			XPathFactory xpfac = XPathFactory.instance();
+			XPathExpression xp = xpfac.compile(namePath);
+			Element foundElement = (Element) xp.evaluateFirst(element);
+			if (foundElement == null) {
+				return element.getAttributeValue("id");
+			} else {
+				String name = foundElement.getTextNormalize();
+				if (name == null || name.isEmpty()) {
+					return element.getAttributeValue("id");
+				} else {
+					return name;
+				}
+			}
+		}
 	}
 
 	/* finds a relationship based on provided, if relationship is not provided, 
@@ -405,12 +473,10 @@ public class GraphConstructor {
 					continue;
 				}
 			}
-			boolean contains = false;
 			JSONArray inVTypeArray = edgeConfig.getJSONArray("inVType");
 			for (int i = 0; i < inVTypeArray.length(); i++) {
 				String inVType = inVTypeArray.getString(i);
 				if (inVType.equals(inVertType)) {
-					contains = true;
 					return relation.toString();
 				}
 			}
@@ -418,15 +484,6 @@ public class GraphConstructor {
 
 		return null;
 	}
-
-	private JSONObject constructNewEdge(String outVId, String inVId, String relationship) {
-		JSONObject newEdge = new JSONObject();
-		newEdge.put("inVertID", vertices.getJSONObject(inVId).getString("name"));
-		newEdge.put("outVertID", vertices.getJSONObject(outVId).getString("name"));
-		newEdge.put("relation", relationship);
-
-		return newEdge;
-	}	
 
 	/* testing if elements id equals idref, or if element contains child with id equals idref;
 	   required to construct an edges */
@@ -446,6 +503,15 @@ public class GraphConstructor {
 		
 		return false;
 	}
+
+	private JSONObject constructNewEdge(String outVId, String inVId, String relationship) {
+		JSONObject newEdge = new JSONObject();
+		newEdge.put("inVertID", vertices.getJSONObject(inVId).getString("name"));
+		newEdge.put("outVertID", vertices.getJSONObject(outVId).getString("name"));
+		newEdge.put("relation", relationship);
+
+		return newEdge;
+	}	
 	
 	/* tests newVertex to insure all the required fields were found and added */	
 	private boolean verifyStuccoVertex(JSONObject newVertex) {

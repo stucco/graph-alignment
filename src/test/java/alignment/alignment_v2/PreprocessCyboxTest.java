@@ -16,7 +16,7 @@ import org.jdom2.Attribute;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.Format;
 
-import org.mitre.cybox.cybox_2.Observable;
+import org.mitre.cybox.cybox_2.Observable; 
 
 public class PreprocessCyboxTest {
 	

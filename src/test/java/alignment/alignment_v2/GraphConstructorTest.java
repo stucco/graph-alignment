@@ -18,12 +18,13 @@ import java.nio.file.Paths;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import org.jdom2.output.XMLOutputter;
+import org.jdom2.output.XMLOutputter; 
+import org.jdom2.output.Format;
 import org.jdom2.xpath.*;
 import org.jdom2.*;
 
 import org.xml.sax.SAXException;
-import org.mitre.stix.stix_1.*;
+import org.mitre.stix.stix_1.*; 
 import org.mitre.cybox.cybox_2.Observable;
 import org.mitre.cybox.cybox_2.Observables;
 import org.mitre.stix.courseofaction_1.CourseOfAction;
@@ -38,10 +39,10 @@ import org.mitre.stix.incident_1.Incident;
 import org.mitre.stix.threatactor_1.ThreatActor;
 import org.mitre.stix.common_1.IndicatorBaseType;
 import org.mitre.stix.common_1.TTPBaseType;
-import org.mitre.stix.common_1.IncidentBaseType;
+import org.mitre.stix.common_1.IncidentBaseType; 
 import org.mitre.stix.common_1.CampaignBaseType;
 import org.mitre.stix.common_1.ThreatActorBaseType;
-
+ 
 /**
  * Unit test for STIX GraphConstructor
  */
@@ -59,6 +60,11 @@ public class GraphConstructorTest {
 		}
 		
 		return ipLong;
+	}
+
+	public void printElement(Element element) {
+		XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+		System.out.println(outputter.outputString(element));
 	}
 
 	@Test 
@@ -133,16 +139,18 @@ public class GraphConstructorTest {
 
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		STIXPackage pack = new STIXPackage().fromXMLString(stix);
+
 		assertTrue(preprocessSTIX.validate(pack));
 		Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(stix);
+
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
 		JSONObject vertices = graph.getJSONObject("vertices");
 
 		System.out.println("Testing Exploit ...");
 		Element sourceElement = stixElements.get("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d");
-		assertTrue(vertices.has("exploit/aix/rpc_cmsd_opcode21"));
-		JSONObject vertex = vertices.getJSONObject("exploit/aix/rpc_cmsd_opcode21");
+		assertTrue(vertices.has("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d"));
+		JSONObject vertex = vertices.getJSONObject("stucco:exploit-503fe717-e832-48c6-afd0-a93b65ce373d");
 		assertEquals(vertex.getString("vertexType"), "Exploit");
 		assertEquals(vertex.getString("name"), "exploit/aix/rpc_cmsd_opcode21");
 		assertEquals(vertex.get("source").toString(), "[Metasploit]");
@@ -153,8 +161,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing Vulnerability Vertex ... ");
 		String id = "Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("CVE-2009-3699"));
-		vertex = vertices.getJSONObject("CVE-2009-3699");
+		assertTrue(vertices.has("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760"));
+		vertex = vertices.getJSONObject("Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760");
 		assertEquals(vertex.getString("vertexType"), "Vulnerability");
 		assertEquals(vertex.getString("name"), "CVE-2009-3699");
 		assertEquals(vertex.get("source").toString(), "[Metasploit]");
@@ -176,6 +184,7 @@ public class GraphConstructorTest {
 		}
 		assertTrue(edgeExists);
 	}
+
 	@Test 
 	public void testMalwareIP() {
 		
@@ -259,12 +268,12 @@ public class GraphConstructorTest {
 		Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(stix);
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
 		JSONObject vertices = graph.getJSONObject("vertices");
-		
+
 		System.out.println("Testing Malware Vertex ... ");
 		String id = "stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3";
 		Element sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("Scanner"));
-		JSONObject vertex = vertices.getJSONObject("Scanner");
+		assertTrue(vertices.has("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3"));
+		JSONObject vertex = vertices.getJSONObject("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
 		assertEquals(vertex.getString("vertexType"), "Malware");
 		assertEquals(vertex.getString("name"), "Scanner");
 		assertEquals(vertex.get("source").toString(), "[1d4.us]");
@@ -273,8 +282,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing IP Vertex ... ");
 		id = "Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("103.36.125.189"));
-		vertex = vertices.getJSONObject("103.36.125.189");
+		assertTrue(vertices.has("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229"));
+		vertex = vertices.getJSONObject("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "103.36.125.189");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("103.36.125.189"));
@@ -438,14 +447,14 @@ public class GraphConstructorTest {
 		assertTrue(preprocessSTIX.validate(pack));
 		GraphConstructor graphConstructor = new GraphConstructor();
 		Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(stix);
+
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
 		JSONObject vertices = graph.getJSONObject("vertices");
-		
 		System.out.println("Testing Flow Vertex ... ");
 		String id = "stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb";
 		Element sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("10.10.10.1:56867_through_10.10.10.100:22"));
-		JSONObject vertex = vertices.getJSONObject("10.10.10.1:56867_through_10.10.10.100:22");
+		assertTrue(vertices.has("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb"));
+		JSONObject vertex = vertices.getJSONObject("stucco:flow-da6b7a73-6ed4-4d9a-b8dd-b770e2619ffb");
 		assertEquals(vertex.getString("vertexType"), "Flow");
 		assertEquals(vertex.getString("name"), "10.10.10.1:56867_through_10.10.10.100:22");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -456,8 +465,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing (Source) Address Vertex ... ");
 		id = "stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f";	
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("10.10.10.1:56867"));
-		vertex = vertices.getJSONObject("10.10.10.1:56867");
+		assertTrue(vertices.has("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f"));
+		vertex = vertices.getJSONObject("stucco:address-f6e40756-f29f-462c-aa9d-3c90af97626f");
 		assertEquals(vertex.getString("vertexType"), "Address");
 		assertEquals(vertex.getString("name"), "10.10.10.1:56867");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -467,8 +476,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing (Destination) Address Vertex ... ");
 		id = "stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("10.10.10.100:22"));
-		vertex = vertices.getJSONObject("10.10.10.100:22");
+		assertTrue(vertices.has("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd"));
+		vertex = vertices.getJSONObject("stucco:address-046baefe-f1d0-45ee-91c3-a9a22a7e6ddd");
 		assertEquals(vertex.getString("vertexType"), "Address");
 		assertEquals(vertex.getString("name"), "10.10.10.100:22");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -478,8 +487,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing (Source) IP Vertex ... ");
 		id = "stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("10.10.10.1"));
-		vertex = vertices.getJSONObject("10.10.10.1");
+		assertTrue(vertices.has("stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489"));
+		vertex = vertices.getJSONObject("stucco:ip-8134dbc0-ffa4-44cd-89d2-1d7428c08489");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "10.10.10.1");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.1"));
@@ -490,8 +499,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing (Destination) IP Vertex ... ");
 		id = "stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("10.10.10.100"));
-		vertex = vertices.getJSONObject("10.10.10.100");
+		assertTrue(vertices.has("stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a"));
+		vertex = vertices.getJSONObject("stucco:ip-a5dff0b3-0f2f-4308-a16d-949c5826cf1a");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "10.10.10.100");
 		assertEquals(vertex.getLong("ipInt"), ipToLong("10.10.10.100"));
@@ -502,8 +511,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing (Source) Port Vertex ... ");
 		id = "stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("56867"));
-		vertex = vertices.getJSONObject("56867");
+		assertTrue(vertices.has("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09"));
+		vertex = vertices.getJSONObject("stucco:port-6e8e3e78-962a-408e-9495-be65b11fff09");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "56867");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -513,8 +522,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing (Destination) Port Vertex ... ");
 		id = "stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("22"));
-		vertex = vertices.getJSONObject("22");
+		assertTrue(vertices.has("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26"));
+		vertex = vertices.getJSONObject("stucco:port-2ce88ec7-6ace-4d70-aa31-ad6aa8129f26");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "22");
 		assertEquals(vertex.get("source").toString(), "[Argus]");
@@ -666,7 +675,7 @@ public class GraphConstructorTest {
 			"                        <cybox:Relationship>Contains</cybox:Relationship>"+
 			"                    </cybox:Related_Object>"+
 			"                </cybox:Related_Objects>"+
-			"            </cybox:Object>"+
+			"            </cybox:Object>"+ 
 			"        </cybox:Observable>"+
 			"        <cybox:Observable id=\"stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598\">"+
 			"            <cybox:Title>Organization</cybox:Title>"+
@@ -710,8 +719,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing Organization Vertex ... ");
 		String id = "stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598";
 		Element sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("O1.com"));
-		JSONObject vertex = vertices.getJSONObject("O1.com");
+		assertTrue(vertices.has("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598"));
+		JSONObject vertex = vertices.getJSONObject("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598");
 		assertEquals(vertex.getString("vertexType"), "Organization");
 		assertEquals(vertex.getString("name"), "O1.com");
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
@@ -722,8 +731,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing AS Vertex ... ");
 		id = "stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("O1COMM"));
-		vertex = vertices.getJSONObject("O1COMM");
+		assertTrue(vertices.has("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f"));
+		vertex = vertices.getJSONObject("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f");
 		assertEquals(vertex.getString("vertexType"), "AS");
 		assertEquals(vertex.getString("name"), "O1COMM");
 		assertEquals(vertex.getString("number"), "19864");
@@ -734,8 +743,8 @@ public class GraphConstructorTest {
 		System.out.println("Testing AddressRange Vertex ... ");
 		id = "stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95";
 		sourceElement = stixElements.get(id);
-		assertTrue(vertices.has("69.19.190.0 - 69.19.190.255"));
-		vertex = vertices.getJSONObject("69.19.190.0 - 69.19.190.255");
+		assertTrue(vertices.has("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95"));
+		vertex = vertices.getJSONObject("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95");
 		assertEquals(vertex.getString("vertexType"), "AddressRange");
 		assertEquals(vertex.getString("name"), "69.19.190.0 - 69.19.190.255");
 		assertEquals(vertex.getString("startIP"), "69.19.190.0");
@@ -831,7 +840,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing Software Vertex ... ");
 		String id = "stucco:software-69a621f6-d22c-4d9c-a758-bc465dd8235b";
 		Element sourceElement = stixElements.get(id);
-		JSONObject vertex = vertices.getJSONObject("cpe:/a:1024cms:1024_cms:0.7:::");
+		JSONObject vertex = vertices.getJSONObject("stucco:software-69a621f6-d22c-4d9c-a758-bc465dd8235b");
 		assertEquals(vertex.getString("vertexType"), "Software");
 		assertEquals(vertex.getString("name"), "cpe:/a:1024cms:1024_cms:0.7:::");
 		assertEquals(vertex.get("source").toString(), "[CPE]");
@@ -966,7 +975,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing DNSRecord ... ");
 		String id = "stucco:dnsRecord-559dd80d-97b6-4c08-97eb-37001d2c59cb";
 		Element sourceElement = stixElements.get(id);
-		JSONObject vertex = vertices.getJSONObject("DALE-PC.ORNL.GOV_resolved_to_89.79.77.77");
+		JSONObject vertex = vertices.getJSONObject("stucco:dnsRecord-559dd80d-97b6-4c08-97eb-37001d2c59cb");
 		assertEquals(vertex.getString("vertexType"), "DNSRecord");
 		assertEquals(vertex.getString("name"), "DALE-PC.ORNL.GOV_resolved_to_89.79.77.77");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -976,7 +985,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing IP ... ");
 		id = "stucco:ip-bd47ec2e-14a8-4126-8ae0-092b8276bf09";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("89.79.77.77");
+		vertex = vertices.getJSONObject("stucco:ip-bd47ec2e-14a8-4126-8ae0-092b8276bf09");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "89.79.77.77");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -987,7 +996,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing IP ... ");
 		id = "stucco:ip-fe34621f-26a0-48f1-b5e3-3fa641011d63";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("128.219.177.244");
+		vertex = vertices.getJSONObject("stucco:ip-fe34621f-26a0-48f1-b5e3-3fa641011d63");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "128.219.177.244");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -998,7 +1007,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing IP ... ");
 		id = "stucco:ip-3183aead-8eb9-401e-8b30-63f917218e44";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("68.87.73.245");
+		vertex = vertices.getJSONObject("stucco:ip-3183aead-8eb9-401e-8b30-63f917218e44");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "68.87.73.245");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -1009,7 +1018,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing DNSName ... ");
 		id = "stucco:dnsName-d64a70b3-6371-4fce-a0bf-24d902a3dc6c";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("DALE-PC.ORNL.GOV");
+		vertex = vertices.getJSONObject("stucco:dnsName-d64a70b3-6371-4fce-a0bf-24d902a3dc6c");
 		assertEquals(vertex.getString("vertexType"), "DNSName");
 		assertEquals(vertex.getString("name"), "DALE-PC.ORNL.GOV");
 		assertEquals(vertex.get("source").toString(), "[DNSRecord]");
@@ -1144,7 +1153,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing Service ... ");
 		String id = "stucco:service-f7791dd0-03d7-48f2-a323-c02c97008c4b";
 		Element sourceElement = stixElements.get(id);
-		JSONObject vertex = vertices.getJSONObject("ssh");
+		JSONObject vertex = vertices.getJSONObject("stucco:service-f7791dd0-03d7-48f2-a323-c02c97008c4b");
 		assertEquals(vertex.getString("vertexType"), "Service");
 		assertEquals(vertex.getString("name"), "ssh");
 		assertEquals(vertex.get("source").toString(), "[service_list]");
@@ -1154,7 +1163,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing Port ... ");
 		id = "stucco:port-cbd16bd3-38d6-49e5-86aa-39784a774c14";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("22");
+		vertex = vertices.getJSONObject("stucco:port-cbd16bd3-38d6-49e5-86aa-39784a774c14");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "22");
 		assertEquals(vertex.get("source").toString(), "[service_list]");
@@ -1316,7 +1325,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing HTTPRequest ... ");
 		String id = "stucco:httpRequest-59629f94-c963-4788-b897-b1e02bf92cab";
 		Element sourceElement = stixElements.get(id);
-		JSONObject vertex = vertices.getJSONObject("/tv2n/vpaid/8bc5b7b");
+		JSONObject vertex = vertices.getJSONObject("stucco:httpRequest-59629f94-c963-4788-b897-b1e02bf92cab");
 		assertEquals(vertex.getString("vertexType"), "HTTPRequest");
 		assertEquals(vertex.getString("name"), "/tv2n/vpaid/8bc5b7b");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1325,7 +1334,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing IP ... ");
 		id = "stucco:ip-cddd9469-b8a6-4d8b-97d9-830fc191490c";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("54.192.138.232");
+		vertex = vertices.getJSONObject("stucco:ip-cddd9469-b8a6-4d8b-97d9-830fc191490c");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "54.192.138.232");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1335,7 +1344,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing IP ... ");
 		id = "stucco:ip-86590b2c-5e14-4880-85ee-bc9d5c9a3302";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("128.219.49.13");
+		vertex = vertices.getJSONObject("stucco:ip-86590b2c-5e14-4880-85ee-bc9d5c9a3302");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "128.219.49.13");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1345,7 +1354,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing DNSName ... ");
 		id = "stucco:dnsName-9e1fbf26-d46a-43cd-825a-145b31935344";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("cdn455.telemetryverification.net");
+		vertex = vertices.getJSONObject("stucco:dnsName-9e1fbf26-d46a-43cd-825a-145b31935344");
 		assertEquals(vertex.getString("vertexType"), "DNSName");
 		assertEquals(vertex.getString("name"), "cdn455.telemetryverification.net");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1354,7 +1363,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing Port ... ");
 		id = "stucco:port-290e65ae-45df-431b-b051-6121201e9a6e";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("80");
+		vertex = vertices.getJSONObject("stucco:port-290e65ae-45df-431b-b051-6121201e9a6e");
 		assertEquals(vertex.getString("vertexType"), "Port");
 		assertEquals(vertex.getString("name"), "80");
 		assertEquals(vertex.get("source").toString(), "[HTTPRequest]");
@@ -1437,6 +1446,9 @@ public class GraphConstructorTest {
 			"                <cybox:Description>ftp version 0.17-25</cybox:Description>"+
 			"                <cybox:Properties"+
 			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ProductObj:ProductObjectType\">"+
+			"										 <cyboxCommon:Custom_Properties> " +
+			"											 <cyboxCommon:Property name=\"Part\">/a</cyboxCommon:Property> " +
+			"										 </cyboxCommon:Custom_Properties> " +
 			"                    <ProductObj:Product>ftp</ProductObj:Product>"+
 			"                    <ProductObj:Version>0.17-25</ProductObj:Version>"+
 			"                </cybox:Properties>"+
@@ -1478,16 +1490,16 @@ public class GraphConstructorTest {
 		System.out.println("Testing Software ... ");
 		String id = "stucco:software-f159ef23-0b06-452c-81fa-0a266c1d1e02";
 		Element sourceElement = stixElements.get(id);
-		JSONObject vertex = vertices.getJSONObject("cpe:::ftp:0.17-25:::");
+		JSONObject vertex = vertices.getJSONObject("stucco:software-f159ef23-0b06-452c-81fa-0a266c1d1e02");
 		assertEquals(vertex.getString("vertexType"), "Software");
-		assertEquals(vertex.getString("name"), "cpe:::ftp:0.17-25:::");
+		assertEquals(vertex.getString("name"), "cpe:/a::ftp:0.17-25:::");
 		assertEquals(vertex.get("source").toString(), "[PackageList]");
 		assertEquals(vertex.get("description").toString(), "[ftp version 0.17-25]");
 		
 		System.out.println("Testing Host ... ");
 		id = "stucco:hostname-e11a469e-a66a-42b5-835f-d6599cc592a6";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("stucco1");
+		vertex = vertices.getJSONObject("stucco:hostname-e11a469e-a66a-42b5-835f-d6599cc592a6");
 		assertEquals(vertex.getString("vertexType"), "Host");
 		assertEquals(vertex.getString("name"), "stucco1");
 		assertEquals(vertex.get("source").toString(), "[PackageList]");
@@ -1499,7 +1511,7 @@ public class GraphConstructorTest {
 		boolean edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inVertID").equals("cpe:::ftp:0.17-25:::") && 
+			if (edge.getString("inVertID").equals("cpe:/a::ftp:0.17-25:::") && 
 				edge.getString("outVertID").equals("stucco1") &&
 				edge.getString("relation").equals("Runs")) {
 				edgeExists = true;
@@ -1548,6 +1560,9 @@ public class GraphConstructorTest {
 			"                <cybox:Description>sshd</cybox:Description>"+
 			"                <cybox:Properties"+
 			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ProductObj:ProductObjectType\">"+
+			"                    <cyboxCommon:Custom_Properties>"+
+			"                        <cyboxCommon:Property name=\"Part\">/a</cyboxCommon:Property>"+
+			"                    </cyboxCommon:Custom_Properties>"+
 			"                    <ProductObj:Product>sshd</ProductObj:Product>"+
 			"                </cybox:Properties>"+
 			"            </cybox:Object>"+
@@ -1574,6 +1589,7 @@ public class GraphConstructorTest {
 			"                <cybox:Properties"+
 			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UserAccountObj:UserAccountObjectType\">"+
 			"                    <AccountObj:Description>StuccoUser</AccountObj:Description>"+
+			"                    <UserAccountObj:Full_Name>StuccoUser</UserAccountObj:Full_Name>"+
 			"                    <UserAccountObj:Username>StuccoUser</UserAccountObj:Username>"+
 			"                </cybox:Properties>"+
 			"                <cybox:Related_Objects>"+
@@ -1658,11 +1674,11 @@ public class GraphConstructorTest {
 		Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(stix);
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
 		JSONObject vertices = graph.getJSONObject("vertices");
-		
+
 		System.out.println("Testing Account ... ");
 		String id = "stucco:account-c42d3219-bb0a-486e-b144-e3c8887a504e";
 		Element sourceElement = stixElements.get(id);
-		JSONObject vertex = vertices.getJSONObject("StuccoUser");
+		JSONObject vertex = vertices.getJSONObject("stucco:account-c42d3219-bb0a-486e-b144-e3c8887a504e");
 		assertEquals(vertex.getString("vertexType"), "Account");
 		assertEquals(vertex.getString("name"), "StuccoUser");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1671,7 +1687,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing Host ... ");
 		id = "stucco:hostname-01b000b8-9326-43d5-b94a-60f299c9dd35";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("host_at_192.168.10.11");
+		vertex = vertices.getJSONObject("stucco:hostname-01b000b8-9326-43d5-b94a-60f299c9dd35");
 		assertEquals(vertex.getString("vertexType"), "Host");
 		assertEquals(vertex.getString("name"), "host_at_192.168.10.11");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1680,7 +1696,7 @@ public class GraphConstructorTest {
 		System.out.println("Testing Host ... ");
 		id = "stucco:hostname-67ae4885-0914-429c-ac61-fa8f1932ec53";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("StuccoHost");
+		vertex = vertices.getJSONObject("stucco:hostname-67ae4885-0914-429c-ac61-fa8f1932ec53");
 		assertEquals(vertex.getString("vertexType"), "Host");
 		assertEquals(vertex.getString("name"), "StuccoHost");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1689,16 +1705,16 @@ public class GraphConstructorTest {
 		System.out.println("Testing Software ... ");
 		id = "stucco:software-cc2b74cc-7cf2-4383-be29-a41f67332aca";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("cpe:::sshd::::");
+		vertex = vertices.getJSONObject("stucco:software-cc2b74cc-7cf2-4383-be29-a41f67332aca");
 		assertEquals(vertex.getString("vertexType"), "Software");
-		assertEquals(vertex.getString("name"), "cpe:::sshd::::");
+		assertEquals(vertex.getString("name"), "cpe:/a::sshd::::");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
 		assertEquals(vertex.get("description").toString(), "[sshd]");
 
 		System.out.println("Testing IP ... ");
 		id = "stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241";
 		sourceElement = stixElements.get(id);
-		vertex = vertices.getJSONObject("192.168.10.11");
+		vertex = vertices.getJSONObject("stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241");
 		assertEquals(vertex.getString("vertexType"), "IP");
 		assertEquals(vertex.getString("name"), "192.168.10.11");
 		assertEquals(vertex.get("source").toString(), "[LoginEvent]");
@@ -1737,7 +1753,7 @@ public class GraphConstructorTest {
 		edgeExists = false;
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-			if (edge.getString("inVertID").equals("cpe:::sshd::::") && 
+			if (edge.getString("inVertID").equals("cpe:/a::sshd::::") && 
 				edge.getString("outVertID").equals("StuccoHost") &&
 				edge.getString("relation").equals("Runs")) {
 				edgeExists = true;
@@ -1835,8 +1851,10 @@ public class GraphConstructorTest {
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
 		JSONObject vertices = graph.getJSONObject("vertices");
 		
+
+
 		System.out.println("Testing Vulnerability Vertex ... ");
-		JSONObject vertex = vertices.getJSONObject("CVE-2015-2098");
+		JSONObject vertex = vertices.getJSONObject("stucco:vulnerability-b73ca23e-66d6-4fd7-89b4-30859796b38e");
 		assertEquals(vertex.getString("vertexType"), "Vulnerability");
 		assertEquals(vertex.getString("name"), "CVE-2015-2098");
 		assertEquals(vertex.get("source").toString(), "[Bugtraq]");
@@ -2027,6 +2045,7 @@ public class GraphConstructorTest {
 			assertTrue(preprocessSTIX.validate(pack));
 			GraphConstructor graphConstructor = new GraphConstructor();
 			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(stix);
+
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			JSONObject vertices = graph.getJSONObject("vertices");
 
@@ -2176,9 +2195,2690 @@ public class GraphConstructorTest {
 				}
 			}
 			assertTrue(edgeExists);
-
 		} catch (SAXException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test 
+	public void testCyboxElements() {
+		
+		System.out.println("[RUNNING] GraphConstructorTest.testAllCyboxElements()");
+	
+		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+		GraphConstructor graphConstructor = new GraphConstructor();
+		String stix = null;
+		
+		System.out.println("Testing API ... ");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:APIObj=\"http://cybox.mitre.org/objects#APIObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-ff9f3206-b2a4-4535-b5f2-95864be01cc2\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"APIObj:APIObjectType\"> " + 
+			"                    <APIObj:Function_Name>Function_Name</APIObj:Function_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+
+		Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		JSONObject graph = graphConstructor.constructGraph(stixElements);
+		JSONObject vertices = graph.getJSONObject("vertices");	
+		JSONObject vertex = vertices.getJSONObject("stucco:Observable-ff9f3206-b2a4-4535-b5f2-95864be01cc2");
+		String name = vertex.getString("name");
+		assertEquals(name, "Function_Name");
+		String observableType = vertex.getString("observableType");
+		assertEquals(observableType, "API");
+
+		System.out.println("Testing Account ... ");
+		stix = 	
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AccountObj=\"http://cybox.mitre.org/objects#AccountObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-8867dee9-eb87-4510-a3e1-3b3bcd0392d8\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AccountObj:AccountObjectType\"> " + 
+			"                    <AccountObj:Domain>Domain</AccountObj:Domain> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-8867dee9-eb87-4510-a3e1-3b3bcd0392d8");
+		name = vertex.getString("name");
+		assertEquals(name, "Domain");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Account");
+	
+		System.out.println("Testing Windows Computer Account ... ");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinComputerAccountObj=\"http://cybox.mitre.org/objects#WinComputerAccountObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-dd9dc105-caa4-40e6-aca9-91c452f397e1\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinComputerAccountObj:WindowsComputerAccountObjectType\"> " + 
+			"                    <WinComputerAccountObj:Fully_Qualified_Name> " + 
+			"                        <WinComputerAccountObj:NetBEUI_Name>BEUI_Name</WinComputerAccountObj:NetBEUI_Name> " + 
+			"                        <WinComputerAccountObj:Full_Name>Full_Name</WinComputerAccountObj:Full_Name> " + 
+			"                    </WinComputerAccountObj:Fully_Qualified_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-dd9dc105-caa4-40e6-aca9-91c452f397e1");
+		name = vertex.getString("name");
+		assertEquals(name, "Full_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Computer Account");
+
+		System.out.println("Testing ARP Cache ... ");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ARPCacheObj=\"http://cybox.mitre.org/objects#ARPCacheObject-1\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-75ea0896-3986-4a8a-96ae-0f150b4ee499\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ARPCacheObj:ARPCacheObjectType\"> " + 
+			"                    <ARPCacheObj:ARP_Cache_Entry> " + 
+			"                        <ARPCacheObj:IP_Address> " + 
+			"                            <AddressObj:Address_Value>Address_Value</AddressObj:Address_Value> " + 
+			"                        </ARPCacheObj:IP_Address> " + 
+			"                    </ARPCacheObj:ARP_Cache_Entry> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-75ea0896-3986-4a8a-96ae-0f150b4ee499");
+		name = vertex.getString("name");
+		assertEquals(name, "Address_Value");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "ARP Cache");
+	
+		System.out.println("Testing Artifact ... ");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ArtifactObj=\"http://cybox.mitre.org/objects#ArtifactObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-3c37be62-3f00-4eca-b857-84703fb529f4\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ArtifactObj:ArtifactObjectType\"> " + 
+			"                    <ArtifactObj:Raw_Artifact>Artifact_Value</ArtifactObj:Raw_Artifact> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-3c37be62-3f00-4eca-b857-84703fb529f4");
+		name = vertex.getString("name");
+		assertEquals(name, "Artifact_Value");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Artifact");
+		
+		System.out.println("Testing Code ... ");
+		stix =
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:CodeObj=\"http://cybox.mitre.org/objects#CodeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-23fa76ef-c5b5-4888-84d2-1fced870452e\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"CodeObj:CodeObjectType\"> " + 
+			"                    <CodeObj:Code_Language>Code_Language</CodeObj:Code_Language> " + 
+			"                    <CodeObj:Code_Segment>Code_Segment</CodeObj:Code_Segment> " + 
+			"                    <CodeObj:Code_Segment_XOR>Code_Segment_Xor</CodeObj:Code_Segment_XOR> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-23fa76ef-c5b5-4888-84d2-1fced870452e");
+		name = vertex.getString("name");
+		assertEquals(name, "Code_Segment");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Code");
+		
+		System.out.println("Testing Device ... ");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:DeviceObj=\"http://cybox.mitre.org/objects#DeviceObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-3e157d73-6086-4382-901a-12227905b7d1\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"DeviceObj:DeviceObjectType\"> " + 
+			"                    <DeviceObj:Model>Model</DeviceObj:Model> " + 
+			"                    <DeviceObj:Serial_Number>Serial_Number</DeviceObj:Serial_Number> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-3e157d73-6086-4382-901a-12227905b7d1");
+		name = vertex.getString("name");
+		assertEquals(name, "Model");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Device");
+		
+		System.out.println("Testing Disk ... ");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:DiskObj=\"http://cybox.mitre.org/objects#DiskObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-ea9dee68-d6b7-42a2-b56b-a5f1abd85e97\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"DiskObj:DiskObjectType\"> " + 
+			"                    <DiskObj:Disk_Name>Disk_Name</DiskObj:Disk_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-ea9dee68-d6b7-42a2-b56b-a5f1abd85e97");
+		name = vertex.getString("name");
+		assertEquals(name, "Disk_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Disk");
+
+		System.out.println("Testing Disk Partition ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:DiskPartitionObj=\"http://cybox.mitre.org/objects#DiskPartitionObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-f8e60b33-c3b1-4b12-85ec-7a6f303c03e8\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"DiskPartitionObj:DiskPartitionObjectType\"> " + 
+			"                    <DiskPartitionObj:Partition_ID>Partition_ID</DiskPartitionObj:Partition_ID> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-f8e60b33-c3b1-4b12-85ec-7a6f303c03e8");
+		name = vertex.getString("name");
+		assertEquals(name, "Partition_ID");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Disk Partition");
+/*
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:DNSCacheObj=\"http://cybox.mitre.org/objects#DNSCacheObject-2\" " + 
+			"    xmlns:DNSRecordObj=\"http://cybox.mitre.org/objects#DNSRecordObject-2\" " + 
+			"    xmlns:URIObj=\"http://cybox.mitre.org/objects#URIObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-bdba9c62-48bc-4677-b98e-2447ad54d253\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"DNSCacheObj:DNSCacheObjectType\"> " + 
+			"                    <DNSCacheObj:DNS_Cache_Entry> " + 
+			"                        <DNSCacheObj:DNS_Entry> " + 
+			"                            <DNSRecordObj:Description>NS_Record_Description</DNSRecordObj:Description> " + 
+			"                            <DNSRecordObj:Domain_Name> " + 
+			"                                <URIObj:Value>Domain_Name</URIObj:Value> " + 
+			"                            </DNSRecordObj:Domain_Name> " + 
+			"                            <DNSRecordObj:IP_Address> " + 
+			"                                <AddressObj:Address_Value>IP_Address</AddressObj:Address_Value> " + 
+			"                            </DNSRecordObj:IP_Address> " + 
+			"                        </DNSCacheObj:DNS_Entry> " + 
+			"                    </DNSCacheObj:DNS_Cache_Entry> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+*/
+		System.out.println("Testing DNS Query ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:DNSQueryObj=\"http://cybox.mitre.org/objects#DNSQueryObject-2\" " + 
+			"    xmlns:URIObj=\"http://cybox.mitre.org/objects#URIObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-e03c67b4-fa57-4b47-8add-e86500e63536\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"DNSQueryObj:DNSQueryObjectType\"> " + 
+			"                    <DNSQueryObj:Transaction_ID>ID</DNSQueryObj:Transaction_ID> " + 
+			"                    <DNSQueryObj:Question> " + 
+			"                        <DNSQueryObj:QName> " + 
+			"                            <URIObj:Value>Domain_Name</URIObj:Value> " + 
+			"                        </DNSQueryObj:QName> " + 
+			"                    </DNSQueryObj:Question> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-e03c67b4-fa57-4b47-8add-e86500e63536");
+		name = vertex.getString("name");
+		assertEquals(name, "Domain_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "DNS Query");
+		
+		System.out.println("Testing File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-1e2c5459-e089-4d7f-82a0-b421b829517e\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"FileObj:FileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-1e2c5459-e089-4d7f-82a0-b421b829517e");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "File");
+
+		System.out.println("Testing GUI ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:GUIObj=\"http://cybox.mitre.org/objects#GUIObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-c8ebbf7d-eec4-4425-a027-e872f05fdb3a\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"GUIObj:GUIObjectType\"> " + 
+			"                    <GUIObj:Height>Int_Height</GUIObj:Height> " + 
+			"                    <GUIObj:Width>Int_Width</GUIObj:Width> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-c8ebbf7d-eec4-4425-a027-e872f05fdb3a");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "GUI");
+		
+		System.out.println("Testing GUI Dialog Box ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:GUIDialogBoxObj=\"http://cybox.mitre.org/objects#GUIDialogboxObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-c6a6dd40-42c3-4854-abde-a334340a6152\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"GUIDialogBoxObj:GUIDialogboxObjectType\"> " + 
+			"                    <GUIDialogBoxObj:Box_Caption>Box_Caption</GUIDialogBoxObj:Box_Caption> " + 
+			"                    <GUIDialogBoxObj:Box_Text>Box_Text</GUIDialogBoxObj:Box_Text> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-c6a6dd40-42c3-4854-abde-a334340a6152");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "GUI Dialogbox");
+
+		System.out.println("Testing GUI Window ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:GUIWindowObj=\"http://cybox.mitre.org/objects#GUIWindowObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-b4f4b483-1c0a-4648-b31c-2954167f0b61\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"GUIWindowObj:GUIWindowObjectType\"> " + 
+			"                    <GUIWindowObj:Window_Display_Name>Window_Display_Name</GUIWindowObj:Window_Display_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-b4f4b483-1c0a-4648-b31c-2954167f0b61");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "GUI Window");
+
+		System.out.println("Testing HTTP Session ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:HTTPSessionObj=\"http://cybox.mitre.org/objects#HTTPSessionObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-0c798bbb-a0f6-42b4-9fb4-e194952b9156\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"HTTPSessionObj:HTTPSessionObjectType\"> " + 
+			"                    <HTTPSessionObj:HTTP_Request_Response> " + 
+			"                        <HTTPSessionObj:HTTP_Client_Request> " + 
+			"                            <HTTPSessionObj:HTTP_Request_Line> " + 
+			"                                <HTTPSessionObj:Value>Http_Request_Line</HTTPSessionObj:Value> " + 
+			"                            </HTTPSessionObj:HTTP_Request_Line> " + 
+			"                        </HTTPSessionObj:HTTP_Client_Request> " + 
+			"                        <HTTPSessionObj:HTTP_Server_Response> " + 
+			"                            <HTTPSessionObj:HTTP_Status_Line> " + 
+			"                                <HTTPSessionObj:Version>Reponse_Version</HTTPSessionObj:Version> " + 
+			"                                <HTTPSessionObj:Status_Code>200_Status_Code</HTTPSessionObj:Status_Code> " + 
+			"                                <HTTPSessionObj:Reason_Phrase>Reason_Phrase</HTTPSessionObj:Reason_Phrase> " + 
+			"                            </HTTPSessionObj:HTTP_Status_Line> " + 
+			"                            <HTTPSessionObj:HTTP_Response_Header> " + 
+			"                                <HTTPSessionObj:Raw_Header>Raw_Header</HTTPSessionObj:Raw_Header> " + 
+			"                            </HTTPSessionObj:HTTP_Response_Header> " + 
+			"                            <HTTPSessionObj:HTTP_Message_Body> " + 
+			"                                <HTTPSessionObj:Message_Body>Message_body</HTTPSessionObj:Message_Body> " + 
+			"                            </HTTPSessionObj:HTTP_Message_Body> " + 
+			"                        </HTTPSessionObj:HTTP_Server_Response> " + 
+			"                    </HTTPSessionObj:HTTP_Request_Response> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-0c798bbb-a0f6-42b4-9fb4-e194952b9156");
+		name = vertex.getString("name");
+		assertEquals(name, "Http_Request_Line");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "HTTP Session");
+
+		System.out.println("Testing Archive File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ArchiveFileObj=\"http://cybox.mitre.org/objects#ArchiveFileObject-1\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-80c04278-a870-4848-b97d-a543ae98c0ac\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ArchiveFileObj:ArchiveFileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-80c04278-a870-4848-b97d-a543ae98c0ac");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Archive File");
+
+		System.out.println("Testing Windows File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:WinFileObj=\"http://cybox.mitre.org/objects#WinFileObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-86d64eee-c2ca-4db5-b14a-9286fc07b56e\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinFileObj:WindowsFileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-86d64eee-c2ca-4db5-b14a-9286fc07b56e");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows File");
+
+		System.out.println("Testing Windows Executable File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:WinExecutableFileObj=\"http://cybox.mitre.org/objects#WinExecutableFileObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-d4deb3df-eee5-4ce7-a527-a79446d2a1d6\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinExecutableFileObj:WindowsExecutableFileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-d4deb3df-eee5-4ce7-a527-a79446d2a1d6");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Executable File");
+
+		System.out.println("Testing PDF File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:PDFFileObj=\"http://cybox.mitre.org/objects#PDFFileObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-aecd6054-4420-4421-8a6f-13aa07f2f057\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"PDFFileObj:PDFFileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-aecd6054-4420-4421-8a6f-13aa07f2f057");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "PDF File");
+
+		System.out.println("Testing Image File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:ImageFileObj=\"http://cybox.mitre.org/objects#ImageFileObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-b39dc251-9db1-4490-8320-9c118f064463\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ImageFileObj:ImageFileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-b39dc251-9db1-4490-8320-9c118f064463");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Image File");
+
+
+		System.out.println("Testing Unix File ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " + 
+			"    xmlns:UnixFileObj=\"http://cybox.mitre.org/objects#UnixFileObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-ae48bb93-48c2-4f9e-9358-2df33470a75a\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixFileObj:UnixFileObjectType\"> " + 
+			"                    <FileObj:File_Name>File_Name</FileObj:File_Name> " + 
+			"                    <FileObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </FileObj:Hashes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-ae48bb93-48c2-4f9e-9358-2df33470a75a");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Unix File");
+
+		System.out.println("Testing Library ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:LibraryObj=\"http://cybox.mitre.org/objects#LibraryObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-a08e1fd5-c4e3-42f0-b8dc-3ef90c1a3e85\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"LibraryObj:LibraryObjectType\"> " + 
+			"                    <LibraryObj:Name>Library_Name</LibraryObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-a08e1fd5-c4e3-42f0-b8dc-3ef90c1a3e85");
+		name = vertex.getString("name");
+		assertEquals(name, "Library_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Library");
+
+		System.out.println("Testing Linux Package ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:LinuxPackageObj=\"http://cybox.mitre.org/objects#LinuxPackageObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-83e465a9-9a49-455c-b8e7-8e62f5e0ef0d\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"LinuxPackageObj:LinuxPackageObjectType\"> " + 
+			"                    <LinuxPackageObj:Name>Linux_Package</LinuxPackageObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-83e465a9-9a49-455c-b8e7-8e62f5e0ef0d");
+		name = vertex.getString("name");
+		assertEquals(name, "Linux_Package");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Linux Package");
+
+
+		System.out.println("Testing Memory ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:MemoryObj=\"http://cybox.mitre.org/objects#MemoryObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-3ae3dc55-9407-432b-8867-5d5833b4174c\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"MemoryObj:MemoryObjectType\"> " + 
+			"                    <MemoryObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </MemoryObj:Hashes> " + 
+			"                    <MemoryObj:Name>Memory_Name</MemoryObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-3ae3dc55-9407-432b-8867-5d5833b4174c");
+		name = vertex.getString("name");
+		assertEquals(name, "Memory_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Memory");
+
+		System.out.println("Testing Windows Memory Page Region ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:MemoryObj=\"http://cybox.mitre.org/objects#MemoryObject-2\" " + 
+			"    xmlns:WinMemoryPageRegionObj=\"http://cybox.mitre.org/objects#WinMemoryPageRegionObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-c2344585-a2b2-4988-8b11-521905c1e8b0\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinMemoryPageRegionObj:WindowsMemoryPageRegionObjectType\"> " + 
+			"                    <MemoryObj:Hashes> " + 
+			"                        <cyboxCommon:Hash> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                            <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value</cyboxCommon:Simple_Hash_Value> " + 
+			"                            <cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                                <cyboxCommon:Block_Hash> " + 
+			"                                    <cyboxCommon:Block_Hash_Value> " + 
+			"                                    <cyboxCommon:Fuzzy_Hash_Value>Fuzzy_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Fuzzy_Hash_Value> " + 
+			"                                    <cyboxCommon:Simple_Hash_Value>Simple_Hash_Value of Fuzzy_Hash_Structure</cyboxCommon:Simple_Hash_Value> " + 
+			"                                    </cyboxCommon:Block_Hash_Value> " + 
+			"                                </cyboxCommon:Block_Hash> " + 
+			"                            </cyboxCommon:Fuzzy_Hash_Structure> " + 
+			"                        </cyboxCommon:Hash> " + 
+			"                    </MemoryObj:Hashes> " + 
+			"                    <MemoryObj:Name>Memory_Name</MemoryObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-c2344585-a2b2-4988-8b11-521905c1e8b0");
+		name = vertex.getString("name");
+		assertEquals(name, "Memory_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Memory Page Region");
+
+
+		System.out.println("Testing Mutex ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:MutexObj=\"http://cybox.mitre.org/objects#MutexObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-c9d4279c-944f-4a7e-87e4-c9091256410a\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"MutexObj:MutexObjectType\"> " + 
+			"                    <MutexObj:Name>Mutex_Name</MutexObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-c9d4279c-944f-4a7e-87e4-c9091256410a");
+		name = vertex.getString("name");
+		assertEquals(name, "Mutex_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Mutex");
+
+
+/*
+		System.out.println("Testing Network Connection ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:HostnameObj=\"http://cybox.mitre.org/objects#HostnameObject-1\" " + 
+			"    xmlns:NetworkConnectionObj=\"http://cybox.mitre.org/objects#NetworkConnectionObject-2\" " + 
+			"    xmlns:PortObj=\"http://cybox.mitre.org/objects#PortObject-2\" " + 
+			"    xmlns:SocketAddressObj=\"http://cybox.mitre.org/objects#SocketAddressObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-78ea4ebf-ca22-434e-a0f9-2e92fbf3c948\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"NetworkConnectionObj:NetworkConnectionObjectType\"> " + 
+			"                    <NetworkConnectionObj:Source_Socket_Address> " + 
+			"                        <SocketAddressObj:Hostname> " + 
+			"                            <HostnameObj:Hostname_Value>Source_Hostname</HostnameObj:Hostname_Value> " + 
+			"                        </SocketAddressObj:Hostname> " + 
+			"                        <SocketAddressObj:IP_Address> " + 
+			"                            <AddressObj:Address_Value>Source_IP_Address</AddressObj:Address_Value> " + 
+			"                        </SocketAddressObj:IP_Address> " + 
+			"                        <SocketAddressObj:Port> " + 
+			"                            <PortObj:Port_Value>Source_Port_Value</PortObj:Port_Value> " + 
+			"                        </SocketAddressObj:Port> " + 
+			"                    </NetworkConnectionObj:Source_Socket_Address> " + 
+			"                    <NetworkConnectionObj:Destination_Socket_Address> " + 
+			"                        <SocketAddressObj:Hostname> " + 
+			"                            <HostnameObj:Hostname_Value>Destination_Hostname</HostnameObj:Hostname_Value> " + 
+			"                        </SocketAddressObj:Hostname> " + 
+			"                        <SocketAddressObj:IP_Address> " + 
+			"                            <AddressObj:Address_Value>Destination_IP_Address</AddressObj:Address_Value> " + 
+			"                        </SocketAddressObj:IP_Address> " + 
+			"                        <SocketAddressObj:Port> " + 
+			"                            <PortObj:Port_Value>Destination_Port_Value</PortObj:Port_Value> " + 
+			"                        </SocketAddressObj:Port> " + 
+			"                    </NetworkConnectionObj:Destination_Socket_Address> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-78ea4ebf-ca22-434e-a0f9-2e92fbf3c948");
+		System.out.println(vertex.toString(2));
+		name = vertex.getString("name");
+		assertEquals(name, "File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Image File");
+*/
+		System.out.println("Testing Network Packet ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:PacketObj=\"http://cybox.mitre.org/objects#PacketObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-fb36d966-742a-430c-a8b0-6d9da0d20cc6\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"PacketObj:NetworkPacketObjectType\"> " + 
+			"                    <PacketObj:Transport_Layer> " + 
+			"                        <PacketObj:TCP> " + 
+			"                            <PacketObj:Data> " + 
+			"                                <cyboxCommon:Data_Segment>Data_Segment_Value</cyboxCommon:Data_Segment> " + 
+			"                            </PacketObj:Data> " + 
+			"                        </PacketObj:TCP> " + 
+			"                    </PacketObj:Transport_Layer> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-fb36d966-742a-430c-a8b0-6d9da0d20cc6");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-fb36d966-742a-430c-a8b0-6d9da0d20cc6");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Network Packet");
+
+
+		System.out.println("Testing Network Route Entry ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:NetworkRouteEntryObj=\"http://cybox.mitre.org/objects#NetworkRouteEntryObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-d4be6c04-a3d6-4e39-a7e1-2b7ea0be9027\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"NetworkRouteEntryObj:NetworkRouteEntryObjectType\"> " + 
+			"                    <NetworkRouteEntryObj:Destination_Address> " + 
+			"                        <AddressObj:Address_Value>Destination_Address</AddressObj:Address_Value> " + 
+			"                    </NetworkRouteEntryObj:Destination_Address> " + 
+			"                    <NetworkRouteEntryObj:Origin> " + 
+			"                        <AddressObj:Address_Value>Origin_Address</AddressObj:Address_Value> " + 
+			"                    </NetworkRouteEntryObj:Origin> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-d4be6c04-a3d6-4e39-a7e1-2b7ea0be9027");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-d4be6c04-a3d6-4e39-a7e1-2b7ea0be9027");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Network Route Entry");
+
+
+		System.out.println("Testing Unix Network Route ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:NetworkRouteEntryObj=\"http://cybox.mitre.org/objects#NetworkRouteEntryObject-2\" " + 
+			"    xmlns:UnixNetworkRouteEntryObj=\"http://cybox.mitre.org/objects#UnixNetworkRouteEntryObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-d1fe8ea3-d5b4-428e-9032-bdfdb2af471f\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixNetworkRouteEntryObj:UnixNetworkRouteEntryObjectType\"> " + 
+			"                    <NetworkRouteEntryObj:Destination_Address> " + 
+			"                        <AddressObj:Address_Value>Destination_Address</AddressObj:Address_Value> " + 
+			"                    </NetworkRouteEntryObj:Destination_Address> " + 
+			"                    <NetworkRouteEntryObj:Origin> " + 
+			"                        <AddressObj:Address_Value>Origin_Address</AddressObj:Address_Value> " + 
+			"                    </NetworkRouteEntryObj:Origin> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-d1fe8ea3-d5b4-428e-9032-bdfdb2af471f");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-d1fe8ea3-d5b4-428e-9032-bdfdb2af471f");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Unix Network Route Entry");
+
+
+		System.out.println("Testing Windows Network Route Entry ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:NetworkRouteEntryObj=\"http://cybox.mitre.org/objects#NetworkRouteEntryObject-2\" " + 
+			"    xmlns:WinNetworkRouteEntryObj=\"http://cybox.mitre.org/objects#WinNetworkRouteEntryObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-3a5e9b3d-f540-433e-9483-5846ad077794\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinNetworkRouteEntryObj:WindowsNetworkRouteEntryObjectType\"> " + 
+			"                    <NetworkRouteEntryObj:Destination_Address> " + 
+			"                        <AddressObj:Address_Value>Destination_Address</AddressObj:Address_Value> " + 
+			"                    </NetworkRouteEntryObj:Destination_Address> " + 
+			"                    <NetworkRouteEntryObj:Origin> " + 
+			"                        <AddressObj:Address_Value>Origin_Address</AddressObj:Address_Value> " + 
+			"                    </NetworkRouteEntryObj:Origin> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-3a5e9b3d-f540-433e-9483-5846ad077794");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-3a5e9b3d-f540-433e-9483-5846ad077794");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Network Route Entry");
+
+		System.out.println("Testing Network Route ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:NetworkRouteEntryObj=\"http://cybox.mitre.org/objects#NetworkRouteEntryObject-2\" " + 
+			"    xmlns:NetworkRouteObj=\"http://cybox.mitre.org/objects#NetworkRouteObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-740399b4-fe65-4857-8d2e-32711801b31b\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"NetworkRouteObj:NetRouteObjectType\"> " + 
+			"                    <NetworkRouteObj:Network_Route_Entries> " + 
+			"                        <NetworkRouteObj:Network_Route_Entry> " + 
+			"                            <NetworkRouteEntryObj:Destination_Address> " + 
+			"                                <AddressObj:Address_Value>Destination_Address</AddressObj:Address_Value> " + 
+			"                            </NetworkRouteEntryObj:Destination_Address> " + 
+			"                            <NetworkRouteEntryObj:Origin> " + 
+			"                                <AddressObj:Address_Value>Origin_Address</AddressObj:Address_Value> " + 
+			"                            </NetworkRouteEntryObj:Origin> " + 
+			"                        </NetworkRouteObj:Network_Route_Entry> " + 
+			"                    </NetworkRouteObj:Network_Route_Entries> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-740399b4-fe65-4857-8d2e-32711801b31b");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-740399b4-fe65-4857-8d2e-32711801b31b");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Network Route");
+
+		System.out.println("Testing Network Socket ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:HostnameObj=\"http://cybox.mitre.org/objects#HostnameObject-1\" " + 
+			"    xmlns:NetworkSocketObj=\"http://cybox.mitre.org/objects#NetworkSocketObject-2\" " + 
+			"    xmlns:PortObj=\"http://cybox.mitre.org/objects#PortObject-2\" " + 
+			"    xmlns:SocketAddressObj=\"http://cybox.mitre.org/objects#SocketAddressObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-85d23a49-4d07-456f-91e6-abc00c44197c\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"NetworkSocketObj:NetworkSocketObjectType\"> " + 
+			"                    <NetworkSocketObj:Local_Address> " + 
+			"                        <SocketAddressObj:Hostname> " + 
+			"                            <HostnameObj:Hostname_Value>Local_Hostname</HostnameObj:Hostname_Value> " + 
+			"                        </SocketAddressObj:Hostname> " + 
+			"                        <SocketAddressObj:IP_Address> " + 
+			"                            <AddressObj:Address_Value>Local_IP_Address</AddressObj:Address_Value> " + 
+			"                        </SocketAddressObj:IP_Address> " + 
+			"                        <SocketAddressObj:Port> " + 
+			"                            <PortObj:Port_Value>Local_Port</PortObj:Port_Value> " + 
+			"                        </SocketAddressObj:Port> " + 
+			"                    </NetworkSocketObj:Local_Address> " + 
+			"                    <NetworkSocketObj:Remote_Address> " + 
+			"                        <SocketAddressObj:Hostname> " + 
+			"                            <HostnameObj:Hostname_Value>Remote_Hostname</HostnameObj:Hostname_Value> " + 
+			"                        </SocketAddressObj:Hostname> " + 
+			"                        <SocketAddressObj:IP_Address> " + 
+			"                            <AddressObj:Address_Value>Remote_IP_Address</AddressObj:Address_Value> " + 
+			"                        </SocketAddressObj:IP_Address> " + 
+			"                        <SocketAddressObj:Port> " + 
+			"                            <PortObj:Port_Value>Remote_Port</PortObj:Port_Value> " + 
+			"                        </SocketAddressObj:Port> " + 
+			"                    </NetworkSocketObj:Remote_Address> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-85d23a49-4d07-456f-91e6-abc00c44197c");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-85d23a49-4d07-456f-91e6-abc00c44197c");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Network Socket");
+
+
+		System.out.println("Testing Network Subnet ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:NetworkRouteEntryObj=\"http://cybox.mitre.org/objects#NetworkRouteEntryObject-2\" " + 
+			"    xmlns:NetworkSubnetObj=\"http://cybox.mitre.org/objects#NetworkSubnetObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-9c8aab5f-c320-40a4-90c6-0b9b019bae36\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"NetworkSubnetObj:NetworkSubnetObjectType\"> " + 
+			"                    <NetworkSubnetObj:Name>Subnet_Name</NetworkSubnetObj:Name> " + 
+			"                    <NetworkSubnetObj:Routes> " + 
+			"                        <NetworkSubnetObj:Route> " + 
+			"                            <NetworkRouteEntryObj:Destination_Address> " + 
+			"                                <AddressObj:Address_Value>Destination_Address</AddressObj:Address_Value> " + 
+			"                            </NetworkRouteEntryObj:Destination_Address> " + 
+			"                            <NetworkRouteEntryObj:Origin> " + 
+			"                                <AddressObj:Address_Value>Origin_Address</AddressObj:Address_Value> " + 
+			"                            </NetworkRouteEntryObj:Origin> " + 
+			"                        </NetworkSubnetObj:Route> " + 
+			"                    </NetworkSubnetObj:Routes> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-9c8aab5f-c320-40a4-90c6-0b9b019bae36");
+		name = vertex.getString("name");
+		assertEquals(name, "Subnet_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Network Subnet");
+
+		System.out.println("Testing Pipe ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:PipeObj=\"http://cybox.mitre.org/objects#PipeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-4f5cc563-7f3c-466c-b71b-086c3b9e78ff\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"PipeObj:PipeObjectType\"> " + 
+			"                    <PipeObj:Name>Pipe_Name</PipeObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-4f5cc563-7f3c-466c-b71b-086c3b9e78ff");
+		name = vertex.getString("name");
+		assertEquals(name, "Pipe_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Pipe");
+
+		System.out.println("Testing Unix Pipe ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:PipeObj=\"http://cybox.mitre.org/objects#PipeObject-2\" " + 
+			"    xmlns:UnixPipeObj=\"http://cybox.mitre.org/objects#UnixPipeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-0969755f-32b1-41ea-9b1a-a0f2451aebbd\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixPipeObj:UnixPipeObjectType\"> " + 
+			"                    <PipeObj:Name>Pipe_Name</PipeObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-0969755f-32b1-41ea-9b1a-a0f2451aebbd");
+		name = vertex.getString("name");
+		assertEquals(name, "Pipe_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Unix Pipe");
+
+		System.out.println("Testing Windows Pipe ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:PipeObj=\"http://cybox.mitre.org/objects#PipeObject-2\" " + 
+			"    xmlns:WinPipeObj=\"http://cybox.mitre.org/objects#WinPipeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-162a6a97-5fe8-4647-ade0-14883e0f3312\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinPipeObj:WindowsPipeObjectType\"> " + 
+			"                    <PipeObj:Name>Pipe_Name</PipeObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-162a6a97-5fe8-4647-ade0-14883e0f3312");
+		name = vertex.getString("name");
+		assertEquals(name, "Pipe_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Pipe");
+
+		System.out.println("Testing Process ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ProcessObj=\"http://cybox.mitre.org/objects#ProcessObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-300f9ba7-4f78-4950-acb9-76436065810a\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ProcessObj:ProcessObjectType\"> " + 
+			"                    <ProcessObj:PID>PID</ProcessObj:PID> " + 
+			"                    <ProcessObj:Name>Process_Name</ProcessObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-300f9ba7-4f78-4950-acb9-76436065810a");
+		name = vertex.getString("name");
+		assertEquals(name, "Process_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Process");
+
+		System.out.println("Testing Unix Process ...");
+		stix = 
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ProcessObj=\"http://cybox.mitre.org/objects#ProcessObject-2\" " + 
+			"    xmlns:UnixProcessObj=\"http://cybox.mitre.org/objects#UnixProcessObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-1bb74c3d-2fe1-42b2-a9b8-ec255b3a8183\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixProcessObj:UnixProcessObjectType\"> " + 
+			"                    <ProcessObj:PID>PID</ProcessObj:PID> " + 
+			"                    <ProcessObj:Name>Process_Name</ProcessObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-1bb74c3d-2fe1-42b2-a9b8-ec255b3a8183");
+		name = vertex.getString("name");
+		assertEquals(name, "Process_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Unix Process");
+
+		System.out.println("Testing Windows Process ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ProcessObj=\"http://cybox.mitre.org/objects#ProcessObject-2\" " + 
+			"    xmlns:WinProcessObj=\"http://cybox.mitre.org/objects#WinProcessObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-dce0b6ab-7233-4517-9331-0df91cf0dd13\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinProcessObj:WindowsProcessObjectType\"> " + 
+			"                    <ProcessObj:PID>PID</ProcessObj:PID> " + 
+			"                    <ProcessObj:Name>Process_Name</ProcessObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-dce0b6ab-7233-4517-9331-0df91cf0dd13");
+		name = vertex.getString("name");
+		assertEquals(name, "Process_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Process");
+
+		System.out.println("Testing Product ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:ProductObj=\"http://cybox.mitre.org/objects#ProductObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-7f3666d5-869d-4366-95e9-9bf94425c099\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ProductObj:ProductObjectType\"> " + 
+			"                    <ProductObj:Edition>edition</ProductObj:Edition> " + 
+			"                    <ProductObj:Language>language</ProductObj:Language> " + 
+			"                    <ProductObj:Product>product</ProductObj:Product> " + 
+			"                    <ProductObj:Update>update</ProductObj:Update> " + 
+			"                    <ProductObj:Vendor>vendor</ProductObj:Vendor> " + 
+			"                    <ProductObj:Version>version</ProductObj:Version> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-7f3666d5-869d-4366-95e9-9bf94425c099");
+		name = vertex.getString("name");
+		assertEquals(name, "product");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Product");
+
+
+
+		System.out.println("Testing Windows Semaphore ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:SemaphoreObj=\"http://cybox.mitre.org/objects#SemaphoreObject-2\" " + 
+			"    xmlns:WinSemaphoreObj=\"http://cybox.mitre.org/objects#WinSemaphoreObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-34c0f264-1652-419a-ba3a-015bcfdfdcf8\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinSemaphoreObj:WindowsSemaphoreObjectType\"> " + 
+			"                    <SemaphoreObj:Name>Semaphore_Name</SemaphoreObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+	  stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-34c0f264-1652-419a-ba3a-015bcfdfdcf8");
+		name = vertex.getString("name");
+		assertEquals(name, "Semaphore_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Semaphore");
+
+		System.out.println("Testing Semaphore ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:SemaphoreObj=\"http://cybox.mitre.org/objects#SemaphoreObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-6ac2bf25-cf31-4933-b114-418be9885ee5\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"SemaphoreObj:SemaphoreObjectType\"> " + 
+			"                    <SemaphoreObj:Name>Semaphore_Name</SemaphoreObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-6ac2bf25-cf31-4933-b114-418be9885ee5");
+		name = vertex.getString("name");
+		assertEquals(name, "Semaphore_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Semaphore");
+
+		System.out.println("Testing SMS Message ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:SMSMessageObj=\"http://cybox.mitre.org/objects#SMSMessageObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-60ffe0eb-72aa-4e96-8caf-89272443e84f\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"SMSMessageObj:SMSMessageObjectType\"> " + 
+			"                    <SMSMessageObj:Sender_Phone_Number>Sender_Phone_Number</SMSMessageObj:Sender_Phone_Number> " + 
+			"                    <SMSMessageObj:Recipient_Phone_Number>Receipient_Phone_Number</SMSMessageObj:Recipient_Phone_Number> " + 
+			"                    <SMSMessageObj:Sent_DateTime>Date_Time</SMSMessageObj:Sent_DateTime> " + 
+			"                    <SMSMessageObj:Body>Message_Body</SMSMessageObj:Body> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-60ffe0eb-72aa-4e96-8caf-89272443e84f");
+		name = vertex.getString("name");
+		assertEquals(name, "Message_Body");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "SMS Message");
+
+		System.out.println("Testing System ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:SystemObj=\"http://cybox.mitre.org/objects#SystemObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-cd9782ee-9cf4-4d35-83a0-f8b4c378b3fb\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"SystemObj:SystemObjectType\"> " + 
+			"                    <SystemObj:Hostname>Hostname</SystemObj:Hostname> " + 
+			"                    <SystemObj:OS> " + 
+			"                        <cyboxCommon:Identifier>Platform_Identifier_For_This_System</cyboxCommon:Identifier> " + 
+			"                        <SystemObj:Build_Number>Build_Number</SystemObj:Build_Number> " + 
+			"                    </SystemObj:OS> " + 
+			"                    <SystemObj:Processor>Process</SystemObj:Processor> " + 
+			"                    <SystemObj:Username>Username</SystemObj:Username> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-cd9782ee-9cf4-4d35-83a0-f8b4c378b3fb");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-cd9782ee-9cf4-4d35-83a0-f8b4c378b3fb");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "System");
+
+		System.out.println("Testing Windows System ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:SystemObj=\"http://cybox.mitre.org/objects#SystemObject-2\" " + 
+			"    xmlns:WinSystemObj=\"http://cybox.mitre.org/objects#WinSystemObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " + 
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-046f3b5d-6846-42ff-97ab-3a4b2b295afd\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinSystemObj:WindowsSystemObjectType\"> " + 
+			"                    <SystemObj:Hostname>Hostname</SystemObj:Hostname> " + 
+			"                    <SystemObj:OS> " + 
+			"                        <cyboxCommon:Identifier>Platform_Identifier_For_This_System</cyboxCommon:Identifier> " + 
+			"                        <SystemObj:Build_Number>Build_Number</SystemObj:Build_Number> " + 
+			"                    </SystemObj:OS> " + 
+			"                    <SystemObj:Processor>Process</SystemObj:Processor> " + 
+			"                    <SystemObj:Username>Username</SystemObj:Username> " + 
+			"                    <WinSystemObj:Product_ID>Product_Id</WinSystemObj:Product_ID> " + 
+			"                    <WinSystemObj:Product_Name>Product_Name</WinSystemObj:Product_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-046f3b5d-6846-42ff-97ab-3a4b2b295afd");
+		name = vertex.getString("name");
+		assertEquals(name, "Product_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows System");
+
+		System.out.println("Testing URI ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:URIObj=\"http://cybox.mitre.org/objects#URIObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-73cadd8e-0d3b-4eb3-8c05-6cd96ab37951\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"URIObj:URIObjectType\"> " + 
+			"                    <URIObj:Value>URI</URIObj:Value> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-73cadd8e-0d3b-4eb3-8c05-6cd96ab37951");
+		name = vertex.getString("name");
+		assertEquals(name, "URI");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "URI");
+
+
+		System.out.println("Testing URL History ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:URIObj=\"http://cybox.mitre.org/objects#URIObject-2\" " + 
+			"    xmlns:URLHistoryObj=\"http://cybox.mitre.org/objects#URLHistoryObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-66b5b0f0-3cff-448b-9bc5-5e82343adda0\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"URLHistoryObj:URLHistoryObjectType\"> " + 
+			"                    <URLHistoryObj:URL_History_Entry> " + 
+			"                        <URLHistoryObj:URL> " + 
+			"                            <URIObj:Value>URL</URIObj:Value> " + 
+			"                        </URLHistoryObj:URL> " + 
+			"                        <URLHistoryObj:User_Profile_Name>User_Profile</URLHistoryObj:User_Profile_Name> " + 
+			"                    </URLHistoryObj:URL_History_Entry> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-66b5b0f0-3cff-448b-9bc5-5e82343adda0");
+		name = vertex.getString("name");
+		assertEquals(name, "URL");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "URL History");
+
+
+		System.out.println("Testing User Session ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:UserSessionObj=\"http://cybox.mitre.org/objects#UserSessionObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-bdeb5750-8348-45cf-b791-53a0cfec5a59\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UserSessionObj:UserSessionObjectType\"> " + 
+			"                    <UserSessionObj:Effective_Group>Group</UserSessionObj:Effective_Group> " + 
+			"                    <UserSessionObj:Effective_Group_ID>Group_ID</UserSessionObj:Effective_Group_ID> " + 
+			"                    <UserSessionObj:Effective_User>User</UserSessionObj:Effective_User> " + 
+			"                    <UserSessionObj:Effective_User_ID>User_ID</UserSessionObj:Effective_User_ID> " + 
+			"                    <UserSessionObj:Login_Time>Login_Time</UserSessionObj:Login_Time> " + 
+			"                    <UserSessionObj:Logout_Time>Logout_Time</UserSessionObj:Logout_Time> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-bdeb5750-8348-45cf-b791-53a0cfec5a59");
+		name = vertex.getString("name");
+		assertEquals(name, "Group");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "User Session");
+
+
+		System.out.println("Testing Unix Volume ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:UnixVolumeObj=\"http://cybox.mitre.org/objects#UnixVolumeObject-2\" " + 
+			"    xmlns:VolumeObj=\"http://cybox.mitre.org/objects#VolumeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-84494d3c-d338-45b6-8dbe-7f924ed332bb\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixVolumeObj:UnixVolumeObjectType\"> " + 
+			"                    <VolumeObj:Name>Volume_Name</VolumeObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-84494d3c-d338-45b6-8dbe-7f924ed332bb");
+		name = vertex.getString("name");
+		assertEquals(name, "Volume_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Unix Volume");
+
+
+		System.out.println("Testing Windows Volume ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:VolumeObj=\"http://cybox.mitre.org/objects#VolumeObject-2\" " + 
+			"    xmlns:WinVolumeObj=\"http://cybox.mitre.org/objects#WinVolumeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-f74128d0-e162-48e7-bbbd-631d8606c262\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinVolumeObj:WindowsVolumeObjectType\"> " + 
+			"                    <VolumeObj:Name>Volume_Name</VolumeObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-f74128d0-e162-48e7-bbbd-631d8606c262");
+		name = vertex.getString("name");
+		assertEquals(name, "Volume_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Volume");
+
+
+		System.out.println("Testing Volume ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:VolumeObj=\"http://cybox.mitre.org/objects#VolumeObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-aaa8c8e1-36a3-4ed4-a56b-670ff3f0a16d\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"VolumeObj:VolumeObjectType\"> " + 
+			"                    <VolumeObj:Name>Volume_Name</VolumeObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-aaa8c8e1-36a3-4ed4-a56b-670ff3f0a16d");
+		name = vertex.getString("name");
+		assertEquals(name, "Volume_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Volume");
+
+
+		System.out.println("Testing Whois ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:URIObj=\"http://cybox.mitre.org/objects#URIObject-2\" " + 
+			"    xmlns:WhoisObj=\"http://cybox.mitre.org/objects#WhoisObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-8cc3cb1c-74be-4f5f-bb26-4d77c5cac3d6\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WhoisObj:WhoisObjectType\"> " + 
+			"                    <WhoisObj:Domain_Name> " + 
+			"                        <URIObj:Value>Domain_Name</URIObj:Value> " + 
+			"                    </WhoisObj:Domain_Name> " + 
+			"                    <WhoisObj:Server_Name> " + 
+			"                        <URIObj:Value>Server_Name</URIObj:Value> " + 
+			"                    </WhoisObj:Server_Name> " + 
+			"                    <WhoisObj:IP_Address> " + 
+			"                        <AddressObj:Address_Value>Address_Value</AddressObj:Address_Value> " + 
+			"                    </WhoisObj:IP_Address> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-8cc3cb1c-74be-4f5f-bb26-4d77c5cac3d6");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-8cc3cb1c-74be-4f5f-bb26-4d77c5cac3d6");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Whois");
+
+		System.out.println("Testing Windows Critical Section ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinCriticalSectionObj=\"http://cybox.mitre.org/objects#WinCriticalSectionObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-2415e5ed-6e4f-4b33-9fc2-065c09d6b317\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinCriticalSectionObj:WindowsCriticalSectionObjectType\"> " + 
+			"                    <WinCriticalSectionObj:Address>Hex_Binary_Address</WinCriticalSectionObj:Address> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-2415e5ed-6e4f-4b33-9fc2-065c09d6b317");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-2415e5ed-6e4f-4b33-9fc2-065c09d6b317");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Critical Section");
+
+		System.out.println("Testing Windows Event Log ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinEventLogObj=\"http://cybox.mitre.org/objects#WinEventLogObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-90133cd1-a1a1-43d7-b5a9-89464082d9f8\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinEventLogObj:WindowsEventLogObjectType\"> " + 
+			"                    <WinEventLogObj:EID>EID</WinEventLogObj:EID> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-90133cd1-a1a1-43d7-b5a9-89464082d9f8");
+		name = vertex.getString("name");
+		assertEquals(name, "EID");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Event Log");
+
+
+		System.out.println("Testing Windows Event ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinEventObj=\"http://cybox.mitre.org/objects#WinEventObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-bb5438b5-2fdf-464a-8a08-2c4a38e8ee46\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinEventObj:WindowsEventObjectType\"> " + 
+			"                    <WinEventObj:Name>Event_Name</WinEventObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-bb5438b5-2fdf-464a-8a08-2c4a38e8ee46");
+		name = vertex.getString("name");
+		assertEquals(name, "Event_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Event");
+
+		System.out.println("Testing Windows Filemapping ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinFilemappingObj=\"http://cybox.mitre.org/objects#WinFilemappingObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-b77fdf7f-7453-43e5-852f-7e2848f89714\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinFilemappingObj:WindowsFilemappingObjectType\"> " + 
+			"                    <WinFilemappingObj:Name>File_Mapping_Name</WinFilemappingObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-b77fdf7f-7453-43e5-852f-7e2848f89714");
+		name = vertex.getString("name");
+		assertEquals(name, "File_Mapping_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Filemapping");
+
+		System.out.println("Testing Windows Handle ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinHandleObj=\"http://cybox.mitre.org/objects#WinHandleObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-fdefa0b1-69de-4190-904e-d6a2d18506d6\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinHandleObj:WindowsHandleObjectType\"> " + 
+			"                    <WinHandleObj:ID>ID</WinHandleObj:ID> " + 
+			"                    <WinHandleObj:Name>Handler_Name</WinHandleObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-fdefa0b1-69de-4190-904e-d6a2d18506d6");
+		name = vertex.getString("name");
+		assertEquals(name, "Handler_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Handle");
+
+		System.out.println("Testing Windows Hook ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:LibraryObj=\"http://cybox.mitre.org/objects#LibraryObject-2\" " + 
+			"    xmlns:WinHandleObj=\"http://cybox.mitre.org/objects#WinHandleObject-2\" " + 
+			"    xmlns:WinHookObj=\"http://cybox.mitre.org/objects#WinHookObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-d0849c88-7a46-432b-aa09-988b94278eea\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinHookObj:WindowsHookObjectType\"> " + 
+			"                    <WinHookObj:Handle> " + 
+			"                        <WinHandleObj:ID>ID</WinHandleObj:ID> " + 
+			"                        <WinHandleObj:Name>Handler_Name</WinHandleObj:Name> " + 
+			"                    </WinHookObj:Handle> " + 
+			"                    <WinHookObj:Hooking_Function_Name>Hooking_Function_Name</WinHookObj:Hooking_Function_Name> " + 
+			"                    <WinHookObj:Hooking_Module> " + 
+			"                        <LibraryObj:Name>Library_Name</LibraryObj:Name> " + 
+			"                    </WinHookObj:Hooking_Module> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-d0849c88-7a46-432b-aa09-988b94278eea");
+		name = vertex.getString("name");
+		assertEquals(name, "Hooking_Function_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Hook");
+
+		System.out.println("Testing Windows Kernel Hook ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinKernelHookObj=\"http://cybox.mitre.org/objects#WinKernelHookObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-98fe2371-672e-471b-9713-7d7a669e04aa\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinKernelHookObj:WindowsKernelHookObjectType\"> " + 
+			"                    <WinKernelHookObj:Hooking_Module>Hooking_Nodule_Name</WinKernelHookObj:Hooking_Module> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-98fe2371-672e-471b-9713-7d7a669e04aa");
+		name = vertex.getString("name");
+		assertEquals(name, "Hooking_Nodule_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Kernel Hook");
+
+		System.out.println("Testing Windows Kernel ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinKernelObj=\"http://cybox.mitre.org/objects#WinKernelObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-298b100b-5298-4440-acc4-9278f64521b8\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinKernelObj:WindowsKernelObjectType\"/> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-298b100b-5298-4440-acc4-9278f64521b8");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-298b100b-5298-4440-acc4-9278f64521b8");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Kernel");
+
+		System.out.println("Testing Windows Mutex ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:MutexObj=\"http://cybox.mitre.org/objects#MutexObject-2\" " + 
+			"    xmlns:WinMutexObj=\"http://cybox.mitre.org/objects#WinMutexObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-9c799658-d8cb-4350-86e5-227099a484f8\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinMutexObj:WindowsMutexObjectType\"> " + 
+			"                    <MutexObj:Name>Mutex_Name</MutexObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-9c799658-d8cb-4350-86e5-227099a484f8");
+		name = vertex.getString("name");
+		assertEquals(name, "Mutex_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Mutex");
+
+		System.out.println("Testing Windows Network Share ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinNetworkShareObj=\"http://cybox.mitre.org/objects#WinNetworkShareObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-8f7b8673-2b7b-4fbd-9ffc-9918fe1ec4ec\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinNetworkShareObj:WindowsNetworkShareObjectType\"> " + 
+			"                    <WinNetworkShareObj:Netname>Windows_Network_Name</WinNetworkShareObj:Netname> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-8f7b8673-2b7b-4fbd-9ffc-9918fe1ec4ec");
+		name = vertex.getString("name");
+		assertEquals(name, "Windows_Network_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Network Share");
+
+		System.out.println("Testing Windows Prefetch ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinPrefetchObj=\"http://cybox.mitre.org/objects#WinPrefetchObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-983b843c-526f-4b44-9b02-8c5be5cd549a\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinPrefetchObj:WindowsPrefetchObjectType\"> " + 
+			"                    <WinPrefetchObj:Application_File_Name>Application_File_Name</WinPrefetchObj:Application_File_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-983b843c-526f-4b44-9b02-8c5be5cd549a");
+		name = vertex.getString("name");
+		assertEquals(name, "Application_File_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Prefetch");
+
+		System.out.println("Testing Windows Registry Key ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinRegistryKeyObj=\"http://cybox.mitre.org/objects#WinRegistryKeyObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-6ecad031-a76a-4672-b6e3-dce6b8e57efe\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinRegistryKeyObj:WindowsRegistryKeyObjectType\"> " + 
+			"                    <WinRegistryKeyObj:Key>Key</WinRegistryKeyObj:Key> " + 
+			"                    <WinRegistryKeyObj:Hive>Hive</WinRegistryKeyObj:Hive> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-6ecad031-a76a-4672-b6e3-dce6b8e57efe");
+		name = vertex.getString("name");
+		assertEquals(name, "Key");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Registry Key");
+
+		System.out.println("Testing Windows System Restore ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinSystemRestoreObj=\"http://cybox.mitre.org/objects#WinSystemRestoreObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-35d58164-4eb3-4285-a7e9-94d466531c89\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinSystemRestoreObj:WindowsSystemRestoreObjectType\"> " + 
+			"                    <WinSystemRestoreObj:Restore_Point_Name>Restore_Point_Name</WinSystemRestoreObj:Restore_Point_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-35d58164-4eb3-4285-a7e9-94d466531c89");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-35d58164-4eb3-4285-a7e9-94d466531c89");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows System Restore");
+
+		System.out.println("Testing Windows Task ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinTaskObj=\"http://cybox.mitre.org/objects#WinTaskObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-d55859ea-0cb8-4c9c-b36d-9071ce6af518\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinTaskObj:WindowsTaskObjectType\"> " + 
+			"                    <WinTaskObj:Name>Name</WinTaskObj:Name> " + 
+			"                    <WinTaskObj:Application_Name>Application_Name</WinTaskObj:Application_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-d55859ea-0cb8-4c9c-b36d-9071ce6af518");
+		name = vertex.getString("name");
+		assertEquals(name, "Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Task");
+
+		System.out.println("Testing Windows Thread ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinThreadObj=\"http://cybox.mitre.org/objects#WinThreadObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-a7fe91f8-68d6-410e-a935-19035c812b1f\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinThreadObj:WindowsThreadObjectType\"> " + 
+			"                    <WinThreadObj:Thread_ID>ID</WinThreadObj:Thread_ID> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-a7fe91f8-68d6-410e-a935-19035c812b1f");
+		name = vertex.getString("name");
+		assertEquals(name, "ID");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Thread");
+
+		System.out.println("Testing Windows User Account ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AccountObj=\"http://cybox.mitre.org/objects#AccountObject-2\" " + 
+			"    xmlns:UserAccountObj=\"http://cybox.mitre.org/objects#UserAccountObject-2\" " + 
+			"    xmlns:WinUserAccountObj=\"http://cybox.mitre.org/objects#WinUserAccountObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-c492cfc9-28ca-4839-a97a-fd7dd4cb6271\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinUserAccountObj:WindowsUserAccountObjectType\"> " + 
+			"                    <AccountObj:Domain>Domain</AccountObj:Domain> " + 
+			"                    <UserAccountObj:Full_Name>Full_Name</UserAccountObj:Full_Name> " + 
+			"                    <WinUserAccountObj:Security_ID>Security_ID</WinUserAccountObj:Security_ID> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-c492cfc9-28ca-4839-a97a-fd7dd4cb6271");
+		name = vertex.getString("name");
+		assertEquals(name, "Full_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows User Account");
+
+		System.out.println("Testing Unix User Account ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AccountObj=\"http://cybox.mitre.org/objects#AccountObject-2\" " + 
+			"    xmlns:UnixUserAccountObj=\"http://cybox.mitre.org/objects#UnixUserAccountObject-2\" " + 
+			"    xmlns:UserAccountObj=\"http://cybox.mitre.org/objects#UserAccountObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-88bb15ae-f84d-40d8-ac03-cad8e16c33e5\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UnixUserAccountObj:UnixUserAccountObjectType\"> " + 
+			"                    <AccountObj:Domain>Domain</AccountObj:Domain> " + 
+			"                    <UserAccountObj:Full_Name>Full_Name</UserAccountObj:Full_Name> " + 
+			"                    <UnixUserAccountObj:Group_ID>Group_ID</UnixUserAccountObj:Group_ID> " + 
+			"                    <UnixUserAccountObj:User_ID>User_ID</UnixUserAccountObj:User_ID> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-88bb15ae-f84d-40d8-ac03-cad8e16c33e5");
+		name = vertex.getString("name");
+		assertEquals(name, "Full_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Unix User Account");
+
+		System.out.println("Testing Windows Waitable Timer ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinWaitableTimerObj=\"http://cybox.mitre.org/objects#WinWaitableTimerObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-c58e0eba-2a31-4d10-8e29-d9b56af323fa\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinWaitableTimerObj:WindowsWaitableTimerObjectType\"> " + 
+			"                    <WinWaitableTimerObj:Name>Table_Name</WinWaitableTimerObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-c58e0eba-2a31-4d10-8e29-d9b56af323fa");
+		name = vertex.getString("name");
+		assertEquals(name, "Table_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Waitable Timer");
+
+		System.out.println("Testing X509 Certificate ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:X509CertificateObj=\"http://cybox.mitre.org/objects#X509CertificateObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-abfc2845-0cae-4d11-9ecf-5f905bb21945\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"X509CertificateObj:X509CertificateObjectType\"> " + 
+			"                    <X509CertificateObj:Certificate> " + 
+			"                        <X509CertificateObj:Serial_Number>Serial_Number</X509CertificateObj:Serial_Number> " + 
+			"                    </X509CertificateObj:Certificate> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-abfc2845-0cae-4d11-9ecf-5f905bb21945");
+		name = vertex.getString("name");
+		assertEquals(name, "Serial_Number");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "X509 Certificate");
+
+		System.out.println("Testing Windows System ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinSystemObj=\"http://cybox.mitre.org/objects#WinSystemObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-bb1225d1-4e17-4dc0-8644-adbf394fef9c\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinSystemObj:WindowsSystemObjectType\"> " + 
+			"                    <WinSystemObj:Product_ID>ID</WinSystemObj:Product_ID> " + 
+			"                    <WinSystemObj:Product_Name>Product_Name</WinSystemObj:Product_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-bb1225d1-4e17-4dc0-8644-adbf394fef9c");
+		name = vertex.getString("name");
+		assertEquals(name, "Product_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows System");
+
+
+		System.out.println("Testing Windows Driver ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinDriverObj=\"http://cybox.mitre.org/objects#WinDriverObject-3\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-0ef5a0a4-1ecb-491c-9643-42405338f428\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinDriverObj:WindowsDriverObjectType\"> " + 
+			"                    <WinDriverObj:Driver_Name>Driver_Name</WinDriverObj:Driver_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-0ef5a0a4-1ecb-491c-9643-42405338f428");
+		name = vertex.getString("name");
+		assertEquals(name, "Driver_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Driver");
+
+
+		System.out.println("Testing Windows Mailslot ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinMailslotObj=\"http://cybox.mitre.org/objects#WinMailslotObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-399e91a7-a38e-419f-a437-126d998da944\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinMailslotObj:WindowsMailslotObjectType\"> " + 
+			"                    <WinMailslotObj:Name>Mailslot_Name</WinMailslotObj:Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-399e91a7-a38e-419f-a437-126d998da944");
+		name = vertex.getString("name");
+		assertEquals(name, "Mailslot_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Mailslot");
+
+
+		System.out.println("Testing Windows Service ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:WinServiceObj=\"http://cybox.mitre.org/objects#WinServiceObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-2501125e-f5f9-4cac-900b-27e16b560cb9\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"WinServiceObj:WindowsServiceObjectType\"> " + 
+			"                    <WinServiceObj:Service_Name>Windows_Service_Name</WinServiceObj:Service_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-2501125e-f5f9-4cac-900b-27e16b560cb9");
+		name = vertex.getString("name");
+		assertEquals(name, "Windows_Service_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Service");
+
+
+		System.out.println("Testing Link ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:LinkObj=\"http://cybox.mitre.org/objects#LinkObject-1\" " + 
+			"    xmlns:URIObj=\"http://cybox.mitre.org/objects#URIObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-bd3d9513-48c6-488f-a0f7-53bfbf50390e\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"LinkObj:LinkObjectType\"> " + 
+			"                    <URIObj:Value>Link_Value</URIObj:Value> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-bd3d9513-48c6-488f-a0f7-53bfbf50390e");
+		name = vertex.getString("name");
+		assertEquals(name, "Link_Value");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Link");
+
+
+		System.out.println("Testing User Account ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:UserAccountObj=\"http://cybox.mitre.org/objects#UserAccountObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-8b6b248c-1e51-4d63-9cf1-2226b781645c\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"UserAccountObj:UserAccountObjectType\"> " + 
+			"                    <UserAccountObj:Full_Name>Full_Name</UserAccountObj:Full_Name> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-8b6b248c-1e51-4d63-9cf1-2226b781645c");
+		name = vertex.getString("name");
+		assertEquals(name, "Full_Name");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "User Account");
+
+
+		System.out.println("Testing Address ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-633b417c-327f-4085-86ae-722ee26440bf\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\"> " + 
+			"                    <AddressObj:Address_Value>Address_Value</AddressObj:Address_Value> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-633b417c-327f-4085-86ae-722ee26440bf");
+		name = vertex.getString("name");
+		assertEquals(name, "Address_Value");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Address");
+
+
+		System.out.println("Testing Email Message ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:EmailMessageObj=\"http://cybox.mitre.org/objects#EmailMessageObject-2\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-8d5c1efd-d5f8-489d-b2cb-f400f924f800\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"EmailMessageObj:EmailMessageObjectType\"> " + 
+			"                    <EmailMessageObj:Header> " + 
+			"                        <EmailMessageObj:Subject>Subject</EmailMessageObj:Subject> " + 
+			"                    </EmailMessageObj:Header> " + 
+			"                    <EmailMessageObj:Raw_Body>Raw_Body</EmailMessageObj:Raw_Body> " + 
+			"                    <EmailMessageObj:Raw_Header>Raw_Header</EmailMessageObj:Raw_Header> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-8d5c1efd-d5f8-489d-b2cb-f400f924f800");
+		name = vertex.getString("name");
+		assertEquals(name, "Raw_Body");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Email Message");
+
+
+		System.out.println("Testing Socket Address ...");
+		stix =   
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\" " + 
+			"    xmlns:HostnameObj=\"http://cybox.mitre.org/objects#HostnameObject-1\" " + 
+			"    xmlns:PortObj=\"http://cybox.mitre.org/objects#PortObject-2\" " + 
+			"    xmlns:SocketAddressObj=\"http://cybox.mitre.org/objects#SocketAddressObject-1\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Object> " + 
+			"                <cybox:Properties " + 
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"SocketAddressObj:SocketAddressObjectType\"> " + 
+			"                    <SocketAddressObj:Hostname> " + 
+			"                        <HostnameObj:Hostname_Value>Hostname</HostnameObj:Hostname_Value> " + 
+			"                    </SocketAddressObj:Hostname> " + 
+			"                    <SocketAddressObj:IP_Address> " + 
+			"                        <AddressObj:Address_Value>100.100.100.100</AddressObj:Address_Value> " + 
+			"                    </SocketAddressObj:IP_Address> " + 
+			"                    <SocketAddressObj:Port> " + 
+			"                        <PortObj:Port_Value>80</PortObj:Port_Value> " + 
+			"                    </SocketAddressObj:Port> " + 
+			"                </cybox:Properties> " + 
+			"            </cybox:Object> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
+		name = vertex.getString("name");
+		assertEquals(name, "100.100.100.100:80");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Socket Address");
+
+
+		System.out.println("Testing Network Subnet ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables> " + 
+			"        <cybox:Observable " + 
+			"            id=\"stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f\" xmlns:stucco=\"gov.ornl.stucco\"> " + 
+			"            <cybox:Event> " + 
+			"                <cybox:Actions> " + 
+			"                    <cybox:Action> " + 
+			"                        <cybox:Name>Action_Name</cybox:Name> " + 
+			"                        <cybox:Description>Action_Description</cybox:Description> " + 
+			"                    </cybox:Action> " + 
+			"                </cybox:Actions> " + 
+			"            </cybox:Event> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Event");
+
+		System.out.println("Testing Network Subnet ...");
+		stix =  
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
+			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\"> " + 
+			"        <cybox:Observable " +
+			"            id=\"stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f\" xmlns:stucco=\"gov.ornl.stucco\"> " +  
+			"            <cybox:Observable_Composition> " + 
+			"                <cybox:Observable " + 
+			"                    idref=\"stucco:Observable-abd2ae66-be08-43e6-a66d-eec294c1d210\" xmlns:stucco=\"gov.ornl.stucco\"/> " + 
+			"                <cybox:Observable " + 
+			"                    idref=\"stucco:Observable-9438e492-3f93-444b-a159-216f32db4bef\" xmlns:stucco=\"gov.ornl.stucco\"/> " + 
+			"            </cybox:Observable_Composition> " + 
+			"        </cybox:Observable> " + 
+			"    </stix:Observables> " + 
+			"</stix:STIX_Package> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
+		name = vertex.getString("name");
+		assertEquals(name, "stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Observable Composition");
 	}
 }
