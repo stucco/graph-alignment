@@ -1,0 +1,4764 @@
+{
+  "NLRouteProtocolType": {
+    "prefix": "WinNetworkRouteEntryObj",
+    "URI": "http://cybox.mitre.org/objects#WinNetworkRouteEntryObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPFIXTemplateSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Template_Record": {
+        "maxOccurs": "unbounded",
+        "type": "IPFIXTemplateRecordType"
+      },
+      "Padding": {"type": "HexBinaryObjectPropertyType"},
+      "Set_Header": {"type": "IPFIXSetHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "NetworkInterfaceType": {
+    "prefix": "SystemObj",
+    "elements": {
+      "DHCP_Lease_Expires": {"type": "DateTimeObjectPropertyType"},
+      "Description": {"type": "StringObjectPropertyType"},
+      "DHCP_Server_List": {"type": "DHCPServerListType"},
+      "IP_Gateway_List": {"type": "IPGatewayListType"},
+      "DHCP_Lease_Obtained": {"type": "DateTimeObjectPropertyType"},
+      "Adapter": {"type": "StringObjectPropertyType"},
+      "MAC": {"type": "StringObjectPropertyType"},
+      "IP_List": {"type": "IPInfoListType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "ARPCacheObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'ARP_Cache_Entry']/*[local-name() = 'IP_Address']",
+    "prefix": "ARPCacheObj",
+    "elements": {"ARP_Cache_Entry": {
+      "maxOccurs": "unbounded",
+      "type": "ARPCacheEntryType"
+    }},
+    "typeName": "ARP Cache",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ARPCacheObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "HiveListType": {
+    "prefix": "WinSystemRestoreObj",
+    "elements": {"Hive": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinSystemRestoreObject-2",
+    "base": "anyType"
+  },
+  "IPFIXMessageType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Set": {
+        "maxOccurs": "unbounded",
+        "type": "IPFIXSetType"
+      },
+      "Message_Header": {"type": "IPFIXMessageHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "ServiceStatusType": {
+    "prefix": "WinServiceObj",
+    "URI": "http://cybox.mitre.org/objects#WinServiceObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "TaskActionType": {
+    "prefix": "WinTaskObj",
+    "elements": {
+      "Action_Type": {"type": "TaskActionTypeType"},
+      "IShowMessageAction": {"type": "IShowMessageActionType"},
+      "IComHandlerAction": {"type": "IComHandlerActionType"},
+      "Action_ID": {"type": "StringObjectPropertyType"},
+      "IEmailAction": {"type": "EmailMessageObjectType"},
+      "IExecAction": {"type": "IExecActionType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "PDFXrefEntryListType": {
+    "prefix": "PDFFileObj",
+    "elements": {"Cross_Reference_Entry": {
+      "maxOccurs": "unbounded",
+      "type": "PDFXrefEntryType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "PESectionListType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {"Section": {
+      "maxOccurs": "unbounded",
+      "type": "PESectionType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "NetflowV9FieldType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "EncryptionType": {
+    "prefix": "ArtifactObj",
+    "URI": "http://cybox.mitre.org/objects#ArtifactObject-2",
+    "base": "anyType"
+  },
+  "FileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "FileObj",
+    "elements": {
+      "File_Extension": {"type": "StringObjectPropertyType"},
+      "File_Name": {"type": "StringObjectPropertyType"},
+      "Peak_Entropy": {"type": "DoubleObjectPropertyType"},
+      "File_Format": {"type": "StringObjectPropertyType"},
+      "Device_Path": {"type": "StringObjectPropertyType"},
+      "File_Attributes_List": {"type": "FileAttributeType"},
+      "Compression_Method": {"type": "StringObjectPropertyType"},
+      "Compression_Comment": {"type": "StringObjectPropertyType"},
+      "Digital_Signatures": {"type": "DigitalSignaturesType"},
+      "User_Owner": {"type": "StringObjectPropertyType"},
+      "Permissions": {"type": "FilePermissionsType"},
+      "Compression_Version": {"type": "StringObjectPropertyType"},
+      "Decryption_Key": {"type": "StringObjectPropertyType"},
+      "Size_In_Bytes": {"type": "UnsignedLongObjectPropertyType"},
+      "Modified_Time": {"type": "DateTimeObjectPropertyType"},
+      "Sym_Links": {"type": "SymLinksListType"},
+      "File_Path": {"type": "FilePathType"},
+      "Created_Time": {"type": "DateTimeObjectPropertyType"},
+      "Accessed_Time": {"type": "DateTimeObjectPropertyType"},
+      "Packer_List": {"type": "PackerListType"},
+      "Magic_Number": {"type": "HexBinaryObjectPropertyType"},
+      "Encryption_Algorithm": {"type": "CipherType"},
+      "Hashes": {"type": "HashListType"},
+      "Extracted_Features": {"type": "ExtractedFeaturesType"},
+      "Full_Path": {"type": "StringObjectPropertyType"},
+      "Byte_Runs": {"type": "ByteRunsType"}
+    },
+    "typeName": "File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "ICMPv4InfoMessageContentType": {
+    "elements": {
+      "Identifier": {"type": "HexBinaryObjectPropertyType"},
+      "Sequence_Number": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "Layer7ConnectionsType": {
+    "prefix": "NetworkConnectionObj",
+    "elements": {
+      "DNS_Query": {
+        "maxOccurs": "unbounded",
+        "type": "DNSQueryObjectType"
+      },
+      "HTTP_Session": {"type": "HTTPSessionObjectType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkConnectionObject-2",
+    "base": "anyType"
+  },
+  "WindowsDriverObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Driver_Name']",
+    "prefix": "WinDriverObj",
+    "elements": {
+      "IRP_MJ_QUERY_VOLUME_INFORMATION": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_WRITE": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_SYSTEM_CONTROL": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_CREATE_NAMED_PIPE": {"type": "UnsignedLongObjectPropertyType"},
+      "Image_Base": {"type": "HexBinaryObjectPropertyType"},
+      "IRP_MJ_POWER": {"type": "UnsignedLongObjectPropertyType"},
+      "Device_Object_List": {"type": "DeviceObjectListType"},
+      "Driver_Init": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_QUERY_QUOTA": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_SET_EA": {"type": "UnsignedLongObjectPropertyType"},
+      "Driver_Start_IO": {"type": "HexBinaryObjectPropertyType"},
+      "Driver_Name": {"type": "StringObjectPropertyType"},
+      "IRP_MJ_DEVICE_CHANGE": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_CLOSE": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_READ": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_SET_VOLUME_INFORMATION": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_FILE_SYSTEM_CONTROL": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_QUERY_SECURITY": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_DEVICE_CONTROL": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_DIRECTORY_CONTROL": {"type": "UnsignedLongObjectPropertyType"},
+      "Driver_Unload": {"type": "HexBinaryObjectPropertyType"},
+      "Image_Size": {"type": "HexBinaryObjectPropertyType"},
+      "IRP_MJ_PNP": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_SET_INFORMATION": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_CREATE_MAILSLOT": {"type": "UnsignedLongObjectPropertyType"},
+      "Driver_Object_Address": {"type": "HexBinaryObjectPropertyType"},
+      "IRP_MJ_SET_QUOTA": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_SHUTDOWN": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_SET_SECURITY": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_CREATE": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_INTERNAL_DEVICE_CONTROL": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_QUERY_INFORMATION": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_LOCK_CONTROL": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_FLUSH_BUFFERS": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_QUERY_EA": {"type": "UnsignedLongObjectPropertyType"},
+      "IRP_MJ_CLEANUP": {"type": "UnsignedLongObjectPropertyType"}
+    },
+    "typeName": "Windows Driver",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinDriverObject-3",
+    "base": "WindowsExecutableFileObjectType"
+  },
+  "NeighborAdvertisementType": {
+    "elements": {
+      "Options": {"type": "NeighborOptionsType"},
+      "Target_IPv6_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "IPFIXTemplateRecordFieldSpecifiersType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Enterprise_Bit": {"type": "boolean"},
+      "Information_Element_ID": {"type": "StringObjectPropertyType"},
+      "Field_Length": {"type": "StringObjectPropertyType"},
+      "Enterprise_Number": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "AddressObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+    "prefix": "AddressObj",
+    "elements": {
+      "VLAN_Name": {"type": "StringObjectPropertyType"},
+      "Address_Value": {"type": "StringObjectPropertyType"},
+      "VLAN_Num": {"type": "IntegerObjectPropertyType"}
+    },
+    "typeName": "Address",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#AddressObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "DNSQuestionType": {
+    "prefix": "DNSQueryObj",
+    "elements": {
+      "QName": {"type": "URIObjectType"},
+      "QType": {"type": "DNSRecordType"},
+      "QClass": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#DNSQueryObject-2",
+    "base": "anyType"
+  },
+  "WindowsEventLogObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'EID']",
+    "prefix": "WinEventLogObj",
+    "elements": {
+      "EID": {"type": "LongObjectPropertyType"},
+      "Blob": {"type": "Base64BinaryObjectPropertyType"},
+      "Category": {"type": "StringObjectPropertyType"},
+      "User": {"type": "StringObjectPropertyType"},
+      "Message": {"type": "StringObjectPropertyType"},
+      "Log": {"type": "StringObjectPropertyType"},
+      "Generation_Time": {"type": "DateTimeObjectPropertyType"},
+      "Execution_Thread_ID": {"type": "StringObjectPropertyType"},
+      "Index": {"type": "LongObjectPropertyType"},
+      "Correlation_Related_Activity_ID": {"type": "StringObjectPropertyType"},
+      "Source": {"type": "StringObjectPropertyType"},
+      "Machine": {"type": "StringObjectPropertyType"},
+      "Correlation_Activity_ID": {"type": "StringObjectPropertyType"},
+      "Type": {"type": "StringObjectPropertyType"},
+      "Category_Num": {"type": "LongObjectPropertyType"},
+      "Write_Time": {"type": "DateTimeObjectPropertyType"},
+      "Unformatted_Message_List": {"type": "UnformattedMessageListType"},
+      "Execution_Process_ID": {"type": "StringObjectPropertyType"},
+      "Reserved": {"type": "LongObjectPropertyType"}
+    },
+    "typeName": "Windows Event Log",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinEventLogObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IPv4PacketType": {
+    "elements": {
+      "Data": {"type": "HexBinaryObjectPropertyType"},
+      "IPv4_Header": {"type": "IPv4HeaderType"}
+    },
+    "base": "anyType"
+  },
+  "NetflowV9TemplateRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Template_ID": {"type": "IntegerObjectPropertyType"},
+      "Field_Type": {"type": "NetflowV9FieldType"},
+      "Field_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Field_Count": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "ProcessStatusType": {
+    "prefix": "ProcessObj",
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "anyType"
+  },
+  "RouterAdvertisementOptionsType": {
+    "elements": {
+      "Src_Link_Addr": {"type": "NDPLinkAddrType"},
+      "Prefix_Info": {"type": "NDPPrefixInfoType"},
+      "MTU": {"type": "NDPMTUType"}
+    },
+    "base": "anyType"
+  },
+  "PEImportedFunctionsType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {"Imported_Function": {
+      "maxOccurs": "unbounded",
+      "type": "PEImportedFunctionType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "ASObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "ASObj",
+    "elements": {
+      "Number": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "StringObjectPropertyType"},
+      "Regional_Internet_Registry": {"type": "RegionalRegistryType"}
+    },
+    "typeName": "AS",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ASObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "EmailHeaderType": {
+    "prefix": "EmailMessageObj",
+    "elements": {
+      "CC": {"type": "EmailRecipientsType"},
+      "MIME_Version": {"type": "StringObjectPropertyType"},
+      "BCC": {"type": "EmailRecipientsType"},
+      "In_Reply_To": {"type": "StringObjectPropertyType"},
+      "From": {"type": "AddressObjectType"},
+      "Errors_To": {"type": "StringObjectPropertyType"},
+      "X_Priority": {"type": "PositiveIntegerObjectPropertyType"},
+      "Subject": {"type": "StringObjectPropertyType"},
+      "Date": {"type": "DateTimeObjectPropertyType"},
+      "Reply_To": {"type": "AddressObjectType"},
+      "Boundary": {"type": "StringObjectPropertyType"},
+      "User_Agent": {"type": "StringObjectPropertyType"},
+      "X_Mailer": {"type": "StringObjectPropertyType"},
+      "Sender": {"type": "AddressObjectType"},
+      "Content_Type": {"type": "StringObjectPropertyType"},
+      "X_Originating_IP": {"type": "AddressObjectType"},
+      "Received_Lines": {"type": "EmailReceivedLineListType"},
+      "Message_ID": {"type": "StringObjectPropertyType"},
+      "To": {"type": "EmailRecipientsType"},
+      "Precedence": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "FlowDataRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {"Flow_Record_Collection_Element": {
+      "maxOccurs": "unbounded",
+      "type": "FlowCollectionElementType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "WindowsKernelObjectType": {
+    "prefix": "WinKernelObj",
+    "elements": {
+      "SSDT": {"type": "SSDTEntryListType"},
+      "IDT": {"type": "IDTEntryListType"}
+    },
+    "typeName": "Windows Kernel",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinKernelObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WindowsFilePermissionsType": {
+    "prefix": "WinFileObj",
+    "elements": {
+      "Read": {"type": "boolean"},
+      "Write": {"type": "boolean"},
+      "Modify": {"type": "boolean"},
+      "Full_Control": {"type": "boolean"},
+      "Read_And_Execute": {"type": "boolean"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinFileObject-2",
+    "base": "FilePermissionsType"
+  },
+  "DomainFamilyType": {
+    "prefix": "NetworkSocketObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkSocketObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "UserSessionObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Effective_Group' or local-name() = 'Effective_User']",
+    "prefix": "UserSessionObj",
+    "elements": {
+      "Effective_Group_ID": {"type": "StringObjectPropertyType"},
+      "Effective_Group": {"type": "StringObjectPropertyType"},
+      "Logout_Time": {"type": "DateTimeObjectPropertyType"},
+      "Login_Time": {"type": "DateTimeObjectPropertyType"},
+      "Effective_User": {"type": "StringObjectPropertyType"},
+      "Effective_User_ID": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "User Session",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UserSessionObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IPv6PacketType": {
+    "elements": {
+      "Data": {"type": "HexBinaryObjectPropertyType"},
+      "IPv6_Header": {"type": "IPv6HeaderType"},
+      "Ext_Headers": {
+        "maxOccurs": "unbounded",
+        "type": "IPv6ExtHeaderType"
+      }
+    },
+    "base": "anyType"
+  },
+  "NetworkSocketObjectType": {
+    "prefix": "NetworkSocketObj",
+    "elements": {
+      "Local_Address": {"type": "SocketAddressObjectType"},
+      "Options": {"type": "SocketOptionsType"},
+      "Type": {"type": "SocketType"},
+      "Remote_Address": {"type": "SocketAddressObjectType"},
+      "Address_Family": {"type": "AddressFamilyType"},
+      "Domain": {"type": "DomainFamilyType"},
+      "Protocol": {"type": "ProtocolType"},
+      "Socket_Descriptor": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "typeName": "Network Socket",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#NetworkSocketObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "DNSCacheObjectType": {
+    "prefix": "DNSCacheObj",
+    "elements": {"DNS_Cache_Entry": {
+      "maxOccurs": "unbounded",
+      "type": "DNSCacheEntryType"
+    }},
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DNSCacheObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "ICMPv6PacketTooBigType": {
+    "elements": {
+      "Packet_Too_Big": {"type": "boolean"},
+      "MTU": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "EncapsulatingSecurityPayloadType": {
+    "elements": {
+      "Padding_Len": {"type": "HexBinaryObjectPropertyType"},
+      "Payload_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Next_Header": {"type": "IANAAssignedIPNumbersType"},
+      "Authentication_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Sequence_Number": {"type": "HexBinaryObjectPropertyType"},
+      "Padding": {"type": "HexBinaryObjectPropertyType"},
+      "Security_Parameters_Index": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "WhoisNameserversType": {
+    "prefix": "WhoisObj",
+    "elements": {"Nameserver": {
+      "maxOccurs": "unbounded",
+      "type": "URIObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "anyType"
+  },
+  "YAFFlowType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Octet_Total_Count": {"type": "IntegerObjectPropertyType"},
+      "Second_Packet_Banner": {"type": "HexBinaryObjectPropertyType"},
+      "Passive_OS_Fingerprinting": {"type": "PlatformSpecificationType"},
+      "TCP_Flow": {"type": "YAFTCPFlowType"},
+      "Flow_End_Milliseconds": {"type": "IntegerObjectPropertyType"},
+      "N_Bytes_Payload": {"type": "HexBinaryObjectPropertyType"},
+      "Packet_Total_Count": {"type": "IntegerObjectPropertyType"},
+      "Flow_End_Reason": {"type": "HexBinaryObjectPropertyType"},
+      "First_Packet_Banner": {"type": "HexBinaryObjectPropertyType"},
+      "SiLK_App_Label": {"type": "IntegerObjectPropertyType"},
+      "Vlan_ID_MAC_Addr": {"type": "AddressObjectType"},
+      "ML_App_Label": {"type": "HexBinaryObjectPropertyType"},
+      "Payload_Entropy": {"type": "IntegerObjectPropertyType"},
+      "Flow_Start_Milliseconds": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "PDFXrefTableSubsectionType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "First_Object_Number": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Number_Of_Objects": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Cross_Reference_Entries": {"type": "PDFXrefEntryListType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "HTTPServerResponseType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "HTTP_Response_Header": {"type": "HTTPResponseHeaderType"},
+      "HTTP_Status_Line": {"type": "HTTPStatusLineType"},
+      "HTTP_Message_Body": {"type": "HTTPMessageType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "AuthenticationTokenProtectionMechanismTypeVocab-1.0": {
+    "prefix": "AccountObj",
+    "URI": "http://cybox.mitre.org/objects#AccountObject-2",
+    "base": "ControlledVocabularyStringType"
+  },
+  "ProcessObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "ProcessObj",
+    "elements": {
+      "Port_List": {"type": "PortListType"},
+      "Status": {"type": "ProcessStatusType"},
+      "Environment_Variable_List": {"type": "EnvironmentVariableListType"},
+      "User_Time": {"type": "DurationObjectPropertyType"},
+      "PID": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Image_Info": {"type": "ImageInfoType"},
+      "Argument_List": {"type": "ArgumentListType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Network_Connection_List": {"type": "NetworkConnectionListType"},
+      "Creation_Time": {"type": "DateTimeObjectPropertyType"},
+      "Child_PID_List": {"type": "ChildPIDListType"},
+      "Start_Time": {"type": "DateTimeObjectPropertyType"},
+      "Username": {"type": "StringObjectPropertyType"},
+      "Parent_PID": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Extracted_Features": {"type": "ExtractedFeaturesType"},
+      "Kernel_Time": {"type": "DurationObjectPropertyType"}
+    },
+    "typeName": "Process",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WindowsKernelHookObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hooking_Module']",
+    "prefix": "WinKernelHookObj",
+    "elements": {
+      "Hooking_Address": {"type": "UnsignedLongObjectPropertyType"},
+      "Hooking_Module": {"type": "StringObjectPropertyType"},
+      "Type": {"type": "KernelHookType"},
+      "Hook_Description": {"type": "StringObjectPropertyType"},
+      "Digital_Signature_Hooked": {"type": "DigitalSignatureInfoType"},
+      "Hooked_Module": {"type": "StringObjectPropertyType"},
+      "Hooked_Function": {"type": "StringObjectPropertyType"},
+      "Digital_Signature_Hooking": {"type": "DigitalSignatureInfoType"}
+    },
+    "typeName": "Windows Kernel Hook",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinKernelHookObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "EncodingType": {
+    "prefix": "ArtifactObj",
+    "URI": "http://cybox.mitre.org/objects#ArtifactObject-2",
+    "base": "anyType"
+  },
+  "RouteType": {
+    "prefix": "NetworkRouteEntryObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkRouteEntryObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "X509V3ExtensionsType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "CRL_Distribution_Points": {"type": "StringObjectPropertyType"},
+      "Policy_Constraints": {"type": "StringObjectPropertyType"},
+      "Extended_Key_Usage": {"type": "StringObjectPropertyType"},
+      "Name_Constraints": {"type": "StringObjectPropertyType"},
+      "Authority_Key_Identifier": {"type": "StringObjectPropertyType"},
+      "Inhibit_Any_Policy": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Private_Key_Usage_Period": {"type": "ValidityType"},
+      "Subject_Directory_Attributes": {"type": "StringObjectPropertyType"},
+      "Policy_Mappings": {"type": "StringObjectPropertyType"},
+      "Basic_Constraints": {"type": "StringObjectPropertyType"},
+      "Issuer_Alternative_Name": {"type": "StringObjectPropertyType"},
+      "Certificate_Policies": {"type": "StringObjectPropertyType"},
+      "Key_Usage": {"type": "StringObjectPropertyType"},
+      "Subject_Alternative_Name": {"type": "StringObjectPropertyType"},
+      "Subject_Key_Identifier": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "PEHeadersType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Optional_Header": {"type": "PEOptionalHeaderType"},
+      "Hashes": {"type": "HashListType"},
+      "Signature": {"type": "HexBinaryObjectPropertyType"},
+      "File_Header": {"type": "PEFileHeaderType"},
+      "Entropy": {"type": "EntropyType"},
+      "DOS_Header": {"type": "DOSHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "IPFIXDataRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {"Field_Value": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "IPFIXTemplateRecordHeaderType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Template_ID": {"type": "IntegerObjectPropertyType"},
+      "Field_Count": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "PrivilegeType": {
+    "prefix": "UserAccountObj",
+    "URI": "http://cybox.mitre.org/objects#UserAccountObject-2",
+    "base": "anyType"
+  },
+  "OptionCollectionElementType": {
+    "prefix": "NetFlowObj",
+    "elements": {"Option_Record_Field_Value": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "PDFFileMetadataType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Number_Of_Trailers": {"type": "PositiveIntegerObjectPropertyType"},
+      "Keyword_Counts": {"type": "PDFKeywordCountsType"},
+      "Document_Information_Dictionary": {"type": "PDFDocumentInformationDictionaryType"},
+      "Number_Of_Indirect_Objects": {"type": "PositiveIntegerObjectPropertyType"},
+      "Number_Of_Cross_Reference_Tables": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "WindowsRegistryKeyObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Key']",
+    "prefix": "WinRegistryKeyObj",
+    "elements": {
+      "Hive": {"type": "RegistryHiveType"},
+      "Number_Values": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Modified_Time": {"type": "DateTimeObjectPropertyType"},
+      "Number_Subkeys": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Creator_Username": {"type": "StringObjectPropertyType"},
+      "Subkeys": {"type": "RegistrySubkeysType"},
+      "Values": {"type": "RegistryValuesType"},
+      "Handle_List": {"type": "WindowsHandleListType"},
+      "Key": {"type": "StringObjectPropertyType"},
+      "Byte_Runs": {"type": "ByteRunsType"}
+    },
+    "typeName": "Windows Registry Key",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinRegistryKeyObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "PDFDocumentInformationDictionaryType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "CreationDate": {"type": "DateTimeObjectPropertyType"},
+      "Keywords": {"type": "StringObjectPropertyType"},
+      "Producer": {"type": "StringObjectPropertyType"},
+      "Title": {"type": "StringObjectPropertyType"},
+      "Author": {"type": "StringObjectPropertyType"},
+      "Creator": {"type": "StringObjectPropertyType"},
+      "ModDate": {"type": "DateTimeObjectPropertyType"},
+      "Trapped": {"type": "StringObjectPropertyType"},
+      "Subject": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "URLHistoryObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'URL_History_Entry']/*[local-name() = 'URL']",
+    "prefix": "URLHistoryObj",
+    "elements": {
+      "Browser_Information": {"type": "ToolInformationType"},
+      "URL_History_Entry": {
+        "maxOccurs": "unbounded",
+        "type": "URLHistoryEntryType"
+      }
+    },
+    "typeName": "URL History",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#URLHistoryObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "MFlagType": {"base": "BaseObjectPropertyType"},
+  "ICMPv4DestinationUnreachableType": {
+    "elements": {
+      "Destination_Host_Unknown": {"type": "boolean"},
+      "Network_Unreachable_For_TOS": {"type": "boolean"},
+      "Source_Route_Failed": {"type": "boolean"},
+      "Destination_Protocol_Unreachable": {"type": "boolean"},
+      "Destination_Host_Unreachable": {"type": "boolean"},
+      "Network_Administratively_Prohibited": {"type": "boolean"},
+      "Communication_Administratively_Prohibited": {"type": "boolean"},
+      "Source_Host_Isolated": {"type": "boolean"},
+      "Host_Administratively_Prohibited": {"type": "boolean"},
+      "Fragmentation_Required": {"type": "FragmentationRequiredType"},
+      "Host_Unreachable_For_TOS": {"type": "boolean"},
+      "Precedence_Cutoff_In_Effect": {"type": "boolean"},
+      "Destination_Port_Unreachable": {"type": "boolean"},
+      "Destination_Network_Unknown": {"type": "boolean"},
+      "Destination_Network_Unreachable": {"type": "boolean"},
+      "Host_Precedence_Violation": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "DeviceObjectStructType": {
+    "prefix": "WinDriverObj",
+    "elements": {
+      "Attached_To_Device_Name": {"type": "StringObjectPropertyType"},
+      "Attached_Device_Name": {"type": "StringObjectPropertyType"},
+      "Device_Name": {"type": "StringObjectPropertyType"},
+      "Attached_To_Driver_Object": {"type": "UnsignedLongObjectPropertyType"},
+      "Attached_Device_Object": {"type": "UnsignedLongObjectPropertyType"},
+      "Device_Object": {"type": "UnsignedLongObjectPropertyType"},
+      "Attached_To_Driver_Name": {"type": "StringObjectPropertyType"},
+      "Attached_To_Device_Object": {"type": "UnsignedLongObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinDriverObject-3",
+    "base": "anyType"
+  },
+  "RedirectOptionsType": {
+    "elements": {
+      "Target_Link_Addr": {"type": "NDPLinkAddrType"},
+      "Redirected_Header": {"type": "NDPRedirectedHeaderType"}
+    },
+    "base": "anyType"
+  },
+  "WinEventType": {
+    "prefix": "WinEventObj",
+    "URI": "http://cybox.mitre.org/objects#WinEventObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPv6PacketChangeType": {"base": "BaseObjectPropertyType"},
+  "IPv6OptionType": {
+    "elements": {
+      "Option_Byte": {"type": "HexBinaryObjectPropertyType"},
+      "Packet_Change": {"type": "IPv6PacketChangeType"},
+      "Do_Not_Recogn_Action": {"type": "IPv6DoNotRecogActionType"}
+    },
+    "base": "anyType"
+  },
+  "DeviceObjectListType": {
+    "prefix": "WinDriverObj",
+    "elements": {"Device_Object_Struct": {
+      "maxOccurs": "unbounded",
+      "type": "DeviceObjectStructType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinDriverObject-3",
+    "base": "anyType"
+  },
+  "ImageFileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "ImageFileObj",
+    "elements": {
+      "Image_Width": {"type": "IntegerObjectPropertyType"},
+      "Image_Height": {"type": "IntegerObjectPropertyType"},
+      "Compression_Algorithm": {"type": "StringObjectPropertyType"},
+      "Bits_Per_Pixel": {"type": "PositiveIntegerObjectPropertyType"},
+      "Image_File_Format": {"type": "ImageFileFormatType"}
+    },
+    "typeName": "Image File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ImageFileObject-1",
+    "base": "FileObjectType"
+  },
+  "SymLinksListType": {
+    "prefix": "FileObj",
+    "elements": {"Sym_Link": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "StreamObjectType": {
+    "prefix": "WinFileObj",
+    "elements": {
+      "Size_In_Bytes": {"type": "UnsignedLongObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinFileObject-2",
+    "base": "HashListType"
+  },
+  "ChildPIDListType": {
+    "prefix": "ProcessObj",
+    "elements": {"Child_PID": {
+      "maxOccurs": "unbounded",
+      "type": "UnsignedIntegerObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "anyType"
+  },
+  "PadNType": {
+    "elements": {
+      "Option_Data": {"type": "IntegerObjectPropertyType"},
+      "Octet": {"type": "HexBinaryObjectPropertyType"},
+      "Option_Data_Length": {"type": "IntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "NLRouteOriginType": {
+    "prefix": "WinNetworkRouteEntryObj",
+    "URI": "http://cybox.mitre.org/objects#WinNetworkRouteEntryObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "TCPHeaderType": {
+    "elements": {
+      "Window": {"type": "HexBinaryObjectPropertyType"},
+      "Src_Port": {"type": "PortObjectType"},
+      "Seq_Num": {"type": "HexBinaryObjectPropertyType"},
+      "TCP_Flags": {"type": "TCPFlagsType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "ACK_Num": {"type": "HexBinaryObjectPropertyType"},
+      "Data_Offset": {"type": "HexBinaryObjectPropertyType"},
+      "Urg_Ptr": {"type": "HexBinaryObjectPropertyType"},
+      "Dest_Port": {"type": "PortObjectType"},
+      "Reserved": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "WindowsSystemObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Product_Name']",
+    "prefix": "WinSystemObj",
+    "elements": {
+      "Windows_Temp_Directory": {"type": "StringObjectPropertyType"},
+      "Registered_Organization": {"type": "StringObjectPropertyType"},
+      "Product_ID": {"type": "StringObjectPropertyType"},
+      "NetBIOS_Name": {"type": "StringObjectPropertyType"},
+      "Open_Handle_List": {"type": "WindowsHandleListType"},
+      "Windows_System_Directory": {"type": "StringObjectPropertyType"},
+      "Product_Name": {"type": "StringObjectPropertyType"},
+      "Domain": {
+        "maxOccurs": "unbounded",
+        "type": "StringObjectPropertyType"
+      },
+      "Global_Flag_List": {"type": "GlobalFlagListType"},
+      "Windows_Directory": {"type": "StringObjectPropertyType"},
+      "Registered_Owner": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Windows System",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinSystemObject-2",
+    "base": "SystemObjectType"
+  },
+  "SocketAddressObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hostname' or local-name() = 'IP_Address' or local-name() = 'Port']",
+    "prefix": "SocketAddressObj",
+    "elements": {
+      "Port": {"type": "PortObjectType"},
+      "Hostname": {"type": "HostnameObjectType"},
+      "IP_Address": {"type": "AddressObjectType"}
+    },
+    "pattern": "IP_Address:Port",
+    "typeName": "Socket Address",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#SocketAddressObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "ICMPv6ParameterProblemType": {
+    "elements": {
+      "Erroneous_Header_Field": {"type": "boolean"},
+      "Unrecognized_Next_Header_Type": {"type": "boolean"},
+      "Unrecognized_IPv6_Option": {"type": "boolean"},
+      "Pointer": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "OSType": {
+    "prefix": "SystemObj",
+    "elements": {
+      "Environment_Variable_List": {"type": "EnvironmentVariableListType"},
+      "Install_Date": {"type": "DateObjectPropertyType"},
+      "Platform": {"type": "PlatformSpecificationType"},
+      "Patch_Level": {"type": "StringObjectPropertyType"},
+      "Build_Number": {"type": "StringObjectPropertyType"},
+      "Bitness": {"type": "BitnessType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "PlatformSpecificationType"
+  },
+  "HTTPMethodType": {
+    "prefix": "HTTPSessionObj",
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "InternetLayerType": {
+    "elements": {
+      "IPv6": {"type": "IPv6PacketType"},
+      "IPv4": {"type": "IPv4PacketType"},
+      "ICMPv6": {"type": "ICMPv6PacketType"},
+      "ICMPv4": {"type": "ICMPv4PacketType"}
+    },
+    "base": "anyType"
+  },
+  "MemoryPageStateType": {
+    "prefix": "WinMemoryPageRegionObj",
+    "URI": "http://cybox.mitre.org/objects#WinMemoryPageRegionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "WindowsMailslotObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinMailslotObj",
+    "elements": {
+      "Read_Timeout": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Max_Message_Size": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Windows Mailslot",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinMailslotObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "ICMPv4ErrorMessageType": {
+    "elements": {
+      "Time_Exceeded": {"type": "ICMPv4TimeExceededType"},
+      "Source_Quench": {"type": "ICMPv4SourceQuenchType"},
+      "Destination_Unreachable": {"type": "ICMPv4DestinationUnreachableType"},
+      "Error_Msg_Content": {"type": "ICMPv4ErrorMessageContentType"},
+      "Redirect_Message": {"type": "ICMPv4RedirectMessageType"}
+    },
+    "base": "anyType"
+  },
+  "ICMPv4RedirectMessageType": {
+    "elements": {
+      "ToS_Host_Redirect": {"type": "boolean"},
+      "Host_Redirect": {"type": "boolean"},
+      "ToS_Network_Redirect": {"type": "boolean"},
+      "Network_Redirect": {"type": "boolean"},
+      "IP_Address": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "PDFTrailerListType": {
+    "prefix": "PDFFileObj",
+    "elements": {"Trailer": {
+      "maxOccurs": "unbounded",
+      "type": "PDFTrailerType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "SiLKAddressType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ImageInfoType": {
+    "prefix": "ProcessObj",
+    "elements": {
+      "Path": {"type": "StringObjectPropertyType"},
+      "Current_Directory": {"type": "StringObjectPropertyType"},
+      "File_Name": {"type": "StringObjectPropertyType"},
+      "Command_Line": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "anyType"
+  },
+  "WindowsExecutableFileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Type": {"type": "PEType"},
+      "PE_Checksum": {"type": "PEChecksumType"},
+      "Sections": {"type": "PESectionListType"},
+      "Headers": {"type": "PEHeadersType"},
+      "Extraneous_Bytes": {"type": "IntegerObjectPropertyType"},
+      "Build_Information": {"type": "PEBuildInformationType"},
+      "Imports": {"type": "PEImportListType"},
+      "Resources": {"type": "PEResourceListType"},
+      "Digital_Signature": {"type": "DigitalSignatureInfoType"},
+      "Exports": {"type": "PEExportsType"}
+    },
+    "typeName": "Windows Executable File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "WindowsFileObjectType"
+  },
+  "YAFReverseFlowType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Reverse_Octet_Total_Count": {"type": "IntegerObjectPropertyType"},
+      "TCP_Reverse_Flow": {"type": "YAFTCPFlowType"},
+      "Reverse_Flow_Delta_Milliseconds": {"type": "IntegerObjectPropertyType"},
+      "Reverse_Passive_OS_Fingerprinting": {"type": "PlatformSpecificationType"},
+      "Reverse_Vlan_ID_MAC_Addr": {"type": "AddressObjectType"},
+      "Reverse_Packet_Total_Count": {"type": "IntegerObjectPropertyType"},
+      "Reverse_N_Bytes_Payload": {"type": "HexBinaryObjectPropertyType"},
+      "Reverse_Payload_Entropy": {"type": "IntegerObjectPropertyType"},
+      "Reverse_First_Packet": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "IPFIXOptionsTemplateRecordFieldSpecifiersType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Option_Field_Length": {"type": "IntegerObjectPropertyType"},
+      "Option_Enterprise_Bit": {"type": "boolean"},
+      "Scope_Information_Element_ID": {"type": "StringObjectPropertyType"},
+      "Option_Enterprise_Number": {"type": "StringObjectPropertyType"},
+      "Scope_Enterprise_Number": {"type": "StringObjectPropertyType"},
+      "Scope_Field_Length": {"type": "IntegerObjectPropertyType"},
+      "Option_Information_Element_ID": {"type": "StringObjectPropertyType"},
+      "Scope_Enterprise_Bit": {"type": "boolean"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "HTTPResponseHeaderFieldsType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Cache_Control": {"type": "StringObjectPropertyType"},
+      "X_Frame_Options": {"type": "StringObjectPropertyType"},
+      "Warning": {"type": "StringObjectPropertyType"},
+      "X_XSS_Protection": {"type": "StringObjectPropertyType"},
+      "Server": {"type": "StringObjectPropertyType"},
+      "Content_Encoding": {"type": "StringObjectPropertyType"},
+      "Content_Range": {"type": "StringObjectPropertyType"},
+      "P3P": {"type": "StringObjectPropertyType"},
+      "Set_Cookie": {"type": "StringObjectPropertyType"},
+      "Trailer": {"type": "StringObjectPropertyType"},
+      "X_Powered_By": {"type": "StringObjectPropertyType"},
+      "Refresh": {"type": "StringObjectPropertyType"},
+      "Content_Type": {"type": "StringObjectPropertyType"},
+      "Strict_Transport_Security": {"type": "StringObjectPropertyType"},
+      "Transfer_Encoding": {"type": "StringObjectPropertyType"},
+      "Content_Location": {"type": "StringObjectPropertyType"},
+      "Last_Modified": {"type": "DateTimeObjectPropertyType"},
+      "Age": {"type": "IntegerObjectPropertyType"},
+      "X_Content_Type_Options": {"type": "StringObjectPropertyType"},
+      "Content_MD5": {"type": "StringObjectPropertyType"},
+      "Connection": {"type": "StringObjectPropertyType"},
+      "Pragma": {"type": "StringObjectPropertyType"},
+      "Access_Control_Allow_Origin": {"type": "StringObjectPropertyType"},
+      "X_UA_Compatible": {"type": "StringObjectPropertyType"},
+      "Accept_Ranges": {"type": "StringObjectPropertyType"},
+      "Content_Language": {"type": "StringObjectPropertyType"},
+      "Date": {"type": "DateTimeObjectPropertyType"},
+      "Proxy_Authenticate": {"type": "StringObjectPropertyType"},
+      "Via": {"type": "StringObjectPropertyType"},
+      "Retry_After": {"type": "IntegerObjectPropertyType"},
+      "Content_Length": {"type": "IntegerObjectPropertyType"},
+      "ETag": {"type": "StringObjectPropertyType"},
+      "Content_Disposition": {"type": "StringObjectPropertyType"},
+      "Vary": {"type": "StringObjectPropertyType"},
+      "Expires": {"type": "DateTimeObjectPropertyType"},
+      "Link": {"type": "StringObjectPropertyType"},
+      "WWW_Authenticate": {"type": "StringObjectPropertyType"},
+      "Location": {"type": "URIObjectType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "NetflowV9FlowSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Options_Template_Flow_Set": {"type": "NetflowV9OptionsTemplateFlowSetType"},
+      "Data_Flow_Set": {"type": "NetflowV9DataFlowSetType"},
+      "Template_Flow_Set": {"type": "NetflowV9TemplateFlowSetType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "GlobalFlagListType": {
+    "prefix": "WinSystemObj",
+    "elements": {"Global_Flag": {
+      "maxOccurs": "unbounded",
+      "type": "GlobalFlagType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinSystemObject-2",
+    "base": "anyType"
+  },
+  "IPv4CopyFlagType": {"base": "BaseObjectPropertyType"},
+  "RegistryHiveType": {
+    "prefix": "WinRegistryKeyObj",
+    "URI": "http://cybox.mitre.org/objects#WinRegistryKeyObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPFIXSetHeaderType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Set_ID": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "YAFRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Reverse_Flow": {"type": "YAFReverseFlowType"},
+      "Flow": {"type": "YAFFlowType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "FullyQualifiedNameType": {
+    "prefix": "ns1",
+    "elements": {
+      "Full_Name": {"type": "StringObjectPropertyType"},
+      "NetBEUI_Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinComputerAccountObject-2",
+    "base": "anyType"
+  },
+  "ICMPv6PacketType": {
+    "elements": {
+      "Error_Msg": {"type": "ICMPv6ErrorMessageType"},
+      "ICMPv6_Header": {"type": "ICMPv6HeaderType"},
+      "Info_Msg": {"type": "ICMPv6InfoMessageType"}
+    },
+    "base": "anyType"
+  },
+  "PageProtectionValueType": {
+    "prefix": "WinFilemappingObj",
+    "URI": "http://cybox.mitre.org/objects#WinFilemappingObject-1",
+    "base": "BaseObjectPropertyType"
+  },
+  "UnixVolumeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "UnixVolumeObj",
+    "elements": {
+      "Options": {"type": "StringObjectPropertyType"},
+      "Mount_Point": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Unix Volume",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UnixVolumeObject-2",
+    "base": "VolumeObjectType"
+  },
+  "EmailMessageObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Raw_Body']",
+    "prefix": "EmailMessageObj",
+    "elements": {
+      "Header": {"type": "EmailHeaderType"},
+      "Links": {"type": "LinksType"},
+      "Email_Server": {"type": "StringObjectPropertyType"},
+      "Raw_Header": {"type": "StringObjectPropertyType"},
+      "Attachments": {"type": "AttachmentsType"},
+      "Raw_Body": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Email Message",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "UnixUserAccountObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+    "prefix": "UnixUserAccountObj",
+    "elements": {
+      "Group_ID": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Login_Shell": {"type": "StringObjectPropertyType"},
+      "User_ID": {"type": "UnsignedIntegerObjectPropertyType"}
+    },
+    "typeName": "Unix User Account",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UnixUserAccountObject-2",
+    "base": "UserAccountObjectType"
+  },
+  "CodeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Code_Segment']",
+    "prefix": "CodeObj",
+    "elements": {
+      "Processor_Family": {
+        "maxOccurs": "unbounded",
+        "type": "ProcessorTypeType"
+      },
+      "Type": {"type": "CodeTypeType"},
+      "Description": {"type": "StructuredTextType"},
+      "Code_Segment": {"type": "StringObjectPropertyType"},
+      "Digital_Signatures": {"type": "DigitalSignaturesType"},
+      "Extracted_Features": {"type": "ExtractedFeaturesType"},
+      "Targeted_Platforms": {"type": "TargetedPlatformsType"},
+      "Discovery_Method": {"type": "MeasureSourceType"},
+      "Code_Language": {"type": "CodeLanguageType"},
+      "Purpose": {"type": "CodePurposeType"},
+      "Start_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Code_Segment_XOR": {"type": "CodeSegmentXORType"}
+    },
+    "typeName": "Code",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WindowsVolumeAttributeType": {
+    "prefix": "WinVolumeObj",
+    "URI": "http://cybox.mitre.org/objects#WinVolumeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ARPType": {
+    "elements": {
+      "Hardware_Addr_Type": {"type": "IANAHardwareType"},
+      "Proto_Addr_Size": {"type": "HexBinaryObjectPropertyType"},
+      "Op_Type": {"type": "ARPOpType"},
+      "Sender_Hardware_Addr": {"type": "AddressObjectType"},
+      "Recip_Protocol_Addr": {"type": "AddressObjectType"},
+      "Hardware_Addr_Size": {"type": "HexBinaryObjectPropertyType"},
+      "Sender_Protocol_Addr": {"type": "AddressObjectType"},
+      "Proto_Addr_Type": {"type": "IANAEtherType"},
+      "Recip_Hardware_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "EntryPointSignatureListType": {
+    "prefix": "FileObj",
+    "elements": {"Entry_Point_Signature": {
+      "maxOccurs": "unbounded",
+      "type": "EntryPointSignatureType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "HandleType": {
+    "prefix": "WinHandleObj",
+    "URI": "http://cybox.mitre.org/objects#WinHandleObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "PDFFileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Version": {"type": "DoubleObjectPropertyType"},
+      "Cross_Reference_Tables": {"type": "PDFXRefTableListType"},
+      "Metadata": {"type": "PDFFileMetadataType"},
+      "Indirect_Objects": {"type": "PDFIndirectObjectListType"},
+      "Trailers": {"type": "PDFTrailerListType"}
+    },
+    "typeName": "PDF File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "FileObjectType"
+  },
+  "PipeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "PipeObj",
+    "elements": {"Name": {"type": "StringObjectPropertyType"}},
+    "typeName": "Pipe",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#PipeObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IANAHardwareType": {"base": "BaseObjectPropertyType"},
+  "DNSRecordObjectType": {
+    "namePath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Domain_Name' or local-name() = 'IP_Address']",
+    "pattern":"Domain_Name_resolved_to_IP_Address",
+    "prefix": "DNSRecordObj",
+    "elements": {
+      "Data_Length": {"type": "IntegerObjectPropertyType"},
+      "Record_Data": {"type": "anyType"},
+      "Description": {"type": "StructuredTextType"},
+      "Record_Name": {"type": "StringObjectPropertyType"},
+      "Queried_Date": {"type": "DateTimeObjectPropertyType"},
+      "Entry_Type": {"type": "StringObjectPropertyType"},
+      "Domain_Name": {"type": "URIObjectType"},
+      "Record_Type": {"type": "StringObjectPropertyType"},
+      "Address_Class": {"type": "StringObjectPropertyType"},
+      "Flags": {"type": "HexBinaryObjectPropertyType"},
+      "TTL": {"type": "IntegerObjectPropertyType"},
+      "IP_Address": {"type": "AddressObjectType"}
+    },
+    "typeName": "DNS Record",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DNSRecordObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "RegistryValuesType": {
+    "prefix": "WinRegistryKeyObj",
+    "elements": {"Value": {
+      "maxOccurs": "unbounded",
+      "type": "RegistryValueType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinRegistryKeyObject-2",
+    "base": "anyType"
+  },
+  "DNSResourceRecordsType": {
+    "prefix": "DNSQueryObj",
+    "elements": {"Resource_Record": {
+      "maxOccurs": "unbounded",
+      "type": "DNSRecordObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#DNSQueryObject-2",
+    "base": "anyType"
+  },
+  "TCPType": {
+    "elements": {
+      "Options": {"type": "HexBinaryObjectPropertyType"},
+      "TCP_Header": {"type": "TCPHeaderType"},
+      "Data": {"type": "DataSegmentType"}
+    },
+    "base": "anyType"
+  },
+  "PDFKeywordCountsType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "ObjStm_Count": {"type": "PDFKeywordCountType"},
+      "JS_Count": {"type": "PDFKeywordCountType"},
+      "DCTDecode_Count": {"type": "PDFKeywordCountType"},
+      "JavaScript_Count": {"type": "PDFKeywordCountType"},
+      "LZWDecode_Count": {"type": "PDFKeywordCountType"},
+      "XFA_Count": {"type": "PDFKeywordCountType"},
+      "Encrypt_Count": {"type": "PDFKeywordCountType"},
+      "Page_Count": {"type": "PDFKeywordCountType"},
+      "CCITTFaxDecode_Count": {"type": "PDFKeywordCountType"},
+      "AA_Count": {"type": "PDFKeywordCountType"},
+      "FlateDecode_Count": {"type": "PDFKeywordCountType"},
+      "JBIG2Decode_Count": {"type": "PDFKeywordCountType"},
+      "OpenAction_Count": {"type": "PDFKeywordCountType"},
+      "RichMedia_Count": {"type": "PDFKeywordCountType"},
+      "ASCII85Decode_Count": {"type": "PDFKeywordCountType"},
+      "RunLengthDecode_Count": {"type": "PDFKeywordCountType"},
+      "Launch_Count": {"type": "PDFKeywordCountType"},
+      "ASCIIHexDecode_Count": {"type": "PDFKeywordCountType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "PDFFileIDType": {
+    "prefix": "PDFFileObj",
+    "elements": {"ID_String": {
+      "maxOccurs": "2",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "PDFKeywordCountType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Non_Obfuscated_Count": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Obfuscated_Count": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "TaskTriggerFrequencyType": {
+    "prefix": "WinTaskObj",
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "UserAccountObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+    "prefix": "UserAccountObj",
+    "elements": {
+      "Full_Name": {"type": "StringObjectPropertyType"},
+      "Privilege_List": {"type": "PrivilegeListType"},
+      "User_Password_Age": {"type": "DurationObjectPropertyType"},
+      "Last_Login": {"type": "DateTimeObjectPropertyType"},
+      "Username": {"type": "StringObjectPropertyType"},
+      "Script_Path": {"type": "StringObjectPropertyType"},
+      "Home_Directory": {"type": "StringObjectPropertyType"},
+      "Group_List": {"type": "GroupListType"}
+    },
+    "typeName": "User Account",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UserAccountObject-2",
+    "base": "AccountObjectType"
+  },
+  "ARPCacheEntryTypeType": {
+    "prefix": "ARPCacheObj",
+    "URI": "http://cybox.mitre.org/objects#ARPCacheObject-1",
+    "base": "BaseObjectPropertyType"
+  },
+  "UnidirectionalRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "NetflowV9_Export_Packet": {"type": "NetflowV9ExportPacketType"},
+      "IPFIX_Message": {"type": "IPFIXMessageType"},
+      "SiLK_Record": {"type": "SiLKRecordType"},
+      "NetflowV5_Packet": {"type": "NetflowV5PacketType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "WindowsEventObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinEventObj",
+    "elements": {
+      "Type": {"type": "WinEventType"},
+      "Handle": {"type": "WindowsHandleObjectType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Windows Event",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinEventObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WinHookType": {
+    "prefix": "WinHookObj",
+    "URI": "http://cybox.mitre.org/objects#WinHookObject-1",
+    "base": "BaseObjectPropertyType"
+  },
+  "WindowsPrivilegeType": {
+    "prefix": "WinUserAccountObj",
+    "elements": {"User_Right": {"type": "StringObjectPropertyType/>"}},
+    "URI": "http://cybox.mitre.org/objects#WinUserAccountObject-2",
+    "base": "PrivilegeType"
+  },
+  "NDPType": {
+    "elements": {
+      "Router_Solicitation": {"type": "RouterSolicitationType"},
+      "ICMPv6_Header": {"type": "ICMPv6HeaderType"},
+      "Neighbor_Solicitation": {"type": "NeighborSolicitationType"},
+      "Router_Advertisement": {"type": "RouterAdvertisementType"},
+      "Neighbor_Advertisement": {"type": "NeighborAdvertisementType"},
+      "Redirect": {"type": "RedirectType"}
+    },
+    "base": "anyType"
+  },
+  "PartitionListType": {
+    "prefix": "DiskObj",
+    "elements": {"Partition": {
+      "maxOccurs": "unbounded",
+      "type": "DiskPartitionObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#DiskObject-2",
+    "base": "anyType"
+  },
+  "WindowsTaskObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinTaskObj",
+    "elements": {
+      "Status": {"type": "TaskStatusType"},
+      "Comment": {"type": "StringObjectPropertyType"},
+      "Parameters": {"type": "StringObjectPropertyType"},
+      "Application_Name": {"type": "StringObjectPropertyType"},
+      "Account_Logon_Type": {"type": "StringObjectPropertyType"},
+      "Max_Run_Time": {"type": "UnsignedLongObjectPropertyType"},
+      "Priority": {"type": "TaskPriorityType"},
+      "Flags": {"type": "TaskFlagType"},
+      "Creator": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Working_Directory": {"type": "StringObjectPropertyType"},
+      "Most_Recent_Run_Time": {"type": "DateTimeObjectPropertyType"},
+      "Exit_Code": {"type": "LongObjectPropertyType"},
+      "Work_Item_Data": {"type": "Base64BinaryObjectPropertyType"},
+      "Creation_Date": {"type": "DateTimeObjectPropertyType"},
+      "Account_Name": {"type": "StringObjectPropertyType"},
+      "Action_List": {"type": "TaskActionListType"},
+      "Trigger_List": {"type": "TriggerListType"},
+      "Account_Run_Level": {"type": "StringObjectPropertyType"},
+      "Next_Run_Time": {"type": "DateTimeObjectPropertyType"}
+    },
+    "typeName": "Windows Task",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "EmailReceivedLineListType": {
+    "prefix": "EmailMessageObj",
+    "elements": {"Received": {
+      "maxOccurs": "unbounded",
+      "type": "EmailReceivedLineType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "PEResourceContentType": {
+    "prefix": "WinExecutableFileObj",
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "WindowsHookObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hooking_Function_Name']",
+    "prefix": "WinHookObj",
+    "elements": {
+      "Type": {"type": "WinHookType"},
+      "Hooking_Module": {"type": "LibraryObjectType"},
+      "Thread_ID": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Hooking_Function_Name": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"}
+    },
+    "typeName": "Windows Hook",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinHookObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "NetflowV9ScopeFieldType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "HostnameObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hostname_Value']",
+    "prefix": "HostnameObj",
+    "elements": {
+      "Hostname_Value": {"type": "StringObjectPropertyType"},
+      "Naming_System": {
+        "maxOccurs": "unbounded",
+        "type": "StringObjectPropertyType"
+      }
+    },
+    "typeName": "Hostname",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#HostnameObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "NDPMTUType": {
+    "elements": {
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "MTU": {"type": "IntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "SiLKFlowAttributesType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ICMPv4EchoReplyType": {
+    "elements": {
+      "Data": {"type": "HexBinaryObjectPropertyType"},
+      "Echo_Reply": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "KerberosType": {
+    "prefix": "ns1",
+    "elements": {
+      "Ticket": {"type": "UnsignedLongObjectPropertyType"},
+      "Delegation": {"type": "KerberosDelegationType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinComputerAccountObject-2",
+    "base": "anyType"
+  },
+  "HTTPRequestResponseType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "HTTP_Server_Response": {"type": "HTTPServerResponseType"},
+      "HTTP_Client_Request": {"type": "HTTPClientRequestType"},
+      "HTTP_Provisional_Server_Response": {"type": "HTTPServerResponseType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "WindowsServiceObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Service_Name']",
+    "prefix": "WinServiceObj",
+    "elements": {
+      "Service_DLL_Certificate_Issuer": {"type": "StringObjectPropertyType"},
+      "Service_DLL_Certificate_Subject": {"type": "StringObjectPropertyType"},
+      "Service_Name": {"type": "StringObjectPropertyType"},
+      "Service_DLL": {"type": "StringObjectPropertyType"},
+      "Service_DLL_Hashes": {"type": "HashListType"},
+      "Display_Name": {"type": "StringObjectPropertyType"},
+      "Started_As": {"type": "StringObjectPropertyType"},
+      "Description_List": {"type": "ServiceDescriptionListType"},
+      "Service_Status": {"type": "ServiceStatusType"},
+      "Startup_Type": {"type": "ServiceModeType"},
+      "Service_Type": {"type": "ServiceType"},
+      "Startup_Command_Line": {"type": "StringObjectPropertyType"},
+      "Group_Name": {"type": "StringObjectPropertyType"},
+      "Service_DLL_Signature_Description": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Windows Service",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinServiceObject-2",
+    "base": "WindowsProcessObjectType"
+  },
+  "WindowsUserAccountObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+    "prefix": "WinUserAccountObj",
+    "elements": {
+      "Security_ID": {"type": "StringObjectPropertyType"},
+      "Security_Type": {"type": "SIDType"}
+    },
+    "typeName": "Windows User Account",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinUserAccountObject-2",
+    "base": "UserAccountObjectType"
+  },
+  "IPv4OptionType": {
+    "elements": {
+      "Class": {"type": "IPv4ClassType"},
+      "Option": {"type": "IPv4OptionsType"},
+      "Copy_Flag": {"type": "IPv4CopyFlagType"}
+    },
+    "base": "anyType"
+  },
+  "ArtifactObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Raw_Artifact']",
+    "prefix": "ArtifactObj",
+    "elements": {
+      "Hashes": {"type": "HashListType"},
+      "Packaging": {"type": "PackagingType"},
+      "Raw_Artifact_Reference": {"type": "anyURI"},
+      "Raw_Artifact": {"type": "RawArtifactType"}
+    },
+    "typeName": "Artifact",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ArtifactObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "ICMPv4AddressMaskReplyType": {
+    "elements": {
+      "Address_Mask_Reply": {"type": "boolean"},
+      "Address_Mask": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "UDPHeaderType": {
+    "elements": {
+      "SrcPort": {"type": "PortObjectType"},
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "DestPort": {"type": "PortObjectType"}
+    },
+    "base": "anyType"
+  },
+  "GroupType": {
+    "prefix": "UserAccountObj",
+    "URI": "http://cybox.mitre.org/objects#UserAccountObject-2",
+    "base": "anyType"
+  },
+  "WindowsHandleObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinHandleObj",
+    "elements": {
+      "Type": {"type": "HandleType"},
+      "Access_Mask": {"type": "UnsignedLongObjectPropertyType"},
+      "Pointer_Count": {"type": "UnsignedLongObjectPropertyType"},
+      "ID": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Object_Address": {"type": "UnsignedLongObjectPropertyType"}
+    },
+    "typeName": "Windows Handle",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinHandleObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "X509CertificateObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Certificate']/*[local-name() = 'Serial_Number']",
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "Certificate_Signature": {"type": "X509CertificateSignatureType"},
+      "Raw_Certificate": {"type": "StringObjectPropertyType"},
+      "Certificate": {"type": "X509CertificateContentsType"}
+    },
+    "typeName": "X509 Certificate",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "NetflowV9ExportPacketType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Packet_Header": {"type": "NetflowV9PacketHeaderType"},
+      "Flow_Set": {
+        "maxOccurs": "unbounded",
+        "type": "NetflowV9FlowSetType"
+      }
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "EthernetInterfaceType": {
+    "elements": {"Ethernet_Header": {"type": "EthernetHeaderType"}},
+    "base": "anyType"
+  },
+  "Layer3ProtocolType": {
+    "prefix": "NetworkConnectionObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkConnectionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "Layer7ProtocolType": {
+    "prefix": "NetworkConnectionObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkConnectionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "EmailReceivedLineType": {
+    "prefix": "EmailMessageObj",
+    "elements": {
+      "By": {"type": "StringObjectPropertyType"},
+      "For": {"type": "StringObjectPropertyType"},
+      "From": {"type": "StringObjectPropertyType"},
+      "ID": {"type": "StringObjectPropertyType"},
+      "Timestamp": {"type": "DateTimeObjectPropertyType"},
+      "Via": {"type": "StringObjectPropertyType"},
+      "With": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "DHCPServerListType": {
+    "prefix": "SystemObj",
+    "elements": {"DHCP_Server_Address": {
+      "maxOccurs": "unbounded",
+      "type": "AddressObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "KerberosServiceType": {
+    "prefix": "ns1",
+    "elements": {
+      "User": {"type": "StringObjectPropertyType"},
+      "Port": {"type": "PortObjectType"},
+      "Computer": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinComputerAccountObject-2",
+    "base": "anyType"
+  },
+  "AuthenticationTypeVocab-1.0": {
+    "prefix": "AccountObj",
+    "URI": "http://cybox.mitre.org/objects#AccountObject-2",
+    "base": "ControlledVocabularyStringType"
+  },
+  "HTTPRequestHeaderFieldsType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Cache_Control": {"type": "StringObjectPropertyType"},
+      "X_ATT_DeviceId": {"type": "StringObjectPropertyType"},
+      "Warning": {"type": "StringObjectPropertyType"},
+      "Accept_Language": {"type": "StringObjectPropertyType"},
+      "DNT": {"type": "StringObjectPropertyType"},
+      "User_Agent": {"type": "StringObjectPropertyType"},
+      "Authorization": {"type": "StringObjectPropertyType"},
+      "Content_Type": {"type": "StringObjectPropertyType"},
+      "X_Forwarded_Proto": {"type": "StringObjectPropertyType"},
+      "Max_Forwards": {"type": "IntegerObjectPropertyType"},
+      "If_Match": {"type": "StringObjectPropertyType"},
+      "Cookie": {"type": "StringObjectPropertyType"},
+      "Proxy_Authorization": {"type": "StringObjectPropertyType"},
+      "X_Wap_Profile": {"type": "URIObjectType"},
+      "Accept": {"type": "StringObjectPropertyType"},
+      "Content_MD5": {"type": "StringObjectPropertyType"},
+      "If_Range": {"type": "StringObjectPropertyType"},
+      "X_Requested_With": {"type": "StringObjectPropertyType"},
+      "Connection": {"type": "StringObjectPropertyType"},
+      "Referer": {"type": "URIObjectType"},
+      "Accept_Datetime": {"type": "StringObjectPropertyType"},
+      "Host": {"type": "HostFieldType"},
+      "If_Modified_Since": {"type": "DateTimeObjectPropertyType"},
+      "From": {"type": "AddressObjectType"},
+      "Pragma": {"type": "StringObjectPropertyType"},
+      "Range": {"type": "StringObjectPropertyType"},
+      "If_None_Match": {"type": "StringObjectPropertyType"},
+      "Date": {"type": "DateTimeObjectPropertyType"},
+      "Via": {"type": "StringObjectPropertyType"},
+      "TE": {"type": "StringObjectPropertyType"},
+      "Content_Length": {"type": "IntegerObjectPropertyType"},
+      "Expect": {"type": "StringObjectPropertyType"},
+      "Accept_Charset": {"type": "StringObjectPropertyType"},
+      "Accept_Encoding": {"type": "StringObjectPropertyType"},
+      "X_Forwarded_For": {"type": "StringObjectPropertyType"},
+      "If_Unmodified_Since": {"type": "DateTimeObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "NetworkPacketObjectType": {
+    "elements": {
+      "Internet_Layer": {"type": "InternetLayerType"},
+      "Transport_Layer": {"type": "TransportLayerType"},
+      "Link_Layer": {"type": "LinkLayerType"}
+    },
+    "typeName": "Network Packet",
+    "objectReference": true,
+    "base": "ObjectPropertiesType"
+  },
+  "WindowsMemoryPageRegionObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinMemoryPageRegionObj",
+    "elements": {
+      "Type": {"type": "MemoryPageTypeType"},
+      "Protect": {"type": "MemoryPageProtectionType"},
+      "Allocation_Protect": {"type": "MemoryPageProtectionType"},
+      "State": {"type": "MemoryPageStateType"},
+      "Allocation_Base_Address": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "typeName": "Windows Memory Page Region",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinMemoryPageRegionObject-2",
+    "base": "MemoryObjectType"
+  },
+  "PEDataDirectoryStructType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Size": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Virtual_Address": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "IDTEntryType": {
+    "prefix": "WinKernelObj",
+    "elements": {
+      "Offset_Low": {"type": "HexBinaryObjectPropertyType"},
+      "Type_Attr": {"type": "HexBinaryObjectPropertyType"},
+      "Offset_Middle": {"type": "HexBinaryObjectPropertyType"},
+      "Offset_High": {"type": "HexBinaryObjectPropertyType"},
+      "Selector": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinKernelObject-2",
+    "base": "anyType"
+  },
+  "PDFXRefTableListType": {
+    "prefix": "PDFFileObj",
+    "elements": {"Cross_Reference_Table": {
+      "maxOccurs": "unbounded",
+      "type": "PDFXRefTableType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "DestinationOptionsType": {
+    "elements": {
+      "Option_Data": {
+        "maxOccurs": "unbounded",
+        "type": "OptionDataType"
+      },
+      "Next_Header": {"type": "IANAAssignedIPNumbersType"},
+      "Header_Ext_Len": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "IPFIXTemplateRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Field_Specifier": {
+        "maxOccurs": "unbounded",
+        "type": "IPFIXTemplateRecordFieldSpecifiersType"
+      },
+      "Template_Record_Header": {"type": "IPFIXTemplateRecordHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "MemoryObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "MemoryObj",
+    "elements": {
+      "Hashes": {"type": "HashListType"},
+      "Region_Size": {"type": "UnsignedLongObjectPropertyType"},
+      "Region_Start_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Extracted_Features": {"type": "ExtractedFeaturesType"},
+      "Region_End_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Memory_Source": {"type": "StringObjectPropertyType"},
+      "Block_Type": {"type": "BlockType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Memory",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#MemoryObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IPFIXOptionsTemplateRecordHeaderType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Template_ID": {"type": "IntegerObjectPropertyType"},
+      "Scope_Field_Count": {"type": "PositiveIntegerObjectPropertyType"},
+      "Field_Count": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "WhoisContactsType": {
+    "prefix": "WhoisObj",
+    "elements": {"Contact": {
+      "maxOccurs": "unbounded",
+      "type": "WhoisContactType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "anyType"
+  },
+  "Pad1Type": {
+    "elements": {"Octet": {"type": "HexBinaryObjectPropertyType/>"}},
+    "base": "anyType"
+  },
+  "ICMPv4SourceQuenchType": {
+    "elements": {"Source_Quench": {"type": "boolean"}},
+    "base": "anyType"
+  },
+  "LinkReferenceType": {
+    "prefix": "EmailMessageObj",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "PEOptionalHeaderType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "File_Alignment": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Stack_Commit": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Heap_Reserve": {"type": "HexBinaryObjectPropertyType"},
+      "Image_Base": {"type": "HexBinaryObjectPropertyType"},
+      "Minor_OS_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Uninitialized_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Minor_Image_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Major_Subsystem_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Number_Of_Rva_And_Sizes": {"type": "HexBinaryObjectPropertyType"},
+      "DLL_Characteristics": {"type": "HexBinaryObjectPropertyType"},
+      "Data_Directory": {"type": "DataDirectoryType"},
+      "Size_Of_Image": {"type": "HexBinaryObjectPropertyType"},
+      "Minor_Linker_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Stack_Reserve": {"type": "HexBinaryObjectPropertyType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "Subsystem": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Code": {"type": "HexBinaryObjectPropertyType"},
+      "Section_Alignment": {"type": "HexBinaryObjectPropertyType"},
+      "Major_Image_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Minor_Subsystem_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Headers": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Heap_Commit": {"type": "HexBinaryObjectPropertyType"},
+      "Magic": {"type": "HexBinaryObjectPropertyType"},
+      "Loader_Flags": {"type": "HexBinaryObjectPropertyType"},
+      "Win32_Version_Value": {"type": "HexBinaryObjectPropertyType"},
+      "Base_Of_Code": {"type": "HexBinaryObjectPropertyType"},
+      "Base_Of_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Address_Of_Entry_Point": {"type": "HexBinaryObjectPropertyType"},
+      "Hashes": {"type": "HashListType"},
+      "Major_Linker_Version": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Initialized_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Major_OS_Version": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "X509NonStandardExtensionsType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "Netscape_Certificate_Type": {"type": "StringObjectPropertyType"},
+      "Old_Authority_Key_Identifier": {"type": "StringObjectPropertyType"},
+      "Netscape_Comment": {"type": "StringObjectPropertyType"},
+      "Old_Primary_Key_Attributes": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "GUIObjectType": {
+    "prefix": "GUIObj",
+    "elements": {
+      "Height": {"type": "IntegerObjectPropertyType"},
+      "Width": {"type": "IntegerObjectPropertyType"}
+    },
+    "typeName": "GUI",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#GUIObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "LibraryType": {
+    "prefix": "LibraryObj",
+    "URI": "http://cybox.mitre.org/objects#LibraryObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "NeighborOptionsType": {
+    "elements": {"Target_Link_Addr": {"type": "NDPLinkAddrType"}},
+    "base": "anyType"
+  },
+  "FilePathType": {
+    "prefix": "FileObj",
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "StringObjectPropertyType"
+  },
+  "BidirectionalRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {"YAF_Record": {"type": "YAFRecordType"}},
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "ProtocolType": {
+    "prefix": "NetworkSocketObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkSocketObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "PDFTrailerType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Root": {"type": "PDFIndirectObjectIDType"},
+      "Prev": {"type": "PositiveIntegerObjectPropertyType"},
+      "Hashes": {"type": "HashListType"},
+      "Size": {"type": "PositiveIntegerObjectPropertyType"},
+      "Last_Cross_Reference_Offset": {"type": "PositiveIntegerObjectPropertyType"},
+      "ID": {"type": "PDFFileIDType"},
+      "Info": {"type": "PDFIndirectObjectIDType"},
+      "Encrypt": {"type": "PDFDictionaryType"},
+      "Offset": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "PEImportListType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {"Import": {
+      "maxOccurs": "unbounded",
+      "type": "PEImportType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "CompressionType": {
+    "prefix": "ArtifactObj",
+    "URI": "http://cybox.mitre.org/objects#ArtifactObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4TracerouteType": {
+    "elements": {
+      "Identifier": {"type": "HexBinaryObjectPropertyType"},
+      "Return_Hop_Count": {"type": "HexBinaryObjectPropertyType"},
+      "Outbound_Packet_Forward_Success": {"type": "boolean"},
+      "Output_Link_Speed": {"type": "HexBinaryObjectPropertyType"},
+      "Outbound_Hop_Count": {"type": "HexBinaryObjectPropertyType"},
+      "Outbound_Packet_no_Route": {"type": "boolean"},
+      "Output_Link_MTU": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "URIObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+    "prefix": "URIObj",
+    "elements": {"Value": {"type": "AnyURIObjectPropertyType"}},
+    "typeName": "URI",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#URIObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "AddressFamilyType": {
+    "prefix": "NetworkSocketObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkSocketObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "DoNotFragmentType": {"base": "BaseObjectPropertyType"},
+  "EPJumpCodeType": {
+    "prefix": "FileObj",
+    "elements": {
+      "Opcodes": {"type": "StringObjectPropertyType"},
+      "Depth": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "HTTPRequestLineType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "HTTP_Method": {"type": "HTTPMethodType"},
+      "Version": {"type": "StringObjectPropertyType"},
+      "Value": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "WindowsSemaphoreObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinSemaphoreObj",
+    "elements": {
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"}
+    },
+    "typeName": "Windows Semaphore",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinSemaphoreObject-2",
+    "base": "SemaphoreObjectType"
+  },
+  "NeighborSolicitationType": {
+    "elements": {
+      "Options": {"type": "NeighborSolicitationOptionsType"},
+      "Target_IPv6_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "ICMPv6EchoReplyType": {
+    "elements": {
+      "Data": {"type": "HexBinaryObjectPropertyType"},
+      "Echo_Reply": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "PhysicalInterfaceType": {
+    "elements": {"Ethernet": {"type": "EthernetInterfaceType"}},
+    "base": "anyType"
+  },
+  "NetflowV9OptionsTemplateRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Option_Field_Type": {"type": "NetflowV9FieldType"},
+      "Option_Field_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Template_ID": {"type": "IntegerObjectPropertyType"},
+      "Option_Scope_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Scope_Field_Type": {"type": "NetflowV9ScopeFieldType"},
+      "Option_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Scope_Field_Length": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "CodeLanguageType": {
+    "prefix": "CodeObj",
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "PackerClassType": {
+    "prefix": "FileObj",
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "NetworkRouteEntriesType": {
+    "prefix": "NetworkRouteObj",
+    "elements": {"Network_Route_Entry": {
+      "maxOccurs": "unbounded",
+      "type": "NetworkRouteEntryObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#NetworkRouteObject-2",
+    "base": "anyType"
+  },
+  "PEResourceListType": {
+    "prefix": "WinExecutableFileObj",
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "RawArtifactType": {
+    "prefix": "ArtifactObj",
+    "URI": "http://cybox.mitre.org/objects#ArtifactObject-2",
+    "base": "StringObjectPropertyType"
+  },
+  "PEVersionInfoResourceType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "ProductName": {"type": "StringObjectPropertyType"},
+      "Comments": {"type": "StringObjectPropertyType"},
+      "SpecialBuild": {"type": "StringObjectPropertyType"},
+      "ProductVersion": {"type": "StringObjectPropertyType"},
+      "InternalName": {"type": "StringObjectPropertyType"},
+      "CompanyName": {"type": "StringObjectPropertyType"},
+      "FileDescription": {"type": "StringObjectPropertyType"},
+      "LangID": {"type": "StringObjectPropertyType"},
+      "LegalCopyright": {"type": "StringObjectPropertyType"},
+      "OriginalFilename": {"type": "StringObjectPropertyType"},
+      "FileVersion": {"type": "StringObjectPropertyType"},
+      "PrivateBuild": {"type": "StringObjectPropertyType"},
+      "LegalTrademarks": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "PEResourceType"
+  },
+  "ArgumentListType": {
+    "prefix": "ProcessObj",
+    "elements": {"Argument": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "anyType"
+  },
+  "MemorySectionListType": {
+    "prefix": "WinProcessObj",
+    "elements": {"Memory_Section": {
+      "maxOccurs": "unbounded",
+      "type": "MemoryObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinProcessObject-2",
+    "base": "anyType"
+  },
+  "DiskObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Disk_Name']",
+    "prefix": "DiskObj",
+    "elements": {
+      "Type": {"type": "DiskType"},
+      "Disk_Name": {"type": "StringObjectPropertyType"},
+      "Partition_List": {"type": "PartitionListType"},
+      "Disk_Size": {"type": "UnsignedLongObjectPropertyType"},
+      "Free_Space": {"type": "UnsignedLongObjectPropertyType"}
+    },
+    "typeName": "Disk",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DiskObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "SocketType": {
+    "prefix": "NetworkSocketObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkSocketObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ICMPv6EchoRequestType": {
+    "elements": {
+      "Data": {"type": "HexBinaryObjectPropertyType"},
+      "Echo_Request": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "StructuredAuthenticationMechanismType": {
+    "prefix": "AccountObj",
+    "elements": {"Description": {"type": "StructuredTextType"}},
+    "URI": "http://cybox.mitre.org/objects#AccountObject-2",
+    "base": "anyType"
+  },
+  "NDPLinkAddrType": {
+    "elements": {
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Link_Layer_MAC_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "IPFIXMessageHeaderType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Export_Timestamp": {"type": "IntegerObjectPropertyType"},
+      "Version": {"type": "HexBinaryObjectPropertyType"},
+      "Byte_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Observation_Domain_ID": {"type": "IntegerObjectPropertyType"},
+      "Sequence_Number": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "WhoisStatusesType": {
+    "prefix": "WhoisObj",
+    "elements": {"Status": {
+      "maxOccurs": "unbounded",
+      "type": "WhoisStatusType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "anyType"
+  },
+  "X509CertificateSignatureType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "Signature": {"type": "StringObjectPropertyType"},
+      "Signature_Algorithm": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "ServiceModeType": {
+    "prefix": "WinServiceObj",
+    "URI": "http://cybox.mitre.org/objects#WinServiceObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "SMSMessageObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Body']",
+    "prefix": "SMSMessageObj",
+    "elements": {
+      "Bits_Per_Character": {"type": "PositiveIntegerObjectPropertyType"},
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Size": {"type": "IntegerObjectPropertyType"},
+      "User_Data_Header": {"type": "HexBinaryObjectPropertyType"},
+      "Recipient_Phone_Number": {"type": "StringObjectPropertyType"},
+      "Sent_DateTime": {"type": "DateTimeObjectPropertyType"},
+      "Encoding": {"type": "StringObjectPropertyType"},
+      "Sender_Phone_Number": {"type": "StringObjectPropertyType"},
+      "Body": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "SMS Message",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#SMSMessageObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "TaskTriggerType": {
+    "prefix": "WinTaskObj",
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "UnixPrivilegeType": {
+    "prefix": "UnixUserAccountObj",
+    "elements": {"Permissions_Mask": {"type": "StringObjectPropertyType/>"}},
+    "URI": "http://cybox.mitre.org/objects#UnixUserAccountObject-2",
+    "base": "PrivilegeType"
+  },
+  "PortObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Port_Value']",
+    "prefix": "PortObj",
+    "elements": {
+      "Layer4_Protocol": {"type": "Layer4ProtocolType"},
+      "Port_Value": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "typeName": "Port",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#PortObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "LinksType": {
+    "prefix": "EmailMessageObj",
+    "elements": {"Link": {
+      "maxOccurs": "unbounded",
+      "type": "LinkReferenceType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "KerberosDelegationType": {
+    "prefix": "ns1",
+    "elements": {
+      "Bitmask": {"type": "HexBinaryObjectPropertyType"},
+      "Service": {"type": "KerberosServiceType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinComputerAccountObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4AddressMaskRequestType": {
+    "elements": {
+      "Address_Mask_Request": {"type": "boolean"},
+      "Address_Mask": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "PEExportedFunctionType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Function_Name": {"type": "StringObjectPropertyType"},
+      "Ordinal": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Entry_Point": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "WhoisRegistrarInfoType": {
+    "prefix": "WhoisObj",
+    "elements": {
+      "Registrar_GUID": {"type": "StringObjectPropertyType"},
+      "Registrar_ID": {"type": "StringObjectPropertyType"},
+      "Address": {"type": "StringObjectPropertyType"},
+      "Contacts": {"type": "WhoisContactsType"},
+      "Whois_Server": {"type": "URIObjectType"},
+      "Email_Address": {"type": "AddressObjectType"},
+      "Referral_URL": {"type": "URIObjectType"},
+      "Phone_Number": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "anyType"
+  },
+  "DomainNameObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+    "prefix": "DomainNameObj",
+    "elements": {"Value": {"type": "StringObjectPropertyType/>"}},
+    "typeName": "Domain Name",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DomainNameObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "NetflowV5FlowHeaderType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Flow_Sequence": {"type": "IntegerObjectPropertyType"},
+      "Sys_Up_Time": {"type": "IntegerObjectPropertyType"},
+      "Version": {"type": "HexBinaryObjectPropertyType"},
+      "Unix_Secs": {"type": "IntegerObjectPropertyType"},
+      "Unix_Nsecs": {"type": "IntegerObjectPropertyType"},
+      "Engine_Type": {"type": "StringObjectPropertyType"},
+      "Engine_ID": {"type": "IntegerObjectPropertyType"},
+      "Count": {"type": "IntegerObjectPropertyType"},
+      "Sampling_Interval": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "WhoisObjectType": {
+    "prefix": "WhoisObj",
+    "elements": {
+      "Status": {"type": "WhoisStatusesType"},
+      "Nameservers": {"type": "WhoisNameserversType"},
+      "Server_Name": {"type": "URIObjectType"},
+      "Expiration_Date": {"type": "DateObjectPropertyType"},
+      "Domain_Name": {"type": "URIObjectType"},
+      "Lookup_Date": {"type": "DateTimeObjectPropertyType"},
+      "Registrar_Info": {"type": "WhoisRegistrarInfoType"},
+      "Domain_ID": {"type": "StringObjectPropertyType"},
+      "Contact_Info": {"type": "WhoisContactType"},
+      "IP_Address": {"type": "AddressObjectType"},
+      "DNSSEC": {"type": "WhoisDNSSECTypeEnum"},
+      "Sponsoring_Registrar": {"type": "StringObjectPropertyType"},
+      "Remarks": {"type": "StringObjectPropertyType"},
+      "Updated_Date": {"type": "DateObjectPropertyType"},
+      "Creation_Date": {"type": "DateObjectPropertyType"},
+      "Registrants": {"type": "WhoisRegistrantsType"},
+      "Regional_Internet_Registry": {"type": "RegionalRegistryType"}
+    },
+    "name": "Whois",
+    "typeName": "Whois",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "DNSCacheEntryType": {
+    "prefix": "DNSCacheObj",
+    "elements": {
+      "DNS_Entry": {"type": "DNSRecordObjectType"},
+      "TTL": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "typeName": "DNS Cache",
+    "URI": "http://cybox.mitre.org/objects#DNSCacheObject-2",
+    "base": "anyType"
+  },
+  "UnixProcessStatusType": {
+    "prefix": "UnixProcessObj",
+    "elements": {
+      "Current_Status": {"type": "UnixProcessStateType"},
+      "Timestamp": {"type": "DateTimeObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#UnixProcessObject-2",
+    "base": "ProcessStatusType"
+  },
+  "UnixProcessObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "UnixProcessObj",
+    "elements": {
+      "Priority": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Open_File_Descriptor_List": {"type": "FileDescriptorListType"},
+      "RUID": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Session_ID": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "typeName": "Unix Process",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UnixProcessObject-2",
+    "base": "ProcessObjectType"
+  },
+  "DiskType": {
+    "prefix": "DiskObj",
+    "URI": "http://cybox.mitre.org/objects#DiskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ARPCacheEntryType": {
+    "prefix": "ARPCacheObj",
+    "elements": {
+      "Type": {"type": "ARPCacheEntryTypeType"},
+      "Physical_Address": {"type": "StringObjectPropertyType"},
+      "Network_Interface": {"type": "NetworkInterfaceType"},
+      "IP_Address": {"type": "AddressObjectType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#ARPCacheObject-1",
+    "base": "anyType"
+  },
+  "MemoryPageTypeType": {
+    "prefix": "WinMemoryPageRegionObj",
+    "URI": "http://cybox.mitre.org/objects#WinMemoryPageRegionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "StreamListType": {
+    "prefix": "WinFileObj",
+    "elements": {"Stream": {
+      "maxOccurs": "unbounded",
+      "type": "StreamObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinFileObject-2",
+    "base": "anyType"
+  },
+  "EmailRecipientsType": {
+    "prefix": "EmailMessageObj",
+    "elements": {"Recipient": {
+      "maxOccurs": "unbounded",
+      "type": "AddressObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "TriggerType": {
+    "prefix": "WinTaskObj",
+    "elements": {
+      "Trigger_Type": {"type": "TaskTriggerType"},
+      "Trigger_End": {"type": "DateTimeObjectPropertyType"},
+      "Trigger_Begin": {"type": "DateTimeObjectPropertyType"},
+      "Trigger_Max_Run_Time": {"type": "DurationObjectPropertyType"},
+      "Trigger_Session_Change_Type": {"type": "StringObjectPropertyType"},
+      "Trigger_Frequency": {"type": "TaskTriggerFrequencyType"},
+      "Trigger_Delay": {"type": "DurationObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "FileAttributeType": {
+    "prefix": "FileObj",
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4TimeExceededType": {
+    "elements": {
+      "TTL_Exceeded_In_Transit": {"type": "boolean"},
+      "Frag_Reassembly_Time_Exceeded": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "WindowsNetworkShareObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Netname']",
+    "prefix": "WinNetworkShareObj",
+    "elements": {
+      "Type": {"type": "SharedResourceType"},
+      "Max_Uses": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Current_Uses": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Netname": {"type": "StringObjectPropertyType"},
+      "Local_Path": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Windows Network Share",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinNetworkShareObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "PDFIndirectObjectContentsType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Non_Stream_Contents": {"type": "StringObjectPropertyType"},
+      "Stream_Contents": {"type": "PDFStreamType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "HTTPClientRequestType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "HTTP_Request_Line": {"type": "HTTPRequestLineType"},
+      "HTTP_Request_Header": {"type": "HTTPRequestHeaderType"},
+      "HTTP_Message_Body": {"type": "HTTPMessageType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "WhoisRegistrantsType": {
+    "prefix": "WhoisObj",
+    "elements": {"Registrant": {
+      "maxOccurs": "unbounded",
+      "type": "WhoisRegistrantInfoType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "anyType"
+  },
+  "NDPPrefixInfoType": {
+    "elements": {
+      "Preferred_Lifetime": {"type": "IntegerObjectPropertyType"},
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Valid_Lifetime": {"type": "IntegerObjectPropertyType"},
+      "Prefix": {"type": "PrefixType"},
+      "Prefix_Length": {"type": "IntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "VolumeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "VolumeObj",
+    "elements": {
+      "Actual_Available_Allocation_Units": {"type": "UnsignedLongObjectPropertyType"},
+      "Creation_Time": {"type": "DateTimeObjectPropertyType"},
+      "Total_Allocation_Units": {"type": "UnsignedLongObjectPropertyType"},
+      "Serial_Number": {"type": "StringObjectPropertyType"},
+      "Bytes_Per_Sector": {"type": "PositiveIntegerObjectPropertyType"},
+      "Device_Path": {"type": "StringObjectPropertyType"},
+      "File_System_Type": {"type": "StringObjectPropertyType"},
+      "File_System_Flag_List": {"type": "FileSystemFlagListType"},
+      "Sectors_Per_Allocation_Unit": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Volume",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#VolumeObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "ProcessorTypeType": {
+    "prefix": "CodeObj",
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ServiceDescriptionListType": {
+    "prefix": "WinServiceObj",
+    "elements": {"Description": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinServiceObject-2",
+    "base": "anyType"
+  },
+  "TriggerListType": {
+    "prefix": "WinTaskObj",
+    "elements": {"Trigger": {
+      "maxOccurs": "unbounded",
+      "type": "TriggerType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "URLHistoryEntryType": {
+    "prefix": "URLHistoryObj",
+    "elements": {
+      "Referrer_URL": {"type": "URIObjectType"},
+      "Last_Visit_DateTime": {"type": "DateTimeObjectPropertyType"},
+      "Page_Title": {"type": "StringObjectPropertyType"},
+      "First_Visit_DateTime": {"type": "DateTimeObjectPropertyType"},
+      "Hostname": {"type": "HostnameObjectType"},
+      "Modification_DateTime": {"type": "DateTimeObjectPropertyType"},
+      "User_Profile_Name": {"type": "StringObjectPropertyType"},
+      "Visit_Count": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Expiration_DateTime": {"type": "DateTimeObjectPropertyType"},
+      "URL": {"type": "URIObjectType"},
+      "Manually_Entered_Count": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#URLHistoryObject-1",
+    "base": "anyType"
+  },
+  "BlockType": {
+    "prefix": "MemoryObj",
+    "URI": "http://cybox.mitre.org/objects#MemoryObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "HTTPRequestHeaderType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Raw_Header": {"type": "StringObjectPropertyType"},
+      "Parsed_Header": {"type": "HTTPRequestHeaderFieldsType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "IShowMessageActionType": {
+    "prefix": "WinTaskObj",
+    "elements": {
+      "Show_Message_Body": {"type": "StringObjectPropertyType"},
+      "Show_Message_Title": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "SubjectPublicKeyType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "RSA_Public_Key": {"type": "RSAPublicKeyType"},
+      "Public_Key_Algorithm": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "IANAPortNumberRegistryType": {"base": "BaseObjectPropertyType"},
+  "TransportLayerType": {
+    "elements": {
+      "TCP": {"type": "TCPType"},
+      "UDP": {"type": "UDPType"}
+    },
+    "base": "anyType"
+  },
+  "NetflowV9PacketHeaderType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Sys_Up_Time": {"type": "IntegerObjectPropertyType"},
+      "Version": {"type": "HexBinaryObjectPropertyType"},
+      "Unix_Secs": {"type": "IntegerObjectPropertyType"},
+      "Sequence_Number": {"type": "IntegerObjectPropertyType"},
+      "Source_ID": {"type": "HexBinaryObjectPropertyType"},
+      "Record_Count": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "IANAAssignedIPNumbersType": {"base": "BaseObjectPropertyType"},
+  "ICMPv6InfoMessageContentType": {
+    "elements": {
+      "Identifier": {"type": "HexBinaryObjectPropertyType"},
+      "Sequence_Number": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "WindowsComputerAccountObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Fully_Qualified_Name']/*[local-name() = 'Full_Name']",
+    "prefix": "ns1",
+    "elements": {
+      "Kerberos": {"type": "KerberosType"},
+      "Type": {"type": "StringObjectPropertyType"},
+      "Security_ID": {"type": "StringObjectPropertyType"},
+      "Fully_Qualified_Name": {"type": "FullyQualifiedNameType"},
+      "Security_Type": {"type": "SIDType"}
+    },
+    "typeName": "Windows Computer Account",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinComputerAccountObject-2",
+    "base": "AccountObjectType"
+  },
+  "ICMPv4TimestampRequestType": {
+    "elements": {
+      "Timestamp": {"type": "boolean"},
+      "Originate_Timestamp": {"type": "UnsignedIntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "WindowsFileAttributesType": {
+    "prefix": "WinFileObj",
+    "elements": {"Attribute": {
+      "maxOccurs": "unbounded",
+      "type": "WindowsFileAttributeType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinFileObject-2",
+    "base": "FileAttributeType"
+  },
+  "WhoisContactType": {
+    "prefix": "WhoisObj",
+    "elements": {
+      "Contact_ID": {"type": "StringObjectPropertyType"},
+      "Organization": {"type": "StringObjectPropertyType"},
+      "Address": {"type": "StringObjectPropertyType"},
+      "Fax_Number": {"type": "StringObjectPropertyType"},
+      "Email_Address": {"type": "AddressObjectType"},
+      "Phone_Number": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "anyType"
+  },
+  "WindowsPipeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinPipeObj",
+    "elements": {
+      "Default_Time_Out": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Open_Mode": {"type": "HexBinaryObjectPropertyType"},
+      "Pipe_Mode": {"type": "HexBinaryObjectPropertyType"},
+      "Max_Instances": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "In_Buffer_Size": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Out_Buffer_Size": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"}
+    },
+    "typeName": "Windows Pipe",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinPipeObject-2",
+    "base": "PipeObjectType"
+  },
+  "GroupListType": {
+    "prefix": "UserAccountObj",
+    "elements": {"Group": {
+      "maxOccurs": "unbounded",
+      "type": "GroupType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#UserAccountObject-2",
+    "base": "anyType"
+  },
+  "PrivilegeListType": {
+    "prefix": "UserAccountObj",
+    "elements": {"Privilege": {
+      "maxOccurs": "unbounded",
+      "type": "PrivilegeType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#UserAccountObject-2",
+    "base": "anyType"
+  },
+  "WindowsVolumeAttributesListType": {
+    "prefix": "WinVolumeObj",
+    "elements": {"Attribute": {
+      "maxOccurs": "4",
+      "type": "WindowsVolumeAttributeType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinVolumeObject-2",
+    "base": "anyType"
+  },
+  "PEChecksumType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "PE_Computed_API": {"type": "LongObjectPropertyType"},
+      "PE_File_API": {"type": "LongObjectPropertyType"},
+      "PE_File_Raw": {"type": "LongObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "HTTPMessageType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Length": {"type": "PositiveIntegerObjectPropertyType"},
+      "Message_Body": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "HTTPStatusLineType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Version": {"type": "StringObjectPropertyType"},
+      "Reason_Phrase": {"type": "StringObjectPropertyType"},
+      "Status_Code": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "WindowsSystemRestoreObjectType": {
+    "prefix": "WinSystemRestoreObj",
+    "elements": {
+      "Original_File_Name": {"type": "StringObjectPropertyType"},
+      "Backup_File_Name": {"type": "StringObjectPropertyType"},
+      "ChangeLog_Entry_Type": {"type": "ChangeLogEntryTypeType"},
+      "Change_Log_File_Name": {"type": "StringObjectPropertyType"},
+      "Restore_Point_Name": {"type": "StringObjectPropertyType"},
+      "ChangeLog_Entry_Sequence_Number": {"type": "LongObjectPropertyType"},
+      "Original_Short_File_Name": {"type": "StringObjectPropertyType"},
+      "File_Attributes": {"type": "StringObjectPropertyType"},
+      "ACL_Change_SID": {"type": "StringObjectPropertyType"},
+      "Created": {"type": "DateTimeObjectPropertyType"},
+      "New_File_Name": {"type": "StringObjectPropertyType"},
+      "Process_Name": {"type": "StringObjectPropertyType"},
+      "ACL_Change_Username": {"type": "StringObjectPropertyType"},
+      "Change_Event": {"type": "ChangeLogEntryTypeType"},
+      "Restore_Point_Description": {"type": "StringObjectPropertyType"},
+      "Restore_Point_Type": {"type": "StringObjectPropertyType"},
+      "ChangeLog_Entry_Flags": {"type": "StringObjectPropertyType"},
+      "Restore_Point_Full_Path": {"type": "StringObjectPropertyType"},
+      "Registry_Hive_List": {"type": "HiveListType"}
+    },
+    "typeName": "Windows System Restore",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinSystemRestoreObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "TaskActionTypeType": {
+    "prefix": "WinTaskObj",
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ICMPv6ErrorMessageType": {
+    "elements": {
+      "Time_Exceeded": {"type": "ICMPv6TimeExceededType"},
+      "Destination_Unreachable": {"type": "ICMPv6DestinationUnreachableType"},
+      "Packet_Too_Big": {"type": "ICMPv6PacketTooBigType"},
+      "Parameter_Problem": {"type": "ICMPv6ParameterProblemType"},
+      "Invoking_Packet": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "FileDescriptorListType": {
+    "prefix": "UnixProcessObj",
+    "elements": {"File_Descriptor": {
+      "maxOccurs": "unbounded",
+      "type": "UnsignedIntegerObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#UnixProcessObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4InfoMessageType": {
+    "elements": {
+      "Timestamp_Reply": {"type": "ICMPv4TimestampReplyType"},
+      "Info_Msg_Content": {"type": "ICMPv4InfoMessageContentType"},
+      "Address_Mask_Reply": {"type": "ICMPv4AddressMaskReplyType"},
+      "Timestamp_Request": {"type": "ICMPv4TimestampRequestType"},
+      "Address_Mask_Request": {"type": "ICMPv4AddressMaskRequestType"},
+      "Echo_Request": {"type": "ICMPv4EchoRequestType"},
+      "Echo_Reply": {"type": "ICMPv4EchoReplyType"}
+    },
+    "base": "anyType"
+  },
+  "UnixFileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "UnixFileObj",
+    "elements": {
+      "INode": {"type": "UnsignedLongObjectPropertyType"},
+      "Type": {"type": "UnixFileType"},
+      "Group_Owner": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Unix File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UnixFileObject-2",
+    "base": "FileObjectType"
+  },
+  "WindowsThreadObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Thread_ID']",
+    "prefix": "WinThreadObj",
+    "elements": {
+      "Context": {"type": "StringObjectPropertyType"},
+      "Creation_Time": {"type": "DateTimeObjectPropertyType"},
+      "Creation_Flags": {"type": "HexBinaryObjectPropertyType"},
+      "Parameter_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Thread_ID": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Priority": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Running_Status": {"type": "ThreadRunningStatusType"},
+      "Stack_Size": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"},
+      "Start_Address": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "typeName": "Windows Thread",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinThreadObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "BitnessType": {
+    "prefix": "SystemObj",
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "FragmentType": {
+    "elements": {
+      "Fragment_Header": {"type": "FragmentHeaderType"},
+      "Fragment": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "AuthenticationHeaderType": {
+    "elements": {
+      "Next_Header": {"type": "IANAAssignedIPNumbersType"},
+      "Authentication_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Header_Ext_Len": {"type": "HexBinaryObjectPropertyType"},
+      "Sequence_Number": {"type": "HexBinaryObjectPropertyType"},
+      "Security_Parameters_Index": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "ImageFileFormatType": {
+    "prefix": "ImageFileObj",
+    "URI": "http://cybox.mitre.org/objects#ImageFileObject-1",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPv4ClassType": {"base": "BaseObjectPropertyType"},
+  "PackerListType": {
+    "prefix": "FileObj",
+    "elements": {"Packer": {
+      "maxOccurs": "unbounded",
+      "type": "PackerType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "StartupInfoType": {
+    "prefix": "WinProcessObj",
+    "elements": {
+      "wShowWindow": {"type": "IntegerObjectPropertyType"},
+      "lpTitle": {"type": "StringObjectPropertyType"},
+      "dwX": {"type": "IntegerObjectPropertyType"},
+      "dwY": {"type": "IntegerObjectPropertyType"},
+      "dwYCountChars": {"type": "PositiveIntegerObjectPropertyType"},
+      "dwFillAttribute": {"type": "IntegerObjectPropertyType"},
+      "dwYSize": {"type": "PositiveIntegerObjectPropertyType"},
+      "hStdError": {"type": "WindowsHandleObjectType"},
+      "hStdOutput": {"type": "WindowsHandleObjectType"},
+      "hStdInput": {"type": "WindowsHandleObjectType"},
+      "lpDesktop": {"type": "StringObjectPropertyType"},
+      "dwFlags": {"type": "IntegerObjectPropertyType"},
+      "dwXSize": {"type": "PositiveIntegerObjectPropertyType"},
+      "dwXCountChars": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinProcessObject-2",
+    "base": "anyType"
+  },
+  "RouterSolicitationOptionsType": {
+    "elements": {"Src_Link_Addr": {"type": "NDPLinkAddrType"}},
+    "base": "anyType"
+  },
+  "NetworkConnectionListType": {
+    "prefix": "ProcessObj",
+    "elements": {"Network_Connection": {
+      "maxOccurs": "unbounded",
+      "type": "NetworkConnectionObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "anyType"
+  },
+  "CodePurposeType": {
+    "prefix": "CodeObj",
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "SiLKRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Flow_Application": {"type": "IANAPortNumberRegistryType"},
+      "ICMP_Type": {"type": "IntegerObjectPropertyType"},
+      "Duration": {"type": "IntegerObjectPropertyType"},
+      "Initial_TCP_Flags": {"type": "TCPFlagsType"},
+      "Router_Next_Hop_IP": {"type": "AddressObjectType"},
+      "Dest_Country_Code": {"type": "SiLKCountryCodeType"},
+      "Packet_Count": {"type": "IntegerObjectPropertyType"},
+      "Dest_IP_Type": {"type": "SiLKAddressType"},
+      "End_Time": {"type": "IntegerObjectPropertyType"},
+      "Start_Time": {"type": "IntegerObjectPropertyType"},
+      "TCP_Flags": {"type": "HexBinaryObjectPropertyType"},
+      "Flow_Attributes": {"type": "SiLKFlowAttributesType"},
+      "Src_IP_Type": {"type": "SiLKAddressType"},
+      "Src_Country_Code": {"type": "SiLKCountryCodeType"},
+      "Dest_MAPNAME": {"type": "StringObjectPropertyType"},
+      "Sensor_Info": {"type": "SiLKSensorInfoType"},
+      "Session_TCP_Flags": {"type": "HexBinaryObjectPropertyType"},
+      "Src_MAPNAME": {"type": "StringObjectPropertyType"},
+      "Byte_Count": {"type": "IntegerObjectPropertyType"},
+      "ICMP_Code": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4ErrorMessageContentType": {
+    "elements": {
+      "First_Eight_Bytes": {"type": "HexBinaryObjectPropertyType"},
+      "IP_Header": {"type": "IPv4HeaderType"}
+    },
+    "base": "anyType"
+  },
+  "PEExportsType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Number_Of_Functions": {"type": "IntegerObjectPropertyType"},
+      "Number_Of_Names": {"type": "LongObjectPropertyType"},
+      "Exported_Functions": {"type": "PEExportedFunctionsType"},
+      "Exports_Time_Stamp": {"type": "DateTimeObjectPropertyType"},
+      "Number_Of_Addresses": {"type": "LongObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "NetworkRouteEntryObjectType": {
+    "prefix": "NetworkRouteEntryObj",
+    "elements": {
+      "Destination_Address": {"type": "AddressObjectType"},
+      "Origin": {"type": "AddressObjectType"},
+      "Type": {"type": "RouteType"},
+      "Preferred_Lifetime": {"type": "DurationObjectPropertyType"},
+      "Metric": {"type": "UnsignedLongObjectPropertyType"},
+      "Valid_Lifetime": {"type": "DurationObjectPropertyType"},
+      "Netmask": {"type": "AddressObjectType"},
+      "Protocol": {"type": "StringObjectPropertyType"},
+      "Gateway_Address": {"type": "AddressObjectType"},
+      "Route_Age": {"type": "DurationObjectPropertyType"},
+      "Interface": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Network Route Entry",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#NetworkRouteEntryObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "UnixGroupType": {
+    "prefix": "UnixUserAccountObj",
+    "elements": {"Group_ID": {"type": "NonNegativeIntegerObjectPropertyType/>"}},
+    "URI": "http://cybox.mitre.org/objects#UnixUserAccountObject-2",
+    "base": "GroupType"
+  },
+  "IPInfoListType": {
+    "prefix": "SystemObj",
+    "elements": {"IP_Info": {
+      "maxOccurs": "unbounded",
+      "type": "IPInfoType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "TypeLengthType": {
+    "elements": {
+      "Internet_Layer_Type": {"type": "IANAEtherType"},
+      "Length": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "WindowsWaitableTimerObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinWaitableTimerObj",
+    "elements": {
+      "Type": {"type": "WaitableTimerType"},
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Windows Waitable Timer",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinWaitableTimerObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "PDFDictionaryType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Object_Reference": {"type": "PDFIndirectObjectIDType/>"},
+      "Raw_Contents": {"type": "StringObjectPropertyType/>"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "ArchiveFileFormatType": {
+    "prefix": "ArchiveFileObj",
+    "URI": "http://cybox.mitre.org/objects#ArchiveFileObject-1",
+    "base": "BaseObjectPropertyType"
+  },
+  "NeighborSolicitationOptionsType": {
+    "elements": {"Src_Link_Addr": {"type": "NDPLinkAddrType"}},
+    "base": "anyType"
+  },
+  "PDFXrefTableSubsectionListType": {
+    "prefix": "PDFFileObj",
+    "elements": {"Subsection": {
+      "maxOccurs": "unbounded",
+      "type": "PDFXrefTableSubsectionType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "DataDirectoryType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Exception_Table": {"type": "PEDataDirectoryStructType"},
+      "Import_Address_Table": {"type": "PEDataDirectoryStructType"},
+      "Certificate_Table": {"type": "PEDataDirectoryStructType"},
+      "Architecture": {"type": "PEDataDirectoryStructType"},
+      "Export_Table": {"type": "PEDataDirectoryStructType"},
+      "Import_Table": {"type": "PEDataDirectoryStructType"},
+      "Resource_Table": {"type": "PEDataDirectoryStructType"},
+      "CLR_Runtime_Header": {"type": "PEDataDirectoryStructType"},
+      "Global_Ptr": {"type": "PEDataDirectoryStructType"},
+      "TLS_Table": {"type": "PEDataDirectoryStructType"},
+      "Delay_Import_Descriptor": {"type": "PEDataDirectoryStructType"},
+      "Bound_Import": {"type": "PEDataDirectoryStructType"},
+      "Debug": {"type": "PEDataDirectoryStructType"},
+      "Load_Config_Table": {"type": "PEDataDirectoryStructType"},
+      "Base_Relocation_Table": {"type": "PEDataDirectoryStructType"},
+      "Reserved": {"type": "PEDataDirectoryStructType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "PEExportedFunctionsType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {"Exported_Function": {
+      "maxOccurs": "unbounded",
+      "type": "PEExportedFunctionType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "FlowCollectionElementType": {
+    "prefix": "NetFlowObj",
+    "elements": {"Flow_Record_Field_Value": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "AuthenticationType": {
+    "prefix": "AccountObj",
+    "elements": {
+      "Authentication_Type": {"type": "ControlledVocabularyStringType"},
+      "Structured_Authentication_Mechanism": {"type": "StructuredAuthenticationMechanismType"},
+      "Authentication_Data": {"type": "StringObjectPropertyType"},
+      "Authentication_Token_Protection_Mechanism": {"type": "ControlledVocabularyStringType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#AccountObject-2",
+    "base": "anyType"
+  },
+  "PEFileHeaderType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Pointer_To_Symbol_Table": {"type": "HexBinaryObjectPropertyType"},
+      "Time_Date_Stamp": {"type": "HexBinaryObjectPropertyType"},
+      "Characteristics": {"type": "HexBinaryObjectPropertyType"},
+      "Hashes": {"type": "HashListType"},
+      "Size_Of_Optional_Header": {"type": "HexBinaryObjectPropertyType"},
+      "Number_Of_Sections": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Machine": {"type": "HexBinaryObjectPropertyType"},
+      "Number_Of_Symbols": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "SubsystemType": {
+    "prefix": "WinExecutableFileObj",
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "HopByHopOptionsType": {
+    "elements": {
+      "Option_Data": {
+        "maxOccurs": "unbounded",
+        "type": "OptionDataType"
+      },
+      "Next_Header": {"type": "IANAAssignedIPNumbersType"},
+      "Header_Ext_Len": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "NetworkSubnetObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "NetworkSubnetObj",
+    "elements": {
+      "Description": {"type": "StructuredTextType"},
+      "Number_Of_IP_Addresses": {"type": "IntegerObjectPropertyType"},
+      "Routes": {"type": "RoutesType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Network Subnet",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#NetworkSubnetObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "DNSRecordType": {
+    "prefix": "DNSQueryObj",
+    "URI": "http://cybox.mitre.org/objects#DNSQueryObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "HTTPResponseHeaderType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Raw_Header": {"type": "StringObjectPropertyType"},
+      "Parsed_Header": {"type": "HTTPResponseHeaderFieldsType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "TargetedPlatformsType": {
+    "prefix": "CodeObj",
+    "elements": {"Targeted_Platform": {
+      "maxOccurs": "unbounded",
+      "type": "PlatformSpecificationType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "anyType"
+  },
+  "IPv6DoNotRecogActionType": {"base": "BaseObjectPropertyType"},
+  "RouterSolicitationType": {
+    "elements": {"Options": {
+      "maxOccurs": "unbounded",
+      "type": "RouterSolicitationOptionsType"
+    }},
+    "base": "anyType"
+  },
+  "IPv6HeaderType": {
+    "elements": {
+      "IP_Version": {"type": "IPVersionType"},
+      "Payload_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Dest_IPv6_Addr": {"type": "AddressObjectType"},
+      "Flow_Label": {"type": "HexBinaryObjectPropertyType"},
+      "Next_Header": {"type": "IANAAssignedIPNumbersType"},
+      "Src_IPv6_Addr": {"type": "AddressObjectType"},
+      "Traffic_Class": {"type": "HexBinaryObjectPropertyType"},
+      "TTL": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "DeviceObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Model']",
+    "prefix": "DeviceObj",
+    "elements": {
+      "System_Details": {"type": "ObjectPropertiesType"},
+      "Description": {"type": "StructuredTextType"},
+      "Device_Type": {"type": "StringObjectPropertyType"},
+      "Serial_Number": {"type": "StringObjectPropertyType"},
+      "Manufacturer": {"type": "StringObjectPropertyType"},
+      "Model": {"type": "StringObjectPropertyType"},
+      "Firmware_Version": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Device",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DeviceObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "MutexObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "MutexObj",
+    "elements": {"Name": {"type": "StringObjectPropertyType"}},
+    "typeName": "Mutex",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#MutexObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "SSDTEntryListType": {
+    "prefix": "WinKernelObj",
+    "elements": {"SSDT_Entry": {
+      "maxOccurs": "unbounded",
+      "type": "SSDTEntryType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinKernelObject-2",
+    "base": "anyType"
+  },
+  "WindowsNetworkRouteEntryObjectType": {
+    "prefix": "WinNetworkRouteEntryObj",
+    "elements": {
+      "NL_ROUTE_PROTOCOL": {"type": "NLRouteProtocolType"},
+      "NL_ROUTE_ORIGIN": {"type": "NLRouteOriginType"}
+    },
+    "typeName": "Windows Network Route Entry",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinNetworkRouteEntryObject-2",
+    "base": "NetworkRouteEntryObjectType"
+  },
+  "ICMPv6DestinationUnreachableType": {
+    "elements": {
+      "Src_Addr_Failed_Policy": {"type": "boolean"},
+      "Beyond_Scope": {"type": "boolean"},
+      "Address_Unreachable": {"type": "boolean"},
+      "No_Route": {"type": "boolean"},
+      "Comm_Prohibited": {"type": "boolean"},
+      "Reject_Route": {"type": "boolean"},
+      "Port_Unreachable": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "PEType": {
+    "prefix": "WinExecutableFileObj",
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "SiLKSensorInfoType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Sensor_ID": {"type": "StringObjectPropertyType"},
+      "Type": {"type": "SiLKDirectionType"},
+      "Class": {"type": "SiLKSensorClassType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "ICMPv6HeaderType": {
+    "elements": {
+      "Type": {"type": "HexBinaryObjectPropertyType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "Code": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "BIOSInfoType": {
+    "prefix": "SystemObj",
+    "elements": {
+      "BIOS_Serial_Number": {"type": "StringObjectPropertyType"},
+      "BIOS_Date": {"type": "DateObjectPropertyType"},
+      "BIOS_Release_Date": {"type": "DateObjectPropertyType"},
+      "BIOS_Version": {"type": "StringObjectPropertyType"},
+      "BIOS_Manufacturer": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "NetflowV9OptionsTemplateFlowSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Options_Template_Record": {
+        "maxOccurs": "unbounded",
+        "type": "NetflowV9OptionsTemplateRecordType"
+      },
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Padding": {"type": "HexBinaryObjectPropertyType"},
+      "Flow_Set_ID": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "IPFIXSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Options_Template_Set": {"type": "IPFIXOptionsTemplateSetType"},
+      "Data_Set": {"type": "IPFIXDataSetType"},
+      "Template_Set": {"type": "IPFIXTemplateSetType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "LinkLayerType": {
+    "elements": {
+      "Physical_Interface": {"type": "PhysicalInterfaceType"},
+      "Logical_Protocols": {"type": "LogicalProtocolType"}
+    },
+    "base": "anyType"
+  },
+  "AccountObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Domain']",
+    "prefix": "AccountObj",
+    "elements": {
+      "Last_Accessed_Time": {"type": "DateTimeObjectPropertyType"},
+      "Description": {"type": "StringObjectPropertyType"},
+      "Authentication": {
+        "maxOccurs": "unbounded",
+        "type": "AuthenticationType"
+      },
+      "Creation_Date": {"type": "DateTimeObjectPropertyType"},
+      "Domain": {"type": "StringObjectPropertyType"},
+      "Modified_Date": {"type": "DateTimeObjectPropertyType"}
+    },
+    "typeName": "Account",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#AccountObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IPFIXDataSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Data_Record": {
+        "maxOccurs": "unbounded",
+        "type": "IPFIXDataRecordType"
+      },
+      "Padding": {"type": "HexBinaryObjectPropertyType"},
+      "Set_Header": {"type": "IPFIXSetHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "PortListType": {
+    "prefix": "ProcessObj",
+    "elements": {"Port": {
+      "maxOccurs": "unbounded",
+      "type": "PortObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#ProcessObject-2",
+    "base": "anyType"
+  },
+  "NetflowV9DataRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Flow_Data_Record": {
+        "maxOccurs": "unbounded",
+        "type": "FlowDataRecordType"
+      },
+      "Options_Data_Record": {
+        "maxOccurs": "unbounded",
+        "type": "OptionsDataRecordType"
+      }
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4EchoRequestType": {
+    "elements": {
+      "Data": {"type": "HexBinaryObjectPropertyType"},
+      "Echo_Request": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "IExecActionType": {
+    "prefix": "WinTaskObj",
+    "elements": {
+      "Exec_Arguments": {"type": "StringObjectPropertyType"},
+      "Exec_Program_Path": {"type": "StringObjectPropertyType"},
+      "Exec_Program_Hashes": {"type": "HashListType"},
+      "Exec_Working_Directory": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "NetflowV9TemplateFlowSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Template_Record": {
+        "maxOccurs": "unbounded",
+        "type": "NetflowV9TemplateRecordType"
+      },
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Flow_Set_ID": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "RouterAdvertisementType": {
+    "elements": {
+      "Options": {"type": "RouterAdvertisementOptionsType"},
+      "Retrans_Timer": {"type": "IntegerObjectPropertyType"},
+      "Cur_Hop_Limit": {"type": "IntegerObjectPropertyType"},
+      "Router_Lifetime": {"type": "IntegerObjectPropertyType"},
+      "Reachable_Time": {"type": "IntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "NetworkFlowLabelType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Ingress_Interface_Index": {"type": "IntegerObjectPropertyType"},
+      "Egress_Interface_Index": {"type": "IntegerObjectPropertyType"},
+      "IP_Type_Of_Service": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "NetworkLayerInfoType"
+  },
+  "APIObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Function_Name']",
+    "prefix": "APIObj",
+    "elements": {
+      "Normalized_Function_Name": {"type": "StringObjectPropertyType"},
+      "Description": {"type": "StructuredTextType"},
+      "Function_Name": {"type": "StringObjectPropertyType"},
+      "Platform": {"type": "PlatformSpecificationType"},
+      "Address": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "typeName": "API",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#APIObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IPGatewayListType": {
+    "prefix": "SystemObj",
+    "elements": {"IP_Gateway_Address": {
+      "maxOccurs": "unbounded",
+      "type": "AddressObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "PackagingType": {
+    "prefix": "ArtifactObj",
+    "elements": {
+      "Compression": {"type": "CompressionType"},
+      "Encoding": {"type": "EncodingType"},
+      "Encryption": {"type": "EncryptionType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#ArtifactObject-2",
+    "base": "anyType"
+  },
+  "ChangeLogEntryTypeType": {
+    "prefix": "WinSystemRestoreObj",
+    "URI": "http://cybox.mitre.org/objects#WinSystemRestoreObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "NetworkFlowObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Network_Flow_Label']/*[local-name() = 'Dest_Socket_Address' or local-name() = 'Src_Socket_Address']",
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Network_Flow_Label": {"type": "NetworkFlowLabelType"},
+      "Bidirectional_Flow_Record": {"type": "BidirectionalRecordType"},
+      "Unidirectional_Flow_Record": {"type": "UnidirectionalRecordType"}
+    },
+    "pattern": "Src_Socket_Address_through_Dest_Socket_Address",
+    "typeName": "Network Flow",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "NetworkInterfaceListType": {
+    "prefix": "SystemObj",
+    "elements": {"Network_Interface": {
+      "maxOccurs": "unbounded",
+      "type": "NetworkInterfaceType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "UnixFileType": {
+    "prefix": "UnixFileObj",
+    "URI": "http://cybox.mitre.org/objects#UnixFileObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "LogicalProtocolType": {
+    "elements": {
+      "NDP": {"type": "NDPType"},
+      "ARP_RARP": {"type": "ARPType"}
+    },
+    "base": "anyType"
+  },
+  "PEImportType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Imported_Functions": {"type": "PEImportedFunctionsType"},
+      "File_Name": {"type": "StringObjectPropertyType"},
+      "Virtual_Address": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "PackerType": {
+    "prefix": "FileObj",
+    "elements": {
+      "Type": {"type": "PackerClassType"},
+      "Version": {"type": "StringObjectPropertyType"},
+      "Entry_Point": {"type": "HexBinaryObjectPropertyType"},
+      "Signature": {"type": "StringObjectPropertyType"},
+      "EP_Jump_Codes": {"type": "EPJumpCodeType"},
+      "Detected_Entrypoint_Signatures": {"type": "EntryPointSignatureListType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "WindowsPrefetchObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Application_File_Name']",
+    "prefix": "WinPrefetchObj",
+    "elements": {
+      "Last_Run": {"type": "DateTimeObjectPropertyType"},
+      "Volume": {"type": "VolumeType"},
+      "Prefetch_Hash": {"type": "StringObjectPropertyType"},
+      "Application_File_Name": {"type": "StringObjectPropertyType"},
+      "First_Run": {"type": "DateTimeObjectPropertyType"},
+      "Accessed_Directory_List": {"type": "AccessedDirectoryListType"},
+      "Times_Executed": {"type": "LongObjectPropertyType"},
+      "Accessed_File_List": {"type": "AccessedFileListType"}
+    },
+    "typeName": "Windows Prefetch",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinPrefetchObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "YAFTCPFlowType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "TCP_Sequence_Number": {"type": "IntegerObjectPropertyType"},
+      "Union_TCP_Flags": {"type": "HexBinaryObjectPropertyType"},
+      "Initial_TCP_Flags": {"type": "TCPFlagsType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "NetRouteObjectType": {
+    "prefix": "NetworkRouteObj",
+    "elements": {
+      "Description": {"type": "StructuredTextType"},
+      "Preferred_Lifetime": {"type": "DurationObjectPropertyType"},
+      "Network_Route_Entries": {"type": "NetworkRouteEntriesType"},
+      "Valid_Lifetime": {"type": "DurationObjectPropertyType"},
+      "Route_Age": {"type": "DurationObjectPropertyType"}
+    },
+    "typeName": "Network Route",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#NetworkRouteObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "PDFIndirectObjectListType": {
+    "prefix": "PDFFileObj",
+    "elements": {"Indirect_Object": {
+      "maxOccurs": "unbounded",
+      "type": "PDFIndirectObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "PDFStreamType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Raw_Stream_Hashes": {"type": "HashListType"},
+      "Raw_Stream": {"type": "StringObjectPropertyType"},
+      "Decoded_Stream": {"type": "HexBinaryObjectPropertyType"},
+      "Decoded_Stream_Hashes": {"type": "HashListType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "PESectionType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Data_Hashes": {"type": "HashListType"},
+      "Section_Header": {"type": "PESectionHeaderStructType"},
+      "Header_Hashes": {"type": "HashListType"},
+      "Entropy": {"type": "EntropyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "AttachmentReferenceType": {
+    "prefix": "EmailMessageObj",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "ThreadRunningStatusType": {
+    "prefix": "WinThreadObj",
+    "URI": "http://cybox.mitre.org/objects#WinThreadObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "EntropyType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Min": {"type": "FloatObjectPropertyType"},
+      "Max": {"type": "FloatObjectPropertyType"},
+      "Value": {"type": "FloatObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "FileSystemFlagListType": {
+    "prefix": "VolumeObj",
+    "elements": {"File_System_Flag": {
+      "maxOccurs": "20",
+      "type": "VolumeFileSystemFlagType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#VolumeObject-2",
+    "base": "anyType"
+  },
+  "ServiceType": {
+    "prefix": "WinServiceObj",
+    "URI": "http://cybox.mitre.org/objects#WinServiceObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "SystemObjectType": {
+    "prefix": "SystemObj",
+    "elements": {
+      "Processor": {"type": "StringObjectPropertyType"},
+      "BIOS_Info": {"type": "BIOSInfoType"},
+      "OS": {"type": "OSType"},
+      "Uptime": {"type": "DurationObjectPropertyType"},
+      "System_Time": {"type": "TimeObjectPropertyType"},
+      "Hostname": {"type": "StringObjectPropertyType"},
+      "Date": {"type": "DateObjectPropertyType"},
+      "Network_Interface_List": {"type": "NetworkInterfaceListType"},
+      "Timezone_DST": {"type": "StringObjectPropertyType"},
+      "Total_Physical_Memory": {"type": "UnsignedLongObjectPropertyType"},
+      "Available_Physical_Memory": {"type": "UnsignedLongObjectPropertyType"},
+      "Timezone_Standard": {"type": "StringObjectPropertyType"},
+      "Username": {"type": "StringObjectPropertyType"},
+      "Local_Time": {"type": "TimeObjectPropertyType"},
+      "Processor_Architecture": {"type": "ProcessorArchType"}
+    },
+    "typeName": "System",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "IPv6ExtHeaderType": {
+    "elements": {
+      "Hop_by_Hop_Options": {"type": "HopByHopOptionsType"},
+      "Encapsulating_Security_Payload": {"type": "EncapsulatingSecurityPayloadType"},
+      "Routing": {"type": "RoutingType"},
+      "Authentication_Header": {"type": "AuthenticationHeaderType"},
+      "Fragment": {"type": "FragmentType"},
+      "Destination_Options": {
+        "maxOccurs": "2",
+        "type": "DestinationOptionsType"
+      }
+    },
+    "base": "anyType"
+  },
+  "WhoisStatusType": {
+    "prefix": "WhoisObj",
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPv4HeaderType": {
+    "elements": {
+      "Header_Length": {"type": "IntegerObjectPropertyType"},
+      "Total_Length": {"type": "HexBinaryObjectPropertyType"},
+      "Identification": {"type": "PositiveIntegerObjectPropertyType"},
+      "Flags": {"type": "IPv4FlagsType"},
+      "TTL": {"type": "HexBinaryObjectPropertyType"},
+      "Src_IPv4_Addr": {"type": "AddressObjectType"},
+      "Dest_IPv4_Addr": {"type": "AddressObjectType"},
+      "IP_Version": {"type": "IPVersionType"},
+      "ECN": {"type": "HexBinaryObjectPropertyType"},
+      "Fragment_Offset": {"type": "HexBinaryObjectPropertyType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "Option": {
+        "maxOccurs": "unbounded",
+        "type": "IPv4OptionType"
+      },
+      "DSCP": {"type": "HexBinaryObjectPropertyType"},
+      "Protocol": {"type": "IANAAssignedIPNumbersType"}
+    },
+    "base": "anyType"
+  },
+  "TaskFlagType": {
+    "prefix": "WinTaskObj",
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "VolumeFileSystemFlagType": {
+    "prefix": "VolumeObj",
+    "URI": "http://cybox.mitre.org/objects#VolumeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "WindowsFileAttributeType": {
+    "prefix": "WinFileObj",
+    "URI": "http://cybox.mitre.org/objects#WinFileObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "CodeTypeType": {
+    "prefix": "CodeObj",
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ValidityType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "Not_Before": {"type": "DateTimeObjectPropertyType"},
+      "Not_After": {"type": "DateTimeObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "ProductObjectType": {
+    "namePath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Product' or local-name() = 'Vendor' or local-name() = 'Update' or local-name() = 'Edition' or local-name() = 'Language' or local-name() = 'Version'] | .[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Custom_Properties']/*[local-name() = 'Property' and @name = \"Part\"]",
+    "pattern":"cpe:Property:Vendor:Product:Version:Update:Edition:Language",
+    "prefix": "ProductObj",
+    "elements": {
+      "Language": {"type": "StringObjectPropertyType"},
+      "Version": {"type": "StringObjectPropertyType"},
+      "Product": {"type": "StringObjectPropertyType"},
+      "Vendor": {"type": "StringObjectPropertyType"},
+      "Device_Details": {"type": "ObjectPropertiesType"},
+      "Update": {"type": "StringObjectPropertyType"},
+      "Edition": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Product",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ProductObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "EthernetHeaderType": {
+    "elements": {
+      "Destination_MAC_Addr": {"type": "AddressObjectType"},
+      "Type_Or_Length": {"type": "TypeLengthType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "Source_MAC_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "FragmentHeaderType": {
+    "elements": {
+      "Fragment_Offset": {"type": "HexBinaryObjectPropertyType"},
+      "Next_Header": {"type": "HexBinaryObjectPropertyType"},
+      "Identification": {"type": "HexBinaryObjectPropertyType"},
+      "M_Flag": {"type": "MFlagType"}
+    },
+    "base": "anyType"
+  },
+  "RedirectType": {
+    "elements": {
+      "Options": {"type": "RedirectOptionsType"},
+      "Dest_IPv6_Addr": {"type": "AddressObjectType"},
+      "Target_IPv6_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "CodeSegmentXORType": {
+    "prefix": "CodeObj",
+    "URI": "http://cybox.mitre.org/objects#CodeObject-2",
+    "base": "StringObjectPropertyType"
+  },
+  "DiskPartitionObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Partition_ID']",
+    "prefix": "DiskPartitionObj",
+    "elements": {
+      "Space_Used": {"type": "UnsignedLongObjectPropertyType"},
+      "Total_Space": {"type": "UnsignedLongObjectPropertyType"},
+      "Partition_Length": {"type": "UnsignedLongObjectPropertyType"},
+      "Type": {"type": "PartitionType"},
+      "Space_Left": {"type": "UnsignedLongObjectPropertyType"},
+      "Device_Name": {"type": "NameObjectPropertyType"},
+      "Partition_Offset": {"type": "UnsignedLongObjectPropertyType"},
+      "Partition_ID": {"type": "IntegerObjectPropertyType"},
+      "Mount_Point": {"type": "StringObjectPropertyType"},
+      "Created": {"type": "DateTimeObjectPropertyType"}
+    },
+    "typeName": "Disk Partition",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DiskPartitionObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "FilePermissionsType": {
+    "prefix": "FileObj",
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "LinkObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+    "prefix": "LinkObj",
+    "elements": {"URL_Label": {"type": "StringObjectPropertyType"}},
+    "typeName": "Link",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#LinkObject-1",
+    "base": "URIObjectType"
+  },
+  "PDFXrefEntryType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Object_Number": {"type": "NonNegativeIntegerObjectPropertyType/>"},
+      "Generation_Number": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Byte_Offset": {"type": "IntegerObjectPropertyType/>"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "ProcessorArchType": {
+    "prefix": "SystemObj",
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "TaskPriorityType": {
+    "prefix": "WinTaskObj",
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "SocketOptionsType": {
+    "prefix": "NetworkSocketObj",
+    "elements": {
+      "SO_GROUP_PRIORITY": {"type": "UnsignedIntegerObjectPropertyType"},
+      "SO_UPDATE_ACCEPT_CONTEXT": {"type": "UnsignedIntegerObjectPropertyType"},
+      "IP_TOS": {"type": "StringObjectPropertyType"},
+      "IP_MULTICAST_IF2": {"type": "StringObjectPropertyType"},
+      "SO_TIMEOUT": {"type": "UnsignedIntegerObjectPropertyType"},
+      "IP_MULTICAST_IF": {"type": "StringObjectPropertyType"},
+      "SO_SNDBUF": {"type": "UnsignedIntegerObjectPropertyType"},
+      "SO_DONTROUTE": {"type": "boolean"},
+      "SO_REUSEADDR": {"type": "boolean"},
+      "TCP_NODELAY": {"type": "boolean"},
+      "SO_LINGER": {"type": "UnsignedIntegerObjectPropertyType"},
+      "IP_MULTICAST_LOOP": {"type": "boolean"},
+      "SO_RCVBUF": {"type": "UnsignedIntegerObjectPropertyType"},
+      "SO_SNDTIMEO": {"type": "UnsignedIntegerObjectPropertyType"},
+      "SO_KEEPALIVE": {"type": "boolean"},
+      "SO_CONDITIONAL_ACCEPT": {"type": "boolean"},
+      "SO_BROADCAST": {"type": "boolean"},
+      "SO_DEBUG": {"type": "boolean"},
+      "SO_RCVTIMEO": {"type": "UnsignedIntegerObjectPropertyType"},
+      "SO_DONTLINGER": {"type": "boolean"},
+      "SO_OOBINLINE": {"type": "boolean"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkSocketObject-2",
+    "base": "anyType"
+  },
+  "IANAEtherType": {"base": "BaseObjectPropertyType"},
+  "HTTPSessionObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'HTTP_Request_Response']/*[local-name() = 'HTTP_Client_Request']/*[local-name() = 'HTTP_Request_Line']/*[local-name() = 'Value']",
+    "prefix": "HTTPSessionObj",
+    "elements": {"HTTP_Request_Response": {
+      "maxOccurs": "unbounded",
+      "type": "HTTPRequestResponseType"
+    }},
+    "typeName": "HTTP Session",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WaitableTimerType": {
+    "prefix": "WinWaitableTimerObj",
+    "URI": "http://cybox.mitre.org/objects#WinWaitableTimerObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ARPOpType": {"base": "BaseObjectPropertyType"},
+  "ICMPv6InfoMessageType": {
+    "elements": {
+      "Info_Msg_Content": {"type": "ICMPv6InfoMessageContentType"},
+      "Echo_Request": {"type": "ICMPv6EchoRequestType"},
+      "Echo_Reply": {"type": "ICMPv6EchoReplyType"}
+    },
+    "base": "anyType"
+  },
+  "NDPRedirectedHeaderType": {
+    "elements": {
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "IPHeader_And_Data": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "LibraryObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "LibraryObj",
+    "elements": {
+      "Path": {"type": "StringObjectPropertyType"},
+      "Type": {"type": "LibraryType"},
+      "Version": {"type": "StringObjectPropertyType"},
+      "Size": {"type": "UnsignedLongObjectPropertyType"},
+      "Extracted_Features": {"type": "ExtractedFeaturesType"},
+      "Base_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Library",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#LibraryObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "SemaphoreObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "SemaphoreObj",
+    "elements": {
+      "Maximum_Count": {"type": "PositiveIntegerObjectPropertyType"},
+      "Current_Count": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Semaphore",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#SemaphoreObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WindowsProcessObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinProcessObj",
+    "elements": {
+      "Security_ID": {"type": "StringObjectPropertyType"},
+      "Startup_Info": {"type": "StartupInfoType"},
+      "Window_Title": {"type": "StringObjectPropertyType"},
+      "Priority": {"type": "StringObjectPropertyType"},
+      "Section_List": {"type": "MemorySectionListType"},
+      "Handle_List": {"type": "WindowsHandleListType"},
+      "Security_Type": {"type": "SIDType"},
+      "Thread": {
+        "maxOccurs": "unbounded",
+        "type": "WindowsThreadObjectType"
+      }
+    },
+    "typeName": "Windows Process",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinProcessObject-2",
+    "base": "ProcessObjectType"
+  },
+  "SharedResourceType": {
+    "prefix": "WinNetworkShareObj",
+    "URI": "http://cybox.mitre.org/objects#WinNetworkShareObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "PDFIndirectObjectType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Contents": {"type": "PDFIndirectObjectContentsType"},
+      "Hashes": {"type": "HashListType"},
+      "ID": {"type": "PDFIndirectObjectIDType"},
+      "Offset": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "WindowsGroupType": {
+    "prefix": "WinUserAccountObj",
+    "elements": {"Name": {"type": "StringObjectPropertyType/>"}},
+    "URI": "http://cybox.mitre.org/objects#WinUserAccountObject-2",
+    "base": "GroupType"
+  },
+  "DNSQueryObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Question']/*[local-name() = 'QName']",
+    "prefix": "DNSQueryObj",
+    "elements": {
+      "Additional_Records": {"type": "DNSResourceRecordsType"},
+      "Answer_Resource_Records": {"type": "DNSResourceRecordsType"},
+      "Date_Ran": {"type": "DateTimeObjectPropertyType"},
+      "Service_Used": {"type": "StringObjectPropertyType"},
+      "Question": {"type": "DNSQuestionType"},
+      "Authority_Resource_Records": {"type": "DNSResourceRecordsType"},
+      "Transaction_ID": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "typeName": "DNS Query",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#DNSQueryObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "TaskActionListType": {
+    "prefix": "WinTaskObj",
+    "elements": {"Action": {
+      "maxOccurs": "unbounded",
+      "type": "TaskActionType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "ICMPv6TimeExceededType": {
+    "elements": {
+      "Hop_Limit_Exceeded": {"type": "boolean"},
+      "Fragment_Reassem_Time_Exceeded": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "RoutingType": {
+    "elements": {
+      "Routing_Type": {"type": "HexBinaryObjectPropertyType"},
+      "Next_Header": {"type": "IANAAssignedIPNumbersType"},
+      "Header_Ext_Len": {"type": "IntegerObjectPropertyType"},
+      "Segments_Left": {"type": "IntegerObjectPropertyType"},
+      "Type_Specific_Data": {"type": "StringObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "PageProtectionAttributeType": {
+    "prefix": "WinFilemappingObj",
+    "URI": "http://cybox.mitre.org/objects#WinFilemappingObject-1",
+    "base": "BaseObjectPropertyType"
+  },
+  "PDFXRefTableType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Hashes": {"type": "HashListType"},
+      "Subsections": {"type": "PDFXrefTableSubsectionListType"},
+      "Offset": {"type": "PositiveIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "WindowsMutexObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinMutexObj",
+    "elements": {
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"}
+    },
+    "typeName": "Windows Mutex",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinMutexObject-2",
+    "base": "MutexObjectType"
+  },
+  "AttachmentsType": {
+    "prefix": "EmailMessageObj",
+    "elements": {"File": {
+      "maxOccurs": "unbounded",
+      "type": "AttachmentReferenceType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#EmailMessageObject-2",
+    "base": "anyType"
+  },
+  "VolumeOptionsType": {
+    "prefix": "VolumeObj",
+    "URI": "http://cybox.mitre.org/objects#VolumeObject-2",
+    "base": "anyType"
+  },
+  "LinuxPackageObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "LinuxPackageObj",
+    "elements": {
+      "EVR": {"type": "StringObjectPropertyType"},
+      "Category": {"type": "StringObjectPropertyType"},
+      "Description": {"type": "StringObjectPropertyType"},
+      "Architecture": {"type": "ControlledVocabularyStringType"},
+      "Version": {"type": "StringObjectPropertyType"},
+      "Epoch": {"type": "StringObjectPropertyType"},
+      "Vendor": {"type": "StringObjectPropertyType"},
+      "Release": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "typeName": "Linux Package",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#LinuxPackageObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "X509CertificateContentsType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "Validity": {"type": "ValidityType"},
+      "Non_Standard_Extensions": {"type": "X509NonStandardExtensionsType"},
+      "Standard_Extensions": {"type": "X509V3ExtensionsType"},
+      "Version": {"type": "IntegerObjectPropertyType"},
+      "Issuer": {"type": "StringObjectPropertyType"},
+      "Serial_Number": {"type": "StringObjectPropertyType"},
+      "Subject": {"type": "StringObjectPropertyType"},
+      "Signature_Algorithm": {"type": "StringObjectPropertyType"},
+      "Subject_Public_Key": {"type": "SubjectPublicKeyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "RegistrySubkeysType": {
+    "prefix": "WinRegistryKeyObj",
+    "elements": {"Subkey": {
+      "maxOccurs": "unbounded",
+      "type": "WindowsRegistryKeyObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinRegistryKeyObject-2",
+    "base": "anyType"
+  },
+  "UDPType": {
+    "elements": {
+      "Data": {"type": "DataSegmentType"},
+      "UDP_Header": {"type": "UDPHeaderType"}
+    },
+    "base": "anyType"
+  },
+  "OptionDataType": {
+    "elements": {
+      "Option_Data_Len": {"type": "HexBinaryObjectPropertyType"},
+      "Option_Type": {"type": "IPv6OptionType"},
+      "Pad1": {"type": "Pad1Type"},
+      "PadN": {"type": "PadNType"}
+    },
+    "base": "anyType"
+  },
+  "WindowsFileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "WinFileObj",
+    "elements": {
+      "Security_ID": {"type": "StringObjectPropertyType"},
+      "Stream_List": {"type": "StreamListType"},
+      "Filename_Accessed_Time": {"type": "DateTimeObjectPropertyType"},
+      "Filename_Created_Time": {"type": "DateTimeObjectPropertyType"},
+      "Drive": {"type": "StringObjectPropertyType"},
+      "Security_Type": {"type": "SIDType"},
+      "Filename_Modified_Time": {"type": "DateTimeObjectPropertyType"}
+    },
+    "typeName": "Windows File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinFileObject-2",
+    "base": "FileObjectType"
+  },
+  "ArchiveFileObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "prefix": "ArchiveFileObj",
+    "elements": {
+      "Archived_File": {
+        "maxOccurs": "unbounded",
+        "type": "FileObjectType"
+      },
+      "Comment": {"type": "StringObjectPropertyType"},
+      "Version": {"type": "StringObjectPropertyType"},
+      "File_Count": {"type": "IntegerObjectPropertyType"},
+      "Archive_Format": {"type": "ArchiveFileFormatType"}
+    },
+    "typeName": "Archive File",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#ArchiveFileObject-1",
+    "base": "FileObjectType"
+  },
+  "SSDTEntryType": {
+    "prefix": "WinKernelObj",
+    "elements": {
+      "Number_Of_Services": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Service_Table_Base": {"type": "HexBinaryObjectPropertyType"},
+      "Argument_Table_Base": {"type": "HexBinaryObjectPropertyType"},
+      "Service_Counter_Table_Base": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinKernelObject-2",
+    "base": "anyType"
+  },
+  "IDTEntryListType": {
+    "prefix": "WinKernelObj",
+    "elements": {"IDT_Entry": {
+      "maxOccurs": "unbounded",
+      "type": "IDTEntryType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinKernelObject-2",
+    "base": "anyType"
+  },
+  "PDFIndirectObjectIDType": {
+    "prefix": "PDFFileObj",
+    "elements": {
+      "Object_Number": {"type": "PositiveIntegerObjectPropertyType"},
+      "Generation_Number": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#PDFFileObject-1",
+    "base": "anyType"
+  },
+  "NetworkLayerInfoType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Dest_Socket_Address": {"type": "SocketAddressObjectType"},
+      "IP_Protocol": {"type": "IANAAssignedIPNumbersType"},
+      "Src_Socket_Address": {"type": "SocketAddressObjectType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "PEResourceType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Type": {"type": "PEResourceContentType"},
+      "Language": {"type": "StringObjectPropertyType"},
+      "Hashes": {"type": "HashListType"},
+      "Size": {"type": "PositiveIntegerObjectPropertyType"},
+      "Sub_Language": {"type": "StringObjectPropertyType"},
+      "Data": {"type": "StringObjectPropertyType"},
+      "Virtual_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "RoutesType": {
+    "prefix": "NetworkSubnetObj",
+    "elements": {"Route": {
+      "maxOccurs": "unbounded",
+      "type": "NetworkRouteEntryObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#NetworkSubnetObject-2",
+    "base": "anyType"
+  },
+  "RegistryValueType": {
+    "prefix": "WinRegistryKeyObj",
+    "elements": {
+      "Data": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Datatype": {"type": "RegistryDatatypeType"},
+      "Byte_Runs": {"type": "ByteRunsType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinRegistryKeyObject-2",
+    "base": "anyType"
+  },
+  "IPInfoType": {
+    "prefix": "SystemObj",
+    "elements": {
+      "IP_Address": {"type": "AddressObjectType"},
+      "Subnet_Mask": {"type": "AddressObjectType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#SystemObject-2",
+    "base": "anyType"
+  },
+  "GUIWindowObjectType": {
+    "prefix": "GUIWindowObj",
+    "elements": {
+      "Parent_Window": {"type": "StringObjectPropertyType"},
+      "Window_Display_Name": {"type": "StringObjectPropertyType"},
+      "Owner_Window": {"type": "StringObjectPropertyType"}
+    },
+    "name": "GUI",
+    "typeName": "GUI Window",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#GUIWindowObject-2",
+    "base": "GUIObjectType"
+  },
+  "WindowsCriticalSectionObjectType": {
+    "prefix": "WinCriticalSectionObj",
+    "elements": {
+      "Address": {"type": "HexBinaryObjectPropertyType"},
+      "Spin_Count": {"type": "NonNegativeIntegerObjectPropertyType"}
+    },
+    "typeName": "Windows Critical Section",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinCriticalSectionObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "MoreFragmentsType": {"base": "BaseObjectPropertyType"},
+  "NetworkConnectionObjectType": {
+    "prefix": "NetworkConnectionObj",
+    "elements": {
+      "Creation_Time": {"type": "DateTimeObjectPropertyType"},
+      "Layer3_Protocol": {"type": "Layer3ProtocolType"},
+      "Source_TCP_State": {"type": "TCPStateEnum"},
+      "Layer7_Connections": {"type": "Layer7ConnectionsType"},
+      "Layer4_Protocol": {"type": "Layer4ProtocolType"},
+      "Destination_Socket_Address": {"type": "SocketAddressObjectType"},
+      "Layer7_Protocol": {"type": "Layer7ProtocolType"},
+      "Source_Socket_Address": {"type": "SocketAddressObjectType"},
+      "Destination_TCP_State": {"type": "TCPStateEnum"}
+    },
+    "typeName": "Network Connection",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#NetworkConnectionObject-2",
+    "base": "ObjectPropertiesType"
+  },
+  "WindowsDriveType": {
+    "prefix": "WinVolumeObj",
+    "URI": "http://cybox.mitre.org/objects#WinVolumeObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPv4FlagsType": {
+    "elements": {
+      "More_Fragments": {"type": "MoreFragmentsType"},
+      "Do_Not_Fragment": {"type": "DoNotFragmentType"},
+      "Reserved": {"type": "IntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "PEBuildInformationType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Linker_Version": {"type": "StringObjectPropertyType"},
+      "Compiler_Version": {"type": "StringObjectPropertyType"},
+      "Linker_Name": {"type": "StringObjectPropertyType"},
+      "Compiler_Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "PEImportedFunctionType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Function_Name": {"type": "StringObjectPropertyType"},
+      "Hint": {"type": "HexBinaryObjectPropertyType"},
+      "Ordinal": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Bound": {"type": "HexBinaryObjectPropertyType"},
+      "Virtual_Address": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "SiLKCountryCodeType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "WhoisRegistrantInfoType": {
+    "prefix": "WhoisObj",
+    "elements": {"Registrant_ID": {"type": "StringObjectPropertyType"}},
+    "URI": "http://cybox.mitre.org/objects#WhoisObject-2",
+    "base": "WhoisContactType"
+  },
+  "IPv4OptionsType": {"base": "BaseObjectPropertyType"},
+  "AccessedDirectoryListType": {
+    "prefix": "WinPrefetchObj",
+    "elements": {"Accessed_Directory": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinPrefetchObject-2",
+    "base": "anyType"
+  },
+  "EntryPointSignatureType": {
+    "prefix": "FileObj",
+    "elements": {
+      "Type": {"type": "DetectedTypeEnum"},
+      "Name": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#FileObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4PacketType": {
+    "elements": {
+      "Error_Msg": {"type": "ICMPv4ErrorMessageType"},
+      "Traceroute": {"type": "ICMPv4TracerouteType"},
+      "Info_Msg": {"type": "ICMPv4InfoMessageType"},
+      "ICMPv4_Header": {"type": "ICMPv4HeaderType"}
+    },
+    "base": "anyType"
+  },
+  "PartitionType": {
+    "prefix": "DiskPartitionObj",
+    "URI": "http://cybox.mitre.org/objects#DiskPartitionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "UnixPipeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "UnixPipeObj",
+    "elements": {"Permission_Mode": {"type": "StringObjectPropertyType"}},
+    "typeName": "Unix Pipe",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UnixPipeObject-2",
+    "base": "PipeObjectType"
+  },
+  "NetflowV5FlowRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Padding2": {"type": "HexBinaryObjectPropertyType"},
+      "Padding1": {"type": "HexBinaryObjectPropertyType"},
+      "Src_IP_Mask_Bit_Count": {"type": "StringObjectPropertyType"},
+      "TCP_Flags": {"type": "HexBinaryObjectPropertyType"},
+      "Dest_Autonomous_System": {"type": "IntegerObjectPropertyType"},
+      "SysUpTime_Start": {"type": "IntegerObjectPropertyType"},
+      "Dest_IP_Mask_Bit_Count": {"type": "StringObjectPropertyType"},
+      "Nexthop_IPv4_Addr": {"type": "AddressObjectType"},
+      "Packet_Count": {"type": "IntegerObjectPropertyType"},
+      "Byte_Count": {"type": "IntegerObjectPropertyType"},
+      "Src_Autonomous_System": {"type": "IntegerObjectPropertyType"},
+      "SysUpTime_End": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "UnixNetworkRouteEntryObjectType": {
+    "prefix": "UnixNetworkRouteEntryObj",
+    "elements": {
+      "Window": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Ref": {"type": "UnsignedLongObjectPropertyType"},
+      "Use": {"type": "UnsignedLongObjectPropertyType"},
+      "Flags": {"type": "StringObjectPropertyType"},
+      "MSS": {"type": "UnsignedIntegerObjectPropertyType"}
+    },
+    "typeName": "Unix Network Route Entry",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#UnixNetworkRouteEntryObject-2",
+    "base": "NetworkRouteEntryObjectType"
+  },
+  "SiLKSensorClassType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "GlobalFlagType": {
+    "prefix": "WinSystemObj",
+    "elements": {
+      "Abbreviation": {"type": "StringObjectPropertyType"},
+      "Symbolic_Name": {"type": "StringObjectPropertyType"},
+      "Destination": {"type": "StringObjectPropertyType"},
+      "Hexadecimal_Value": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinSystemObject-2",
+    "base": "anyType"
+  },
+  "IComHandlerActionType": {
+    "prefix": "WinTaskObj",
+    "elements": {
+      "COM_Data": {"type": "StringObjectPropertyType"},
+      "COM_Class_ID": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "anyType"
+  },
+  "UnformattedMessageListType": {
+    "prefix": "WinEventLogObj",
+    "elements": {"Unformatted_Message": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinEventLogObject-2",
+    "base": "anyType"
+  },
+  "TaskStatusType": {
+    "prefix": "WinTaskObj",
+    "URI": "http://cybox.mitre.org/objects#WinTaskObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "IPFIXOptionsTemplateRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Field_Specifier": {
+        "maxOccurs": "unbounded",
+        "type": "IPFIXOptionsTemplateRecordFieldSpecifiersType"
+      },
+      "Options_Template_Record_Header": {"type": "IPFIXOptionsTemplateRecordHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "NetflowV5PacketType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Flow_Record": {
+        "maxOccurs": "30",
+        "type": "NetflowV5FlowRecordType"
+      },
+      "Flow_Header": {"type": "NetflowV5FlowHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "AccessedFileListType": {
+    "prefix": "WinPrefetchObj",
+    "elements": {"Accessed_Filename": {
+      "maxOccurs": "unbounded",
+      "type": "StringObjectPropertyType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinPrefetchObject-2",
+    "base": "anyType"
+  },
+  "NetflowV9DataFlowSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Data_Record": {
+        "maxOccurs": "unbounded",
+        "type": "NetflowV9DataRecordType"
+      },
+      "Length": {"type": "IntegerObjectPropertyType"},
+      "Padding": {"type": "HexBinaryObjectPropertyType"},
+      "Flow_Set_ID_Template_ID": {"type": "IntegerObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "RSAPublicKeyType": {
+    "prefix": "X509CertificateObj",
+    "elements": {
+      "Exponent": {"type": "IntegerObjectPropertyType"},
+      "Modulus": {"type": "StringObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#X509CertificateObject-2",
+    "base": "anyType"
+  },
+  "CustomObjectType": {
+    "prefix": "CustomObj",
+    "elements": {"Description": {"type": "string"}},
+    "typeName": "Custom",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#CustomObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "GUIDialogboxObjectType": {
+    "prefix": "GUIDialogBoxObj",
+    "elements": {
+      "Box_Caption": {"type": "StringObjectPropertyType"},
+      "Box_Text": {"type": "StringObjectPropertyType"}
+    },
+    "name": "GUI Dialog Box",
+    "typeName": "GUI Dialogbox",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#GUIDialogboxObject-2",
+    "base": "GUIObjectType"
+  },
+  "MemoryPageProtectionType": {
+    "prefix": "WinMemoryPageRegionObj",
+    "URI": "http://cybox.mitre.org/objects#WinMemoryPageRegionObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "HostFieldType": {
+    "prefix": "HTTPSessionObj",
+    "elements": {
+      "Port": {"type": "PortObjectType"},
+      "Domain_Name": {"type": "URIObjectType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#HTTPSessionObject-2",
+    "base": "anyType"
+  },
+  "VolumeType": {
+    "prefix": "WinPrefetchObj",
+    "elements": {
+      "DeviceItem": {
+        "maxOccurs": "unbounded",
+        "type": "DeviceObjectType"
+      },
+      "VolumeItem": {
+        "maxOccurs": "unbounded",
+        "type": "WindowsVolumeObjectType"
+      }
+    },
+    "URI": "http://cybox.mitre.org/objects#WinPrefetchObject-2",
+    "base": "anyType"
+  },
+  "WindowsHandleListType": {
+    "prefix": "WinHandleObj",
+    "elements": {"Handle": {
+      "maxOccurs": "unbounded",
+      "type": "WindowsHandleObjectType"
+    }},
+    "URI": "http://cybox.mitre.org/objects#WinHandleObject-2",
+    "base": "anyType"
+  },
+  "WindowsVolumeObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinVolumeObj",
+    "elements": {
+      "Drive_Letter": {"type": "StringObjectPropertyType"},
+      "Attributes_List": {"type": "WindowsVolumeAttributesListType"},
+      "Drive_Type": {"type": "WindowsDriveType"}
+    },
+    "typeName": "Windows Volume",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinVolumeObject-2",
+    "base": "VolumeObjectType"
+  },
+  "OptionsDataRecordType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Scope_Field_Value": {"type": "StringObjectPropertyType"},
+      "Option_Record_Collection_Element": {
+        "maxOccurs": "unbounded",
+        "type": "OptionCollectionElementType"
+      }
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "IPVersionType": {"base": "BaseObjectPropertyType"},
+  "DOSHeaderType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "e_csum": {"type": "HexBinaryObjectPropertyType"},
+      "e_maxalloc": {"type": "HexBinaryObjectPropertyType"},
+      "e_lfarlc": {"type": "HexBinaryObjectPropertyType"},
+      "e_crlc": {"type": "HexBinaryObjectPropertyType"},
+      "e_cs": {"type": "HexBinaryObjectPropertyType"},
+      "e_oemid": {"type": "HexBinaryObjectPropertyType"},
+      "e_oeminfo": {"type": "HexBinaryObjectPropertyType"},
+      "e_cp": {"type": "HexBinaryObjectPropertyType"},
+      "e_magic": {"type": "HexBinaryObjectPropertyType"},
+      "e_ip": {"type": "HexBinaryObjectPropertyType"},
+      "e_lfanew": {"type": "HexBinaryObjectPropertyType"},
+      "e_ss": {"type": "HexBinaryObjectPropertyType"},
+      "Hashes": {"type": "HashListType"},
+      "e_minalloc": {"type": "HexBinaryObjectPropertyType"},
+      "e_ovro": {"type": "HexBinaryObjectPropertyType"},
+      "e_sp": {"type": "HexBinaryObjectPropertyType"},
+      "reserved2": {"type": "HexBinaryObjectPropertyType"},
+      "reserved1": {
+        "maxOccurs": "4",
+        "type": "HexBinaryObjectPropertyType"
+      },
+      "e_cparhdr": {"type": "HexBinaryObjectPropertyType"},
+      "e_cblp": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "UnixFilePermissionsType": {
+    "prefix": "UnixFileObj",
+    "URI": "http://cybox.mitre.org/objects#UnixFileObject-2",
+    "base": "FilePermissionsType"
+  },
+  "ICMPv4TimestampReplyType": {
+    "elements": {
+      "Timestamp_Reply": {"type": "boolean"},
+      "Transmit_Timestamp": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Receive_Timestamp": {"type": "UnsignedIntegerObjectPropertyType"},
+      "Originate_Timestamp": {"type": "UnsignedIntegerObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "PrefixType": {
+    "elements": {
+      "IP_Addr_Prefix": {"type": "AddressObjectType"},
+      "IPv6_Addr": {"type": "AddressObjectType"}
+    },
+    "base": "anyType"
+  },
+  "IPFIXOptionsTemplateSetType": {
+    "prefix": "NetFlowObj",
+    "elements": {
+      "Options_Template_Record": {
+        "maxOccurs": "unbounded",
+        "type": "IPFIXOptionsTemplateRecordType"
+      },
+      "Padding": {"type": "HexBinaryObjectPropertyType"},
+      "Set_Header": {"type": "IPFIXSetHeaderType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "anyType"
+  },
+  "SiLKDirectionType": {
+    "prefix": "NetFlowObj",
+    "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "TCPFlagsType": {"base": "anyType"},
+  "PESectionHeaderStructType": {
+    "prefix": "WinExecutableFileObj",
+    "elements": {
+      "Virtual_Size": {"type": "HexBinaryObjectPropertyType"},
+      "Number_Of_Relocations": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Characteristics": {"type": "HexBinaryObjectPropertyType"},
+      "Size_Of_Raw_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Number_Of_Linenumbers": {"type": "NonNegativeIntegerObjectPropertyType"},
+      "Pointer_To_Raw_Data": {"type": "HexBinaryObjectPropertyType"},
+      "Pointer_To_Relocations": {"type": "HexBinaryObjectPropertyType"},
+      "Virtual_Address": {"type": "HexBinaryObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Pointer_To_Linenumbers": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "URI": "http://cybox.mitre.org/objects#WinExecutableFileObject-2",
+    "base": "anyType"
+  },
+  "ICMPv4HeaderType": {
+    "elements": {
+      "Type": {"type": "HexBinaryObjectPropertyType"},
+      "Checksum": {"type": "HexBinaryObjectPropertyType"},
+      "Code": {"type": "HexBinaryObjectPropertyType"}
+    },
+    "base": "anyType"
+  },
+  "WindowsFilemappingObjectType": {
+    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "prefix": "WinFilemappingObj",
+    "elements": {
+      "Maximum_Size": {"type": "UnsignedLongObjectPropertyType"},
+      "Page_Protection_Value": {"type": "PageProtectionValueType"},
+      "Page_Protection_Attribute": {
+        "maxOccurs": "unbounded",
+        "type": "PageProtectionAttributeType"
+      },
+      "File_Handle": {"type": "WindowsHandleObjectType"},
+      "Security_Attributes": {"type": "StringObjectPropertyType"},
+      "Name": {"type": "StringObjectPropertyType"},
+      "Handle": {"type": "WindowsHandleObjectType"},
+      "Actual_Size": {"type": "UnsignedLongObjectPropertyType"}
+    },
+    "typeName": "Windows Filemapping",
+    "objectReference": true,
+    "URI": "http://cybox.mitre.org/objects#WinFilemappingObject-1",
+    "base": "ObjectPropertiesType"
+  },
+  "FragmentationRequiredType": {
+    "elements": {
+      "Next_Hop_MTU": {"type": "HexBinaryObjectPropertyType"},
+      "Fragmentation_Required": {"type": "boolean"}
+    },
+    "base": "anyType"
+  },
+  "UnixProcessStateType": {
+    "prefix": "UnixProcessObj",
+    "URI": "http://cybox.mitre.org/objects#UnixProcessObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "RegistryDatatypeType": {
+    "prefix": "WinRegistryKeyObj",
+    "URI": "http://cybox.mitre.org/objects#WinRegistryKeyObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "KernelHookType": {
+    "prefix": "WinKernelHookObj",
+    "URI": "http://cybox.mitre.org/objects#WinKernelHookObject-2",
+    "base": "BaseObjectPropertyType"
+  },
+  "ObservableComposition": {
+    "aliasPath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Composition']/*[local-name() = 'Observable']",
+    "typeName": "Observable Composition"
+  },
+  "Event": {
+    "aliasPath": ".[local-name() = 'Observable']/*[local-name() = 'Event']/*[local-name() = 'Actions']/*[local-name() = 'Action']/*[local-name() = 'Associated_Objects']/*[local-name() = 'Associated_Object']/*[local-name() = 'Properties']",
+    "typeName": "Event"
+  }
+}
