@@ -2,41 +2,16 @@
    "properties":{  
       "vertices":{  
          "title":"vertices",
-         "vertexType":"vertices",
-         "description":"The list of stucco defined vertices",
+         "description":"The list of stucco vertices",
          "type":"array",
          "items":{  
             "anyOf":[  
                {  
-                  "$ref":"#/definitions/Account"
-               },
-               {  
-                  "$ref":"#/definitions/Address"
-               },
-               {  
                   "$ref":"#/definitions/AddressRange"
                },
                {  
-                  "$ref":"#/definitions/AS"
-               },
-               {  
-                  "$ref":"#/definitions/DNSName"
-               },
-               {  
-                  "$ref":"#/definitions/DNSRecord"
-               },
-               {  
                   "$ref":"#/definitions/Exploit"
-               },
-               {  
-                  "$ref":"#/definitions/Flow"
-               },
-               {  
-                  "$ref":"#/definitions/Host"
-               },
-               {  
-                  "$ref":"#/definitions/HTTPRequest"
-               },
+               }, 
                {  
                   "$ref":"#/definitions/IP"
                },
@@ -44,106 +19,168 @@
                   "$ref":"#/definitions/Malware"
                },
                {  
-                  "$ref":"#/definitions/Organization"
-               },
-               {  
-                  "$ref":"#/definitions/Port"
-               },
-               {  
-                  "$ref":"#/definitions/Service"
-               },
-               {  
-                  "$ref":"#/definitions/Software"
-               },
-               {  
                   "$ref":"#/definitions/Vulnerability"
+               },
+               {  
+                  "$ref":"#/definitions/Weakness"
+               },
+               {  
+                  "$ref":"#/definitions/Campaign"
+               },
+               {  
+                  "$ref":"#/definitions/Course_Of_Action"
+               },
+               {  
+                  "$ref":"#/definitions/Exploit_Target"
+               },
+               {  
+                  "$ref":"#/definitions/Incident"
+               },
+               {  
+                  "$ref":"#/definitions/Indicator"
+               },
+               {  
+                  "$ref":"#/definitions/Threat_Actor"
+               },
+               {  
+                  "$ref":"#/definitions/TTP"
+               },
+               {  
+                  "$ref":"#/definitions/Observable"
                }    
             ]
          }
       },
       "edges":{  
          "title":"edges",
-         "vertexType":"edges",
-         "description":"The list of edges between stucco defined vertices",
+         "description":"The list of edges between stucco vertices",
          "type":"array",
          "items":{  
             "anyOf":[  
                {  
-                  "$ref":"#/definitions/Contained_Within"
+                  "$ref":"#/definitions/AddressRange/edges/Sub-Observable"
                },
-               {  
-                  "$ref":"#/definitions/Contains"
+               {
+                  "$ref":"#/definitions/Exploit/edges/RelatedTTP"
                },
-               {  
-                  "$ref":"#/definitions/Dest_Socket_Address"
+               {
+                  "$ref":"#/definitions/Exploit/edges/ExploitTarget"
                },
-               {  
-                  "$ref":"#/definitions/Exploits"
+               {
+                  "$ref":"#/definitions/Exploit/edges/Exploits"
                },
-               {  
-                  "$ref":"#/definitions/Has_AffectedSoftware"
+               {
+                  "$ref":"#/definitions/IP/edges/Sub-Observable"
                },
-               {  
-                  "$ref":"#/definitions/Has_AS"
+               {
+                  "$ref":"#/definitions/Malware/edges/RelatedTTP"
                },
-               {  
-                  "$ref":"#/definitions/Has_DNSName"
+               {
+                  "$ref":"#/definitions/Malware/edges/ExploitTarget"
                },
-               {  
-                  "$ref":"#/definitions/Has_IP"
+               {
+                  "$ref":"#/definitions/Malware/edges/UsesIP"
                },
-               {  
-                  "$ref":"#/definitions/Has_Port"
+               {
+                  "$ref":"#/definitions/Malware/edges/Exploits"
                },
-               {  
-                  "$ref":"#/definitions/Logs_In_From"
+               {
+                  "$ref":"#/definitions/Vulnerability/edges/RelatedExploitTarget"
                },
-               {  
-                  "$ref":"#/definitions/Logs_In_To"
+               {
+                  "$ref":"#/definitions/Vulnerability/edges/PotentialCOA"
                },
-               {  
-                  "$ref":"#/definitions/Moved_By"
+               {
+                  "$ref":"#/definitions/Weakness/edges/RelatedExploitTarget"
                },
-               {  
-                  "$ref":"#/definitions/Requested_By"
+               {
+                  "$ref":"#/definitions/Weakness/edges/PotentialCOA"
                },
-               {  
-                  "$ref":"#/definitions/Requested_DNSName"
+               {
+                  "$ref":"#/definitions/Campaign/edges/AssociatedCampaign"
                },
-               {  
-                  "$ref":"#/definitions/Requested_IP"
+               {
+                  "$ref":"#/definitions/Campaign/edges/RelatedTTP"
                },
-               {  
-                  "$ref":"#/definitions/Resolved_To"
+               {
+                  "$ref":"#/definitions/Campaign/edges/Attribution"
                },
-               {  
-                  "$ref":"#/definitions/Runs"
+               {
+                  "$ref":"#/definitions/Campaign/edges/RelatedIncident"
                },
-               {  
-                  "$ref":"#/definitions/Runs_As"
+               {
+                  "$ref":"#/definitions/Course_Of_Action/edges/RelatedCOA"
                },
-               {  
-                  "$ref":"#/definitions/Runs_On"
+               {
+                  "$ref":"#/definitions/Course_Of_Action/edges/ParameterObservable"
                },
-               {  
-                  "$ref":"#/definitions/Served_By"
+               {
+                  "$ref":"#/definitions/Exploit_Target/edges/RelatedExploitTarget"
                },
-               {  
-                  "$ref":"#/definitions/Served_On"
+               {
+                  "$ref":"#/definitions/Exploit_Target/edges/PotentialCOA"
                },
-               {  
-                  "$ref":"#/definitions/Src_Socket_Address"
+               {
+                  "$ref":"#/definitions/Incident/edges/RelatedIncident"
                },
-               {  
-                  "$ref":"#/definitions/Uses_Address"
+               {
+                  "$ref":"#/definitions/Incident/edges/RelatedIndicator"
                },
-               {  
-                  "$ref":"#/definitions/Uses_IP"
-               }   
+               {
+                  "$ref":"#/definitions/Incident/edges/LeveragedTTP"
+               },
+               {
+                  "$ref":"#/definitions/Incident/edges/COATaken"
+               },
+               {
+                  "$ref":"#/definitions/Incident/edges/COARequested"
+               },
+               {
+                  "$ref":"#/definitions/Incident/edges/RelatedThreatActor"
+               },
+               {
+                  "$ref":"#/definitions/Incident/edges/RelatedObservable"
+               },
+               {
+                  "$ref":"#/definitions/Indicator/edges/RelatedIndicator"
+               },
+               {
+                  "$ref":"#/definitions/Indicator/edges/Observable"
+               },
+               {
+                  "$ref":"#/definitions/Indicator/edges/SuggestedCOA"
+               },
+               {
+                  "$ref":"#/definitions/Indicator/edges/RelatedCampaign"
+               },
+               {
+                  "$ref":"#/definitions/Indicator/edges/IndicatedTTP"
+               },
+               {
+                  "$ref":"#/definitions/Threat_Actor/edges/AssociatedActor"
+               },
+               {
+                  "$ref":"#/definitions/Threat_Actor/edges/HistoricalCampaign"
+               },
+               {
+                  "$ref":"#/definitions/Threat_Actor/edges/ObservedTTP"
+               },
+               {
+                  "$ref":"#/definitions/TTP/edges/RelatedTTP"
+               },
+               {
+                  "$ref":"#/definitions/TTP/edges/ExploitTarget"
+               },
+               {
+                  "$ref":"#/definitions/TTP/edges/Exploits"
+               },
+               {
+                  "$ref":"#/definitions/Observable/edges/Sub-Observable"
+               }
             ]
          }
       }
-   },
+   }, 
    "definitions":{  
       "vertex":{  
          "description":"stucco vertex base element",
@@ -163,9 +200,17 @@
             }
          },
          "required":[  
-            "name",
             "sourceDocument"
-         ]
+         ],
+         "indexes":{  
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "sourceDocument"
+                  ]
+               }
+            ]
+         }
       },
       "edge":{  
          "description":"edge base elements",
@@ -201,313 +246,20 @@
             ]
          }
       },
-      "Account":{  
-         "title":"Account",
-         "vertexType":"Account",
-         "description":"account on some specific system(s), either belonging to some specific user or a system account. All software runs as some account. All accounts are associated with a user or users (such as system accounts.)",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Account"
-               ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Username"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Account observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Account",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Account",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Properties":{  
-                     "Description":{  
-                        "description":"Observable description of Account",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"none"
-                     },
-                     "Username":{  
-                        "description":"Account username",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"none",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"none"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"account Logs_In_To host; account Logs_In_From host",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Properties":{  
-                           "Login_Time":{  
-                              "description":"login time of this account into related host",
-                              "type":"string",
-                              "cardinality":"single",
-                              "comparisonFunction":"compareTimestamps",
-                              "comparisonWeight":"TBD",
-                              "resolutionFunction":"keepNew"
-                           }
-                        },
-                        "State":{  
-                           "description":"current state of this object",
-                           "type":"string",
-                           "cardinality":"single",
-                           "comparisonFunction":"exact",
-                           "comparisonWeight":"TBD",
-                           "resolutionFunction":"TBD"
-                        },
-                        "Relationship":{  
-                           "description":"Account Logs_In_To or Logs_In_From Host",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Logs_In_From",
-                              "Logs_In_To"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set",
-                              "comparisonFunction":"none",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList",
-                              "delimiter":"##"
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "Address":{  
-         "title":"Address",
-         "vertexType":"Address",
-         "description":"any address, either inside or outside of the network",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Address"
-               ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Port' or local-name() = 'IP_Address']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none",
-               "pattern":"IP_Address:Port"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/IP_Address.object_reference:Observable/Object/Properties/Port.object_reference"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Address observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Address",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Address",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of Address",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Custom_Properties":{  
-                        "Property":{  
-                           "description":"banner of this address represented as a custom field",
-                           "type":"string",
-                           "cardinality":"set",
-                           "comparisonFunction":"TBD",
-                           "comparisonWeight":"TBD",
-                           "resolutionFunction":"TBD"
-                        }
-                     },
-                     "Port":{  
-                        "comparisonFunction":"none",
-                        "comparisonWeight":"TBD",
-                        "resolutionFunction":"TBD"
-                     },
-                     "IP_Address":{  
-                        "comparisonFunction":"none",
-                        "comparisonWeight":"TBD",
-                        "resolutionFunction":"TBD"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"Address has DNSName",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Relationship":{  
-                           "description":"Has_DNSName",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Has_DNSName"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set",
-                              "comparisonFunction":"none",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList",
-                              "delimiter":"##"
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
       "AddressRange":{  
          "title":"AddressRange",
          "vertexType":"AddressRange",
          "description":"address range",
+         "type":"object",
+         "regex": {
+            "xpath": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and @*[local-name()='type']=\"AddressObj:AddressObjectType\"]/*[local-name()='Address_Value']",
+            "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5]).+([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+         },
          "properties":{  
             "vertexType":{  
                "type":"string",
                "cardinality":"single",
-               "enum":[  
-                  "AddressRange"
-               ]
+               "default": "AddressRange"
             },
             "name":{  
                "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
@@ -575,9 +327,12 @@
                "resolutionFunction":"TBD",
                "regex":".* - (.*$)",
                "applyFunction":"ipToLong"
+            },
+            "observableType": {
+               "description": "CybOX object type used to describe this vertex",
+               "cardinality": "single"
             }
          },
-         "type":"object",
          "required":[  
             "vertexType",
             "name",
@@ -592,8 +347,7 @@
                {  
                   "keys":[  
                      "name"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value"
+                  ]
                },
                {  
                   "keys":[  
@@ -603,551 +357,37 @@
                {  
                   "keys":[  
                      "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
+                  ]
                },
                {  
                   "keys":[  
                      "location"
-                  ],
-                  "path":"Observable/Object/Location/Name"
+                  ]
                },
                {  
                   "keys":[  
                      "startIP"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value",
-                  "function":"getStartIP"
+                  ]
                },
                {  
                   "keys":[  
                      "endIP"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value",
-                  "function":"getEndIP"
-               }
-            ],
-            "sbTree":[  
-               {  
-                  "keys":[  
-                     "startIPInt"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value",
-                  "function":"ipToLong"
-               },
-               {  
-                  "keys":[  
-                     "endIPInt"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value",
-                  "function":"ipToLong"
+                  ]
                }
             ],
             "fullText":[  
                {  
                   "keys":[  
                      "description"
-                  ],
-                  "path":"Observable/Object/Description"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted AddressRange observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"AddressRange"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this AddressRange",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of AddressRange",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":3.383410480090717,
-                     "resolutionFunction":"TBD"
-                  },
-                  "Properties":{  
-                     "Address_Value":{  
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"none"
-                     }
-                  },
-                  "Location":{  
-                     "Name":{  
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"TBD"
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "AS":{  
-         "title":"AS",
-         "vertexType":"AS",
-         "description":"descripiton of autonomous systems",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "AS"
-               ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "number":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Number']",
-               "type":"integer",
-               "cardinality":"single"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Name"
-               },
-               {  
-                  "keys":[  
-                     "number"
-                  ],
-                  "path":"Observable/Object/Properties/Number"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
                   ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ],
-            "fullText":[  
-               {  
-                  "keys":[  
-                     "description"
-                  ],
-                  "path":"Observable/Object/Description"
                }
             ]
          },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted AS observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"AS",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this AS",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of AS",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Name":{  
-                        "description":"AS name",
-                        "type":"string",
-                        "cardinality":"single"
-                     },
-                     "Number":{  
-                        "description":"AS number",
-                        "type":"number",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"TBD"
-                     },
-                     "Regional_Internet_Registry":{  
-                        "description":"regional internet registry",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"TBD"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"AS Contains AddressRange",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Relationship":{  
-                           "description":"Contains",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Contains"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set"
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "DNSName":{  
-         "title":"DNSName",
-         "vertexType":"DNSName",
-         "description":"a DNS name (and possibly associated info - registration info, etc.)",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "DNSName"
-               ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Value"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted  DNSName observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"DNSName",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this DNSName",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of DNSName",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Value":{  
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"none"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"DNSName Resolved_To IP Address",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Properties":{  
-                           "Nameservers":{  
-                              "Nameserver":{  
-                                 "Value":{  
-                                    "description":"nameserver of this DNSName",
-                                    "type":"string",
-                                    "cardinality":"single",
-                                    "comparisonFunction":"exact",
-                                    "comparisonWeight":1.0,
-                                    "resolutionFunction":"appendList"
-                                 }
-                              }
-                           }
-                        },
-                        "Relationship":{  
-                           "description":"Resolved_To",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Resolved_To"
-                           ]
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "DNSRecord":{  
-         "title":"DNSRecord",
-         "vertexType":"DNSRecord",
-         "description":"dns records of various domain name systems",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "DNSRecord"
-               ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Domain_Name' or local-name() = 'IP_Address']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none",
-               "pattern":"Domain_Name_resolved_to_IP_Address"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Domain_Name.object_reference - Observable/Object/Properties/Value + : + Observable/Object/Properties/IP_Address.object_reference - Observable/Object/Properties/Address_Value"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted DNSRecord observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"DNSRecord",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this DNSRecord",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Properties":{  
-                     "Description":{  
-                        "description":"Observable description of DNSRecord",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"WHIRL",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"none"
-                     },
-                     "Queried_Date":{  
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"compareTimestamps",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"keepNew"
-                     },
-                     "Entry_Type":{  
-                        "description":"resource record type",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"TBD"
-                     },
-                     "Domain_Name":{  
-                        "description": "reference to DNSName"
-                     },
-                     "Flags":{  
-                        "description":"dns request flags",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"CosineSimilarity",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"TBD"
-                     },
-                     "TTL":{  
-                        "description":"total time to live",
-                        "type":"integer",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"TBD"
-                     },
-                     "IP_Address":{  
-                        "description": "reference to IP address"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"ip address was requested by requester (Requested_By) and served by server (Served_By)",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Relationship":{  
-                           "description":"Requested_By; Served_By",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Requested_By",
-                              "Served_By"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set"
-                           }
-                        }
-                     }
-                  }
-               }
+         "edges": {
+            "Sub-Observable": {
+              "inVType": [
+                "Observable"
+              ]
             }
          }
       },
@@ -1155,13 +395,13 @@
          "title":"Exploit",
          "vertexType":"Exploit",
          "description":"Exploit characteristics",
+         "type": "object",
+         "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']",
          "properties":{  
             "vertexType":{  
                "type":"string",
                "cardinality":"single",
-               "enum":[  
-                  "Exploit"
-               ]
+               "default": "Exploit"
             },
             "name":{  
                "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Title']",
@@ -1177,20 +417,19 @@
                "type":"string",
                "cardinality":"set"
             },
-            "source":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            },
             "shortDescription":{  
                "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Short_Description']",
                "description":"additional text description of this Exploit",
                "type":"string",
                "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
             }
          },
-         "type":"object",
          "required":[  
             "vertexType",
             "name",
@@ -1201,8 +440,7 @@
                {  
                   "keys":[  
                      "name"
-                  ],
-                  "path":"TTP/Behavior/Exploits/Exploit/Title"
+                  ]
                },
                {  
                   "keys":[  
@@ -1212,564 +450,57 @@
                {  
                   "keys":[  
                      "source"
-                  ],
-                  "path":"TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  ]
                }
             ],
             "fullText":[  
                {  
                   "keys":[  
                      "description"
-                  ],
-                  "path":"TTP/Behavior/Exploits/Exploit/Description"
+                  ]
                },
                {  
                   "keys":[  
                      "shortDescription"
-                  ],
-                  "path":"TTP/Behavior/Exploits/Exploit/Short_Description"
+                  ]
                }
             ]
          },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Exploits",
-            "TTP":{  
-               "Title":{  
-                  "description":"title for this TTP",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Exploit",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Information_Source":{  
-                  "Contributing_Sources":{  
-                     "Source":{  
-                        "Identity":{  
-                           "Name":{  
-                              "description":"data source for this Exploit",
-                              "type":"string",
-                              "cardinality":"set",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList"
-                           }
-                        }
-                     }
-                  }
-               },
-               "Behavior":{  
-                  "Exploits":{  
-                     "Exploit":{  
-                        "Title":{  
-                           "description":"Exploit title/name",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Description":{  
-                           "description":"TTP description of Exploit",
-                           "type":"string",
-                           "cardinality":"set",
-                           "comparisonFunction":"WHIRL",
-                           "comparisonWeight":5.8790593,
-                           "resolutionFunction":"appendList"
-                        },
-                        "Short_Description":{  
-                           "description":"short descriptive summary of this Exploit",
-                           "type":"string",
-                           "cardinality":"set",
-                           "comparisonFunction":"WHIRL",
-                           "comparisonWeight":5.8790593,
-                           "resolutionFunction":"appendList"
-                        }
-                     }
-                  }
-               },
-               "Exploit_Targets":{  
-                  "Exploit_Target":{  
-                     "Relationship":{  
-                        "description":"Exploit Exploits Vulnerability",
-                        "type":"string",
-                        "cardinality":"single",
-                        "enum":[  
-                           "Exploits"
-                        ]
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "Flow":{  
-         "title":"Flow",
-         "vertexType":"Flow",
-         "description":"a flow of traffic between two addresses",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Flow"
+         "edges": {
+            "RelatedTTP": {
+               "inVType": [
+                  "TTP",
+                  "Malware",
+                  "Exploit"
                ]
             },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Network_Flow_Label']/*[local-name() = 'Dest_Socket_Address' or local-name() = 'Src_Socket_Address']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none",
-               "pattern":"Src_Socket_Address_through_Dest_Socket_Address"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ]
-               }
-            ],
-            "sbTree":[  
-               {  
-                  "keys":[  
-                     "startTime"
-                  ],
-                  "path":"Observable/Object/Properties/Custom_Properties/Property.name=Start_Time"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Flow observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Flow",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Flow",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of Flow",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Network_Flow_Label":{  
-                        "Dest_Socket_Address":{  
-
-                        },
-                        "Src_Socket_Address":{  
-
-                        }
-                     },
-                     "Custom_Properties":{  
-                        "Property":{  
-                           "description":"characteristics of this flow are represented with custom fields",
-                           "type":"string",
-                           "cardinality":"single",
-                           "comparisonFunction":"TBD",
-                           "comparisonWeight":"TBD",
-                           "resolutionFunction":"TBD"
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "Host":{  
-         "title":"Host",
-         "vertexType":"Host",
-         "description":"Any entity on the network, including PCs, routers, switches, virtual machines, etc.",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Host"
+            "ExploitTarget": {
+               "inVType": [
+                  "Exploit_Target",
                ]
             },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hostname_Value']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Hostname_Value"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Host observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Host",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Host",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of Host",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Hostname_Value":{  
-                        "type":"string",
-                        "cardinality":"single"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"Host Runs Software; Host Resolved_To IP; Host Uses_Address Address",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Relationship":{  
-                           "description":"Runs, Resolved_To, Uses_Address",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Runs",
-                              "Resolved_To",
-                              "Uses_Address"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set"
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "HTTPRequest":{  
-         "title":"HTTPRequest",
-         "vertexType":"HTTPRequest",
-         "description":"HTTP Requests to service",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "HTTPRequest"
+            "Exploits": {
+               "inVType": [
+                  "Vulnerability",
+                  "Weakness"
                ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'HTTP_Request_Response']/*[local-name() = 'HTTP_Client_Request']/*[local-name() = 'HTTP_Request_Line']/*[local-name() = 'Value']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/HTTP_Request_Response/HTTP_Client_Request/HTTP_Request_Line/Value"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ],
-            "fullText":[  
-               {  
-                  "keys":[  
-                     "description"
-                  ],
-                  "path":"Observable/Object/Description"
-               },
-               {  
-                  "keys":[  
-                     "rawHeader"
-                  ],
-                  "path":"Observable/Object/Properties/HTTP_Request_Response/HTTP_Client_Request/HTTP_Request_Header/Raw_Header"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted HTTP request observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"HTTPRequest",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this HTTPRequest",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of HTTPRequest",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "HTTP_Request_Response":{  
-                        "HTTP_Client_Request":{  
-                           "HTTP_Request_Line":{  
-                              "HTTP_Method":{  
-                                 "description":"http method type",
-                                 "type":"string",
-                                 "cardinality":"single",
-                                 "enum":[  
-                                    "GET",
-                                    "POST",
-                                    "HEAD",
-                                    "PUT"
-                                 ],
-                                 "comparisonFunction":"exact",
-                                 "comparisonWeight":"TBD",
-                                 "resolutionFunction":"TBD"
-                              },
-                              "Version":{  
-                                 "description":"http request version",
-                                 "type":"string",
-                                 "cardinality":"single",
-                                 "comparisonFunction":"exact",
-                                 "comparisonWeight":1.0,
-                                 "resolutionFunction":"none"
-                              },
-                              "Value":{  
-                                 "description":"http request value",
-                                 "type":"string",
-                                 "cardinality":"single",
-                                 "comparisonFunction":"WHIRL",
-                                 "comparisonWeight":1.0,
-                                 "resolutionFunction":"TBD"
-                              }
-                           },
-                           "HTTP_Request_Header":{  
-                              "Parsed_Header":{  
-                                 "Content_Length":{  
-                                    "description":"length of request",
-                                    "type":"number",
-                                    "cardinality":"single",
-                                    "comparisonFunction":"exact",
-                                    "comparisonWeight":1.0,
-                                    "resolutionFunction":"TBD"
-                                 },
-                                 "Referer":{  
-                                    "Value":{  
-                                       "description":"http referer",
-                                       "type":"string",
-                                       "cardinality":"single",
-                                       "comparisonFunction":"exact",
-                                       "comparisonWeight":1.0,
-                                       "resolutionFunction":"TBD"
-                                    }
-                                 },
-                                 "Host":{  
-                                    "Port":{  
-
-                                    },
-                                    "Domain_Name":{  
-
-                                    }
-                                 },
-                                 "Accept_Language":{  
-                                    "description":"http request accept language",
-                                    "type":"string",
-                                    "cardinality":"single",
-                                    "comparisonFunction":"exact",
-                                    "comparisonWeight":1.0,
-                                    "resolutionFunction":"TBD"
-                                 },
-                                 "From":{  
-
-                                 },
-                                 "Date":{  
-                                    "description":"http request date",
-                                    "type":"string",
-                                    "cardinality":"single",
-                                    "comparisonFunction":"compareTimestamps",
-                                    "comparisonWeight":1.0,
-                                    "resolutionFunction":"TBD"
-                                 },
-                                 "User_Agent":{  
-                                    "description":"user agent of the http request",
-                                    "type":"string",
-                                    "cardinality":"single",
-                                    "comparisonFunction":"exact",
-                                    "comparisonWeight":1.0,
-                                    "resolutionFunction":"TBD"
-                                 }
-                              },
-                              "Raw_Header":{  
-                                 "description":"unparsed http request",
-                                 "type":"string",
-                                 "cardinality":"single",
-                                 "comparisonFunction":"WHIRL",
-                                 "comparisonWeight":1.0,
-                                 "resolutionFunction":"TBD"
-                              }
-                           }
-                        }
-                     }
-                  }
-               }
             }
          }
       },
       "IP":{  
          "title":"IP",
          "vertexType":"IP",
-         "description":"a specific IP address",
+         "description":"A specific IP address",
+         "type": "object",
+         "regex": {
+            "xpath": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and @*[local-name()='type']=\"AddressObj:AddressObjectType\"]/*[local-name()='Address_Value']",
+            "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+         },
          "properties":{  
             "vertexType":{  
                "type":"string",
                "cardinality":"single",
-               "enum":[  
-                  "IP"
-               ]
+               "default": "IP"
             },
             "name":{  
                "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
@@ -1799,9 +530,12 @@
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            },
+            "observableType": {
+               "description": "CybOX object type used to describe this vertex",
+               "cardinality": "single"
             }
          },
-         "type":"object",
          "required":[  
             "vertexType",
             "name",
@@ -1813,8 +547,7 @@
                {  
                   "keys":[  
                      "name"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value"
+                  ]
                },
                {  
                   "keys":[  
@@ -1824,114 +557,51 @@
                {  
                   "keys":[  
                      "source"
-                  ],
-                  "path":"Observable/bservable_Source/Information_Source_Type"
+                  ]
                }
             ],
-            "sb-tree":[  
+            "fullText":[  
                {  
                   "keys":[  
-                     "ipInt"
-                  ],
-                  "path":"Observable/Object/Properties/Address_Value",
-                  "function":"ipToLong"
+                     "description"
+                  ]
                }
             ]
          },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted IP observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"IP",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this IP",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of IP address",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Address_Value":{  
-                        "description":"IP value",
-                        "type":"string",
-                        "cardinality":"single"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"IP Address Contained_Within AddressRange",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Relationship":{  
-                           "description":"IP address Contained_Within AddressRange",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Contained_Within"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set"
-                           }
-                        }
-                     }
-                  }
-               }
+         "edges": {
+            "Sub-Observable": {
+               "inVType": [
+                  "Observable"
+               ]
+            },
+            "Contained_Within": {
+               "inVType": [
+                  "AddressRange"
+               ]
             }
          }
       },
       "Malware":{  
          "title":"Malware",
          "vertexType":"Malware",
-         "description":"any malicious software.  This can refer to either a stored binary or a running instance. Malware can contain code to launch an exploit. Malware can itself be an asset that an attacker uses in future attacks (eg. a backdoor left on a compromised system.) or can automatically launch additional attacks on behalf of the original attacker. Malware can be hosted by or communicate with servers controlled by the attacker. Malware can contain code to load other malware. Malware can reuse components from other malware samples.",
+         "description":"Any malicious software. This can refer to either a stored binary or a running instance. Malware can contain code to launch an exploit. Malware can itself be an asset that an attacker uses in future attacks (eg. a backdoor left on a compromised system.) or can automatically launch additional attacks on behalf of the original attacker. Malware can be hosted by or communicate with servers controlled by the attacker. Malware can contain code to load other malware. Malware can reuse components from other malware samples.",
+         "type": "object",
+         "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']",
          "properties":{  
             "vertexType":{  
                "type":"string",
                "cardinality":"single",
-               "enum":[  
-                  "Malware"
-               ]
-            },
-            "name":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Name']",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
+               "default": "Malware"
             },
             "description":{  
                "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Description']",
                "description":"descriptive summary of this malware family",
                "type":"string",
                "cardinality":"set"
-            },
-            "solution":{  
-               "xpath":".[local-name() = 'Course_Of_Action']/*[local-name() = 'Description']",
-               "description":"description of removal procedure",
+            },   
+            "shortDescription":{  
+               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Short_Description']",
+               "description":"additional text description of this Malware",
                "type":"string",
                "cardinality":"set"
             },
@@ -1946,13 +616,12 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
             }
          },
-         "type":"object",
          "required":[  
             "vertexType",
             "name",
@@ -1963,8 +632,7 @@
                {  
                   "keys":[  
                      "name"
-                  ],
-                  "path":"TTP/Behavior/Malware/Malware_Instance/Title"
+                  ]
                },
                {  
                   "keys":[  
@@ -1974,887 +642,69 @@
                {  
                   "keys":[  
                      "source"
-                  ],
-                  "path":"TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+                  ]
                }
             ],
             "fullText":[  
                {  
                   "keys":[  
                      "description"
-                  ],
-                  "path":"TTP/Behavior/Malware/Malware_Instance/Description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
                },
                {  
                   "keys":[  
                      "details"
-                  ],
-                  "path":"TTP/Behavior/Attack_Patterns/Attack_Pattern/Description"
-               },
-               {  
-                  "keys":[  
-                     "solution"
-                  ],
-                  "path":"Course_Of_Action/Description"
+                  ]
                }
             ]
          },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Malware instances",
-            "TTP":{  
-               "Title":{  
-                  "description":"title for this TTP",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Malware",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Information_Source":{  
-                  "Contributing_Sources":{  
-                     "Source":{  
-                        "Identity":{  
-                           "Name":{  
-                              "description":"data source for this Malware",
-                              "type":"string",
-                              "cardinality":"set",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList"
-                           }
-                        }
-                     }
-                  }
-               },
-               "Behavior":{  
-                  "Malware":{  
-                     "Malware_Instance":{  
-                        "Title":{  
-                           "description":"Malware title/name",
-                           "type":"string",
-                           "cardinality":"single",
-                           "comparisonFunction":"exact",
-                           "comparisonWeight":1.0,
-                           "resolutionFunction":"none"
-                        },
-                        "Name":{  
-                           "description":"Malware name",
-                           "type":"string",
-                           "cardinality":"set"
-                        },
-                        "Type":{  
-                           "description":"Malware Type",
-                           "type":"string",
-                           "cardinality":"set",
-                           "comparisonFunction":"exact",
-                           "comparisonWeight":1.4822443,
-                           "resolutionFunction":"appendList"
-                        },
-                        "Description":{  
-                           "description":"TTP description of Malware",
-                           "type":"string",
-                           "cardinality":"set",
-                           "comparisonFunction":"WHIRL",
-                           "comparisonWeight":5.8790593,
-                           "resolutionFunction":"appendList"
-                        }
-                     }
-                  }
-               },
-               "Resources":{  
-                  "Infrastructure":{  
-                     "Observable_Characterization":{  
-                        "Observable":{  
-                           "Event":{  
-                              "Event":{  
-                                 "Actions":{  
-                                    "Action":{  
-                                       "Type":{  
-                                          "description":"type of action taken in compliance with used process, registry key, or file",
-                                          "type":"string",
-                                          "cardinality":"single",
-                                          "enum":[  
-                                             "Created",
-                                             "Modified"
-                                          ],
-                                          "comparisonFunction":"exact",
-                                          "comparisonWeight":1.0,
-                                          "resolutionFunction":"none"
-                                       },
-                                       "Description":{  
-                                          "description":"descriptions of actions used by this Malware",
-                                          "type":"string",
-                                          "cardinality":"single",
-                                          "comparisonFunction":"WHIRL",
-                                          "comparisonWeight":1.0,
-                                          "resolutionFunction":"none"
-                                       },
-                                       "Associated_Objects":{  
-                                          "Associated_Object":{  
-                                             "Properties":{  
-                                                "Key":{  
-                                                   "description":"files, regestry keys, or processes used by this Malware during an attack",
-                                                   "type":"string",
-                                                   "cardinality":"single",
-                                                   "comparisonFunction":"exact",
-                                                   "comparisonWeight":1.0,
-                                                   "resolutionFunction":"appendList"
-                                                }
-                                             }
-                                          }
-                                       }
-                                    }
-                                 }
-                              }
-                           }
-                        }
-                     }
-                  },
-                  "Tools":{  
-                     "Tool":{  
-                        "Name":{  
-                           "description":"name of file used by this Malware",
-                           "type":"string",
-                           "cardinality":"single",
-                           "comparisonFunction":"exact",
-                           "comparisonWeight":1.0,
-                           "resolutionFunction":"appendList"
-                        },
-                        "Type":{  
-                           "enum":[  
-                              "File"
-                           ],
-                           "comparisonFunction":"exact",
-                           "comparisonWeight":1.0,
-                           "resolutionFunction":"appendList"
-                        },
-                        "Tool_Hashes":{  
-                           "Hash":{  
-                              "Type":{  
-                                 "enum":[  
-                                    "MD5",
-                                    "SHA-1"
-                                 ],
-                                 "comparisonFunction":"exact",
-                                 "comparisonWeight":1.0,
-                                 "resolutionFunction":"none"
-                              },
-                              "Simple_Hash_Value":{  
-                                 "comparisonFunction":"exact",
-                                 "comparisonWeight":1.0,
-                                 "resolutionFunction":"appendList"
-                              }
-                           }
-                        }
-                     }
-                  }
-               },
-               "Victim_Targeting":{  
-                  "Targeted_Systems":{  
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               }
-            },
-            "Course_Of_Action":{  
-               "Title":{  
-                  "description":"title for this Course_Of_Action",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Malware",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Description":{  
-                  "description":"Course_Of_Action description of solution for Malware",
-                  "type":"string",
-                  "cardinality":"single",
-                  "comparisonFunction":"WHIRL",
-                  "comparisonWeight":6.1163623196299,
-                  "resolutionFunction":"TBD"
-               },
-               "Information_Source":{  
-                  "Contributing_Sources":{  
-                     "Source":{  
-                        "Identity":{  
-                           "Name":{  
-                              "description":"data source for this Malware solution",
-                              "type":"string",
-                              "cardinality":"set",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList"
-                           }
-                        }
-                     }
-                  }
-               }
-            },
-            "Indicator":{  
-               "Title":{  
-                  "description":"title for this Indicator",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Malware",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Suggested_COAs":{  
-                  "Suggested_COA":{  
-                     "Course_Of_Action":{  
-
-                     }
-                  }
-               },
-               "Indicated_TTP":{  
-                  "TTP":{  
-
-                  }
-               }
-            }
-         }
-      },
-      "Organization":{  
-         "title":"Organization",
-         "vertexType":"Organization",
-         "description":"Descriptions of Oraganizations posessing AS",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Organization"
+         "edges": {
+            "RelatedTTP": {
+               "inVType": [
+                  "TTP",
+                  "Malware",
+                  "Exploit"
                ]
             },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Registrants']/*[local-name() = 'Registrant']/*[local-name() = 'Organization']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Registrants/Registrant/Organization"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               },
-               {  
-                  "keys":[  
-                     "address"
-                  ],
-                  "path":"Observable/Object/Properties/Registrants/Registrant/Address"
-               }
-            ],
-            "fullText":[  
-               {  
-                  "keys":[  
-                     "description"
-                  ],
-                  "path":"Observable/Object/Description"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Organization observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Organization",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Organization",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of this Organization",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Registrants":{  
-                        "Registrant":{  
-                           "Organization":{  
-                              "description":"Organization name",
-                              "type":"string",
-                              "cardinality":"single",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"none"
-                           },
-                           "Address":{  
-                              "description":"Organization physical address",
-                              "type":"string",
-                              "cardinality":"single",
-                              "comparisonFunction":"CosineSimilarity",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList",
-                              "delimiter":"##"
-                           },
-                           "Registrant_ID":{  
-                              "type":"string",
-                              "cardinality":"single",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"none"
-                           }
-                        }
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"Organization Has_AS AS",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Relationship":{  
-                           "description":"Has_AS",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Has_AS"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set"
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "Port":{  
-         "title":"Port",
-         "vertexType":"Port",
-         "description":"a specific port",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Port"
+            "ExploitTarget": {
+               "inVType": [
+                  "Exploit_Target"
                ]
             },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Port_Value']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Port_Value"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Port observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Port",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Port",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of Port",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Port_Value":{  
-                        "description":"Port value",
-                        "type":"number",
-                        "cardinality":"single",
-                        "comparisonFunction":"none",
-                        "comparisonWeight":1.0,
-                        "resolutionFunction":"none"
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "Service":{  
-         "title":"Service",
-         "vertexType":"Service",
-         "description":"expected or actual service using some port",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Service"
+            "UsesIP": {
+               "inVType": [
+                  "IP"
                ]
             },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ],
-                  "path":"Observable/Object/Properties/Name"
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ],
-                  "path":"Observable/Observable_Source/Information_Source_Type"
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Service info observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Service",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Service",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of Service",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Properties":{  
-                     "Name":{  
-                        "description":"name of this Service",
-                        "type":"string",
-                        "cardinality":"single"
-                     },
-                     "Port_List":{  
-                        "Port":{  
-
-                        }
-                     },
-                     "Custom_Properties":{  
-                        "Property":{  
-                           "description":"Notes and References for this Service are represented as a custom fields",
-                           "type":"string",
-                           "cardinality":"set",
-                           "comparisonFunction":"TBD",
-                           "comparisonWeight":"TBD",
-                           "resolutionFunction":"TBD"
-                        }
-                     }
-                  }
-               }
-            }
-         }
-      },
-      "Software":{  
-         "title":"Software",
-         "vertexType":"Software",
-         "description":"Any software components on a system, including OSes, applications, services, and libraries.",
-         "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "enum":[  
-                  "Software"
+            "RelatedObservable": {
+               "inVType": [
+                  "Observable"
                ]
             },
-            "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Product' or local-name() = 'Vendor' or local-name() = 'Update' or local-name() = 'Edition' or local-name() = 'Language' or local-name() = 'Version'] | .[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Custom_Properties']/*[local-name() = 'Property' and @name = \"Part\"]",
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none",
-               "pattern":"cpe:Property:Vendor:Product:Version:Update:Edition:Language",
-               "applyFunction":"cleanCpeName"
-            },
-            "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
-               "description":"description",
-               "type":"string",
-               "cardinality":"set"
-            },
-            "nvdId":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Custom_Properties' and @name = \"NVD_ID\"]",
-               "description":"NVD ID",
-               "type":"string",
-               "cardinality":"single"
-            },
-            "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
-               "description":"Data source for this vertex",
-               "type":"string",
-               "cardinality":"set"
-            }
-         },
-         "type":"object",
-         "required":[  
-            "vertexType",
-            "name",
-            "description"
-         ],
-         "indexes":{  
-            "hash":[  
-               {  
-                  "keys":[  
-                     "name"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "vertexType"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "source"
-                  ]
-               },
-               {  
-                  "keys":[  
-                     "nvdId"
-                  ]
-               }
-            ],
-            "fullText":[  
-               {  
-                  "keys":[  
-                     "description"
-                  ]
-               }
-            ]
-         },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Software observables",
-            "Observable":{  
-               "Title":{  
-                  "description":"title for this Observable",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Software",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Observable_Source":{  
-                  "Information_Source_Type":{  
-                     "description":"data source for this Software",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"exact",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  }
-               },
-               "Object":{  
-                  "Description":{  
-                     "description":"Observable description of Software",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":3.033507781,
-                     "resolutionFunction":"TBD"
-                  },
-                  "Properties":{  
-                     "Language":{  
-                        "description":"software language",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":0.008644951,
-                        "resolutionFunction":"appendList",
-                        "delimiter":"##"
-                     },
-                     "Version":{  
-                        "description":"software version",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":8.713991,
-                        "resolutionFunction":"appendList",
-                        "delimiter":"##"
-                     },
-                     "Product":{  
-                        "description":"software name",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":7.6517224,
-                        "resolutionFunction":"appendList",
-                        "delimiter":"##"
-                     },
-                     "Vendor":{  
-                        "description":"vendor",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":6.062343,
-                        "resolutionFunction":"appendList",
-                        "delimiter":"##"
-                     },
-                     "Update":{  
-                        "description":"update",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"compareTimestamps",
-                        "comparisonWeight":1.1007229,
-                        "resolutionFunction":"keepNew"
-                     },
-                     "Edition":{  
-                        "description":"edition",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":0.540115,
-                        "resolutionFunction":"appendList",
-                        "delimiter":"##"
-                     }
-                  },
-                  "Related_Objects":{  
-                     "Related_Object":{  
-                        "Description":{  
-                           "description":"software Runs_As account; software Resolved_To process; software Moved_By flow",
-                           "type":"string",
-                           "cardinality":"single"
-                        },
-                        "Properties":{  
-                           "Name":{  
-                              "description":"Process Path (Name)",
-                              "type":"string",
-                              "cardinality":"single",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":0.45797676,
-                              "resolutionFunction":"appendList",
-                              "delimiter":"##"
-                           },
-                           "Parent_PID":{  
-                              "description":"Process PPID",
-                              "type":"integer",
-                              "cardinality":"single",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":0.5673976,
-                              "resolutionFunction":"appendList",
-                              "delimiter":"##"
-                           },
-                           "PID":{  
-                              "description":"Process PID",
-                              "type":"integer",
-                              "cardinality":"single",
-                              "comparisonFunction":"exact",
-                              "comparisonWeight":0.5673976,
-                              "resolutionFunction":"appendList",
-                              "delimiter":"##"
-                           },
-                           "Argument_List":{  
-                              "Argument":{  
-                                 "description":"Process Args",
-                                 "type":"string",
-                                 "cardinality":"set",
-                                 "comparisonFunction":"exact",
-                                 "comparisonWeight":0.43408045,
-                                 "resolutionFunction":"appendList"
-                              }
-                           }
-                        },
-                        "Relationship":{  
-                           "description":"Software Runs_As Account, Initialized_To Process, and Moved_By Flow",
-                           "type":"string",
-                           "cardinality":"single",
-                           "enum":[  
-                              "Initialized_To",
-                              "Moved_By",
-                              "Runs_As"
-                           ]
-                        },
-                        "Discovery_Method":{  
-                           "Information_Source_Type":{  
-                              "description":"data source for this relationship",
-                              "type":"string",
-                              "cardinality":"set"
-                           }
-                        }
-                     }
-                  },
-                  "Custom_Properties":{  
-                     "Property":{  
-                        "description":"part type",
-                        "type":"string",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":0.4717679,
-                        "resolutionFunction":"appendList",
-                        "delimiter":"##"
-                     }
-                  }
-               }
+            "Exploits": {
+               "inVType": [
+                  "Vulnerability",
+                  "Weakness"
+               ]
             }
          }
       },
       "Vulnerability":{  
          "title":"Vulnerability",
          "vertexType":"Vulnerability",
-         "description":"a flaw in some software, that can cause improper, unintended operation, and can potentially be exploited as part of an attack",
+         "description":"Vulnerability",
+         "type": "object",
+         "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']",
          "properties":{  
             "vertexType":{  
                "type":"string",
                "cardinality":"single",
-               "enum":[  
-                  "Vulnerability"
-               ]
+               "default": "Vulnerability"
             },
             "name":{  
                "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'CVE_ID']",
@@ -2870,8 +720,14 @@
                "type":"string",
                "cardinality":"set"
             },
+            "shortDescription":{  
+               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Short_Description']",
+               "description":"short description",
+               "type":"string",
+               "cardinality":"set"
+            },
             "source":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Source']",
+               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Source'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -2881,15 +737,8 @@
                "description":"published date",
                "type":"number",
                "cardinality":"single"
-            },
-            "shortDescription":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Short_Description']",
-               "description":"short description",
-               "type":"string",
-               "cardinality":"set"
             }
          },
-         "type":"object",
          "required":[  
             "vertexType",
             "name",
@@ -2900,8 +749,7 @@
                {  
                   "keys":[  
                      "name"
-                  ],
-                  "path":"Exploit_Target/Vulnerability/CVE_ID"
+                  ]
                },
                {  
                   "keys":[  
@@ -2911,712 +759,882 @@
                {  
                   "keys":[  
                      "source"
-                  ],
-                  "path":"Exploit_Target/Vulnerability/Source"
-               }
-            ],
-            "sbTree":[  
-               {  
-                  "keys":[  
-                     "publishedDate"
-                  ],
-                  "path":"Exploit_Target/Vulnerability/Published_DateTime"
+                  ]
                }
             ],
             "fullText":[  
                {  
                   "keys":[  
                      "description"
-                  ],
-                  "path":"Exploit_Target/Vulnerability/Description"
-               },
-               {  
-                  "keys":[  
-                     "shortDescription"
-                  ],
-                  "path":[  
-                     "Exploit_Target/Vulnerability/Short_Description"
                   ]
                },
                {  
                   "keys":[  
-                     "solution"
-                  ],
-                  "path":"Course_Of_Action/Description"
+                     "shortDescription"
+                  ]
                }
             ]
          },
-         "comparisonRules":{  
-            "description":"set of rules to compare and link two STIX formatted Vulnerabilities (Exploit_Target) and their solutions (COA)",
-            "Exploit_Target":{  
-               "Title":{  
-                  "description":"title for this Exploit_Target",
-                  "type":"string",
-                  "cardinality":"single",
-                  "default":"Vulnerability",
-                  "comparisonFunction":"exact",
-                  "comparisonWeight":1.0,
-                  "resolutionFunction":"none"
-               },
-               "Information_Source":{  
-                  "Contributing_Sources":{  
-                     "Source":{  
-                        "Identity":{  
-                           "Name":{  
-                              "description":"data source for this Vulnerability",
-                              "type":"string",
-                              "cardinality":"set",
-                              "comparisonFunction":"none",
-                              "comparisonWeight":1.0,
-                              "resolutionFunction":"appendList"
-                           }
-                        }
-                     }
-                  }
-               },
-               "Potential_COAs":{  
-                  "Potential_COA":{  
-                     "Course_Of_Action":{  
-
-                     }
-                  }
-               },
-               "Vulnerability":{  
-                  "Description":{  
-                     "description":"Exploit_Target description of Vulnerability",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":3.383410480090717,
-                     "resolutionFunction":"appendList"
-                  },
-                  "Affected_Software":{  
-                     "Affected_Software":{  
-                        "Observable":{  
-
-                        }
-                     }
-                  },
-                  "References":{  
-                     "Reference":{  
-                        "description":"references",
-                        "type":"string",
-                        "cardinality":"set",
-                        "comparisonFunction":"compareReferences",
-                        "comparisonWeight":2.21228381503559,
-                        "resolutionFunction":"appendList"
-                     }
-                  },
-                  "CVE_ID":{  
-                     "description":"CWE Number",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":0.0,
-                     "resolutionFunction":"none"
-                  },
-                  "Published_DateTime":{  
-                     "description":"published date",
-                     "type":"number",
-                     "cardinality":"single",
-                     "comparisonFunction":"compareTimestamps",
-                     "comparisonWeight":1.373463923761563,
-                     "resolutionFunction":"keepNew"
-                  },
-                  "OSVDB_ID":{  
-                     "description":"vulnerability database id",
-                     "type":"integer",
-                     "cardinality":"set",
-                     "comparisonFunction":"TBD",
-                     "comparisonWeight":"TBD",
-                     "resolutionFunction":"TBD"
-                  },
-                  "Source":{  
-                     "description":"data source for this Vulnerability",
-                     "type":"string",
-                     "cardinality":"set",
-                     "comparisonFunction":"none",
-                     "comparisonWeight":1.0,
-                     "resolutionFunction":"appendList"
-                  },
-                  "Short_Description":{  
-                     "description":"short description",
-                     "type":"string",
-                     "cardinality":"single",
-                     "comparisonFunction":"WHIRL",
-                     "comparisonWeight":6.882437470997878,
-                     "resolutionFunction":"appendList"
-                  },
-                  "CVSS_Score":{  
-                     "Base_Score":{  
-                        "description":"CVSS score",
-                        "type":"number",
-                        "cardinality":"single",
-                        "comparisonFunction":"exact",
-                        "comparisonWeight":0.7038249561307638,
-                        "resolutionFunction":"keepConfidence"
-                     }
-                  }
-               }
+         "edges": {
+            "RelatedExploitTarget": {
+               "inVType": [
+                  "Exploit_Target",
+                  "Vulnerability",
+                  "Weaknes"
+               ]
+            },
+            "PotentialCOA": {
+               "inVType": [  
+                  "Course_Of_Action"
+               ]
             }
          }
       },
-      "Contained_Within":{  
-         "title":"Contained_Within",
-         "vertexType":"Contained_Within",
-         "description":"IP Contained_Within AddressRange",
+      "Weakness":{  
+         "title":"Weakness",
+         "vertexType":"Weakness",
+         "description":"weakness",
+         "type": "object",
+         "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']",
          "properties":{  
-            "outVType":{  
+            "vertexType":{  
                "type":"string",
-               "enum":[  
-                  "IP"
-               ]
+               "cardinality":"single",
+               "default": "Weakness"
             },
-            "inVType":{  
+            "name":{  
+               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']/*[local-name() = 'CWE_ID']",
                "type":"string",
-               "enum":[  
-                  "AddressRange"
-               ]
+               "cardinality":"single",
+               "comparisonFunction":"exact",
+               "comparisonWeight":1.0,
+               "resolutionFunction":"none"
+            },
+            "description":{  
+               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']/*[local-name() = 'Description']",
+               "description":"description",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
             }
          },
          "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Contains":{  
-         "title":"Contains",
-         "vertexType":"Contains",
-         "description":"AS Contains AddressRange",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "AS"
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "RelatedExploitTarget": {
+               "inVType": [
+                  "Exploit_Target",
+                  "Vulnerability",
+                  "Weaknes"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "AddressRange"
+            "PotentialCOA": {
+               "inVType": [  
+                  "Course_Of_Action"
                ]
+            }
+         }
+      },
+      "Campaign": {
+         "title": "Campaign",
+         "vertexType": "Campaign",
+         "description": "Instance of Threat Actor observed through sets of Incidents and/or TTP",
+         "type": "object",
+         "xpath": ".[local-name() = 'Campaign']",
+         "properties":{  
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "Campaign"
+            },
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "Campaign name"
+            },
+            "description":{  
+               "applyFunction": "getElementDescriptionList",
+               "description":"descriptive summary of this Campaign",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "applyFunction": "getElementShortDescriptionList",
+               "description":"short descriptive summary of this Campaign",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "alias":{  
+               "xpath":".[local-name() = 'Campaign']/*[local-name() = 'Names']/*[local-name() = 'Name']",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Campaign']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Campaign']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
             }
          },
          "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Dest_Socket_Address":{  
-         "title":"Dest_Socket_Address",
-         "vertexType":"Dest_Socket_Address",
-         "description":"Flow's Dest_Socket_Address Address",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Flow"
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "AssociatedCampaign": {
+               "inVType": [
+                  "Campaign"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Address"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Exploits":{  
-         "title":"Exploits",
-         "vertexType":"Exploits",
-         "description":"Exploit Exploits Vulnerability'",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
+            "RelatedTTP": {
+               "inVType": [
+                  "TTP",
+                  "Malware",
                   "Exploit"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Vulnerability"
+            "Attribution": {
+               "inVType": [
+                  "Threat_Actor"
                ]
+            },
+            "RelatedIncident": {
+               "inVType": [
+                  "Incident"
+               ]
+            }
+         }
+      },
+      "Course_Of_Action": {
+         "title": "Course Of Action",
+         "vertexType": "Course_Of_Action",
+         "description": "Measures to be taken to address cyber threat",
+         "type": "object",
+         "xpath": ".[local-name() = 'Course_Of_Action']",
+         "properties":{  
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "Course_Of_Action"
+            },
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Course_Of_Action"
+            },
+            "description":{  
+               "applyFunction": "getElementDescriptionList",
+               "description":"descriptive summary of this Course_Of_Action",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "applyFunction": "getElementShortDescriptionList",
+               "description":"short descriptive summary of this Course_Of_Action",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "alias":{  
+               "xpath":".[local-name() = 'Course_Of_Action']/*[local-name() = 'Parameter_Observables']/*[local-name() = 'Observable']",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Course_Of_Action']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Course_Of_Action']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
             }
          },
          "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Has_AffectedSoftware":{  
-         "title":"Has_AffectedSoftware",
-         "vertexType":"Has_AffectedSoftware",
-         "description":"Vulnerability Has_AffectedSoftware Software",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Vulnerability"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Software"
-               ]
-            }
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
          },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Has_AS":{  
-         "title":"Has_AS",
-         "vertexType":"Has_AS",
-         "description":"Organization Has_AS AS",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Organization"
+         "edges": {
+            "RelatedCOA": {
+               "inVType": [
+                  "Course_Of_Action"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "AS"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Has_DNSName":{  
-         "title":"Has_DNSName",
-         "vertexType":"Has_DNSName",
-         "description":"Address Has_DNSName DNSName",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Address"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSName"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Has_IP":{  
-         "title":"Has_IP",
-         "vertexType":"Has_IP",
-         "description":"Address Has_IP IP",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Address"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
+            "ParameterObservable": {
+               "inVType": [
+                  "Observable",
+                  "AddressRange",
                   "IP"
                ]
             }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
+         }
       },
-      "Has_Port":{  
-         "title":"Has_Port'",
-         "vertexType":"Has_Port'",
-         "description":"Address Has_Port Port",
+      "Exploit_Target": {
+         "title": "Exploit Target",
+         "vertexType": "Exploit_Target",
+         "description": "Exploit Targets are vulnerabilities or weaknesses",
+         "type": "object",
+         "xpath": ".[local-name() = 'Exploit_Target']",
          "properties":{  
-            "outVType":{  
+            "vertexType":{  
                "type":"string",
-               "enum":[  
-                  "Address"
-               ]
+               "cardinality":"single",
+               "default": "Exploit_Target"
             },
-            "inVType":{  
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Exploit_Target"
+            },
+            "description":{  
+               "applyFunction": "getElementDescriptionList",
+               "description":"descriptive summary of this Exploit_Target",
                "type":"string",
-               "enum":[  
-                  "Port"
-               ]
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "applyFunction": "getElementShortDescriptionList",
+               "description":"short descriptive summary of this Exploit_Target",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
             }
          },
          "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Logs_In_From":{  
-         "title":"Logs_In_From",
-         "vertexType":"Logs_In_From",
-         "description":"Account Logs_In_From Host",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Account"
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "RelatedExploitTarget": {
+               "inVType": [
+                  "Exploit_Target",
+                  "Vulnerability",
+                  "Weakness"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Host"
+            "PotentialCOA": {
+               "inVType": [
+                  "Course_Of_Action"
                ]
+            }
+         }
+      },
+      "Incident": {
+         "title": "Incident",
+         "vertexType": "Incident",
+         "description": "Instances of Indicators and/or Threat Actors performing specific threat actions",
+         "type": "object",
+         "xpath": ".[local-name() = 'Incident']",
+         "properties": {  
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Incident"
+            },
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "Incident"
+            },
+            "description":{  
+               "applyFunction": "getElementDescriptionList",
+               "description":"descriptive summary of this Incident",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "applyFunction": "getElementShortDescriptionList",
+               "description":"short descriptive summary of this Incident",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "alias":{  
+               "xpath":".[local-name() = 'Incident']/*[local-name() = 'External_ID'] | .[local-name() = 'Incident']/*[local-name() = 'Related_Observables']/*[local-name() = 'Related_Observable']/*[local-name() = 'Observable'] | .[local-name() = 'Incident']/*[local-name() = 'Leveraged_TTPs']/*[local-name() = 'Leveraged_TTP']/*[local-name() = 'TTP'] | .[local-name() = 'Incident']/*[local-name() = 'Attributed_Threat_Actors']/*[local-name() = 'Threat_Actor']/*[local-name() = 'Threat_Actor']",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Incident']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Incident']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
             }
          },
          "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Logs_In_To":{  
-         "title":"Logs_In_To",
-         "vertexType":"Logs_In_To",
-         "description":"Account Logs_In_To Host",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Account"
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "RelatedIncident": {
+               "inVType": [
+                  "Incident"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Host"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Moved_By":{  
-         "title":"Moved_By",
-         "vertexType":"Moved_By",
-         "description":"Software Moved_By Flow",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Software"
+            "RelatedIndicator": {
+               "inVType": [
+                  "Indicator"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Flow"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Requested_By":{  
-         "title":"Requested_By",
-         "vertexType":"Requested_By",
-         "description":"DNSRecord/HTTPRequest Requested_By IP",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSRecord",
-                  "HTTPRequest"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "IP"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Requested_DNSName":{  
-         "title":"Requested_DNSName",
-         "vertexType":"Requested_DNSName",
-         "description":"DNSRecord Requested_DNSName DNSName",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSRecord"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSName"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Requested_IP":{  
-         "title":"Requested_IP",
-         "vertexType":"Requested_IP",
-         "description":"DNSRecord Requested_IP IP",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSRecord"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "IP"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Resolved_To":{  
-         "title":"Resolved_To",
-         "vertexType":"Resolved_To",
-         "description":"DNSName/Host Resolved_To IP",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSName",
-                  "Host"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "IP"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Runs":{  
-         "title":"Runs",
-         "vertexType":"Runs",
-         "description":"Host Runs Software",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Host"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Software"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Runs_As":{  
-         "title":"Runs_As",
-         "vertexType":"Runs_As",
-         "description":"Software Runs_As Account",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Software"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Account"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Runs_On":{  
-         "title":"Runs_As",
-         "vertexType":"Runs_As",
-         "description":"Service Runs_On Port",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Service"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Port"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Served_By":{  
-         "title":"Served_By",
-         "vertexType":"Served_By",
-         "description":"DNSRecord Served_By IP; HTTPRequest Served_By DNSName",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "DNSRecord",
-                  "HTTPRequest"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "IP",
-                  "DNSName"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Served_On":{  
-         "title":"Served_On",
-         "vertexType":"Served_On",
-         "description":"HTTPRequest Served_On Port",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "HTTPRequest"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Port"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Src_Socket_Address":{  
-         "title":"Src_Socket_Address",
-         "vertexType":"Src_Socket_Address",
-         "description":"Flow's Src_Socket_Address Address",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Flow"
-               ]
-            },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Address"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Uses_Address":{  
-         "title":"Uses_Address",
-         "vertexType":"Uses_Address",
-         "description":"Malware/Host Uses_Address Address",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
+            "LeveragedTTP": {
+               "inVType": [
+                  "TTP",
                   "Malware",
-                  "Host"
+                  "Exploit"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
-                  "Address"
-               ]
-            }
-         },
-         "required":[  
-            "inVType",
-            "outVType"
-         ]
-      },
-      "Uses_IP":{  
-         "title":"Uses_IP",
-         "vertexType":"Uses_IP",
-         "description":"Malware Uses_IP IP",
-         "properties":{  
-            "outVType":{  
-               "type":"string",
-               "enum":[  
-                  "Malware"
+            "COATaken": {
+               "outElementName": "COA_Taken",
+               "inVType": [
+                  "Course_Of_Action"
                ]
             },
-            "inVType":{  
-               "type":"string",
-               "enum":[  
+            "COARequested": {
+               "outElementName": "COA_Requested",
+               "inVType": [
+                  "Course_Of_Action"
+               ]
+            },
+            "RelatedThreatActor": {
+               "inVType": [
+                  "Threat_Actor"
+               ]
+            },
+            "RelatedObservable": {
+               "inVType": [
+                  "Observable",
+                  "AddressRange",
                   "IP"
                ]
             }
+         }
+      },
+      "Indicator": {
+         "title": "Indicator",
+         "vertexType": "Indicator",
+         "description": "Indicating Observable patterns combined with additional contextual information",
+         "type": "object",
+         "xpath": ".[local-name() = 'Indicator']",
+         "properties":{  
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "Indicator"
+            },
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Indicator"
+            },
+            "description":{  
+               "xpath":"*[local-name() = 'Description']",
+               "description":"descriptive summary of this Indicator",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "xpath":"*[local-name() = 'Short_Description']",
+               "description":"short descriptive summary of this Indicator",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "alias":{  
+               "xpath":".[local-name() = 'Indicator']/*[local-name() = 'Alternative_ID'] | .[local-name() = 'Indicator']/*[local-name() = 'Indicated_TTP']/*[local-name() = 'TTP'] | .[local-name() = 'Indicator']/*[local-name() = 'Related_Campaigns']/*[local-name() = 'Related_Campaign']/*[local-name() = 'Campaign'] | .[local-name() = 'Indicator']/*[local-name() = 'Observable']| .[local-name() = 'Indicator']/*[local-name() = 'Suggested_COAs']/*[local-name() = 'Suggested_COA']/*[local-name() = 'Course_Of_Action']",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Indicator']/*[local-name() = 'Producer']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Indicator']/*[local-name() = 'Producer']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
+            }
          },
          "required":[  
-            "inVType",
-            "outVType"
-         ]
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "RelatedIndicator": {
+               "inVType": [
+                  "Indicator"
+               ]
+            },
+            "Observable": {
+               "inVType": [
+                  "Observable",
+                  "AddressRange",
+                  "IP"
+               ]
+            },
+            "SuggestedCOA": {
+               "inVType": [
+                  "Course_Of_Action"
+               ]
+            },
+            "RelatedCampaign": {
+               "inVType": [
+                  "Campaign"
+               ]
+            },
+            "IndicatedTTP": {
+               "inVType": [
+                  "TTP",
+                  "Malware",
+                  "Exploit"
+               ]
+            }
+         }
+      },
+      "Threat_Actor": {
+         "title": "Threat Actor",
+         "vertexType": "Threat_Actor",
+         "description": "Characterizations of malicious actors or adversaries representing a cyber attack",
+         "type": "object",
+         "xpath": ".[local-name() = 'Threat_Actor']",
+         "properties":{  
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "Threat_Actor"
+            },
+            "name":{  
+               "xpath":".[local-name() = 'Threat_Actor']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "cardinality":"single",
+               "comparisonFunction":"exact",
+               "comparisonWeight":1.0,
+               "resolutionFunction":"none"
+            },
+            "description":{  
+               "xpath":"*[local-name() = 'Description']",
+               "description":"descriptive summary of this Threat_Actor",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "xpath":"*[local-name() = 'Short_Description']",
+               "description":"short descriptive summary of this Threat_Actor",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "alias":{  
+               "xpath":".[local-name() = 'Threat_Actor']/*[local-name() = 'Identity']/*[local-name() = 'Related_Identities']/*[local-name() = 'Related_Identity']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Threat_Actor']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Threat_Actor']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
+            }
+         },
+         "required":[  
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "AssociatedActor": {
+               "inVType": [
+                  "Threat_Actor"
+               ]
+            },
+            "HistoricalCampaign": {
+               "inVType": [
+                  "Campaign"
+               ]
+            },
+            "ObservedTTP": {
+               "inVType": [
+                  "TTP",
+                  "Malware",
+                  "Exploit"
+               ]
+            }
+         }
+      },
+      "TTP": {
+         "title": "TTP",
+         "vertexType": "TTP",
+         "description": "Adversary Tactics, Techniques and Procedures leveraged by adversary, such as malware, exploits, tools, etc",
+         "type": "object",
+         "xpath": ".[local-name() = 'TTP']",
+         "properties":{  
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "TTP"
+            },
+            "description":{  
+               "applyFunction": "getElementDescriptionList",
+               "description":"descriptive summary of this TTP",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "shortDescription":{  
+               "applyFunction": "getElementShortDescriptionList",
+               "description":"short descriptive summary of this TTP",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
+            }
+         },
+         "required":[  
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "shortDescription"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "RelatedTTP": {
+               "inVType": [
+                  "TTP",
+                  "Malware",
+                  "Exploit"
+               ]
+            },
+            "ExploitTarget": {
+               "inVType": [
+                  "Exploit_Target"
+               ]
+            },
+            "Exploits": {
+               "inVType": [
+                  "Vulnerability",
+                  "Weakness"
+               ]
+            }
+         }
+      },
+      "Observable": {
+         "title": "Observable",
+         "vertexType": "Observable",
+         "description": "Observable is representing a description of a single cyber observable through",
+         "type": "object",
+         "xpath": ".[local-name() = 'Observable']",
+         "properties":{  
+            "vertexType":{  
+               "type":"string",
+               "cardinality":"single",
+               "default": "Observable"
+            },
+            "description":{  
+               "applyFunction": "getElementDescriptionList",
+               "description":"descriptive summary of this Observable",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "source":{  
+               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "observableType": {
+               "description": "CybOX object type used to describe this vertex; specified in cybox_ontology.json",
+               "cardinality": "single"
+            },
+            "alias": {
+               "description": "objects associated with this observable; specified in cybox_ontology.json",
+               "cardinality": "set"
+            }
+         },
+         "required":[  
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "Sub-Observable": {
+               "inVType": [
+                  "Observable",
+                  "AddressRange",
+                  "IP"
+               ]
+            }
+         }
       }
    }
 }
