@@ -3,20 +3,17 @@ package alignment.alignment_v2;
 import javax.xml.namespace.QName;
 import org.xml.sax.SAXException;
 
-import org.json.JSONObject;
-import org.json.JSONArray;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.HashSet; 
+import java.util.HashSet;  
 import java.util.UUID;
 import java.util.Iterator;
 
-import java.io.StringReader; 
+import java.io.StringReader;  
 import java.io.IOException;
 
 import org.jdom2.output.XMLOutputter;
@@ -28,21 +25,23 @@ import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.util.IteratorIterable;
-
-import org.mitre.stix.stix_1.STIXPackage;
-import org.mitre.cybox.cybox_2.Observable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PreprocessSTIX extends PreprocessCybox {
+public class PreprocessSTIX {
 
 	private static final Logger logger = LoggerFactory.getLogger(PreprocessSTIX.class);
 
 	private static final Namespace xsiNS = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 	private static final Map<String, Namespace> stixElementMap;
 	private static final Set<String> stixParentElementSet;
+
+/**
+ * Normalizing STIX packges by removing nested elements.
+ *
+ * @author Maria Vincent
+ */
 
 	static {
 		/* stix elements wrapers */
@@ -69,16 +68,9 @@ public class PreprocessSTIX extends PreprocessCybox {
 		stixElementMap = Collections.unmodifiableMap(map);
 	}
 
-	public String print(Element e) {
-		XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
-		System.out.println(xmlOutputter.outputString(e));
-
-		return xmlOutputter.outputString(e);
-	}
-
-	/**
-	 * Parses xml String and converts it to jdom2 Document
-	*/ 
+	/*
+	 *	Parses xml String and converts it to jdom2 Document
+	 */ 
 	public static Document parseXMLText(String documentText) {
 		try {
 			SAXBuilder saxBuilder = new SAXBuilder();
@@ -93,10 +85,10 @@ public class PreprocessSTIX extends PreprocessCybox {
 		return null;
 	}
 
-	/**
-	* Normalizes (refactors) stix core elements (Observable, Indicator, COA, etc ...) 
-	* by cloning content, appending it to the proper parent element, and adding reference to it from its original location
-	*/
+	/*
+	 *	Normalizes (refactors) stix core elements (Observable, Indicator, COA, etc ...) 
+	 *	by cloning content, appending it to the proper parent element, and adding reference to it from its original location
+	 */
 	public Map<String, Element> normalizeSTIX(String stixString) {
 		Map<String, Element> stixElements = new HashMap<String, Element>();
 		/* wrapping entire doc into one common root 
@@ -104,6 +96,9 @@ public class PreprocessSTIX extends PreprocessCybox {
 		stixString = stixString.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
 		stixString = "<root>" + stixString + "</root>";
 		Document document = parseXMLText(stixString);
+		if (document == null) {
+			return null;
+		}
 		List<Element> packageList = document.getRootElement().getChildren(); 
 		Iterator<Element> packageIterator = packageList.iterator();
 		while(packageIterator.hasNext()) {
@@ -128,7 +123,7 @@ public class PreprocessSTIX extends PreprocessCybox {
 		/* looking for the elements that should be referenced and storing them in stixElements map */
 		List<Element> outerElementList = stixPackage.getChildren();
 		Iterator<Element> outerElementIterator = outerElementList.iterator();
-		while(outerElementIterator.hasNext()) {
+		while (outerElementIterator.hasNext()) {
 			Element outerElement = outerElementIterator.next();
 			/* if it is STIX_Header or STIX_RelatedPackages, then we do not need to warry about them;
 				 we only keep Observables, Indicators, etc .. */
@@ -138,6 +133,10 @@ public class PreprocessSTIX extends PreprocessCybox {
 				Iterator<Element> elementListIterator = elementList.iterator();
 				while (elementListIterator.hasNext()) {
 					Element element = elementListIterator.next();
+					//TODO: add mover vertex types, such as Kill_Chain, Pools ...
+					if (!stixElementMap.containsKey(element.getName())) {
+						continue;
+					}
 					elementListIterator.remove();
 					/* now we need to normalize namespaces of extracted elements, 
 					   and travers their children to pull out imbeded Observables, COAs, etc.. */
@@ -154,17 +153,8 @@ public class PreprocessSTIX extends PreprocessCybox {
 			}
 			outerElementIterator.remove();
 		}
-		/* now we are looking for Observables to normalize them,
-		   such as extract IP, Port, etc.. from fields of other objects descriptions */
-		Map<String, Element> observableMap = new HashMap<String, Element>();
-		for (String id : stixElements.keySet()) {
-			Element element = stixElements.get(id);
-			String name = element.getName();
-			if (name.equals("Observable")) {
-				observableMap.putAll(normalizeCybox(element));
-			} 
-		}
-		stixElements.putAll(observableMap);
+		
+		stixElements.putAll(preprocessObservableTtpEt(stixElements));
 
 		return stixElements;
 	}				
@@ -172,16 +162,17 @@ public class PreprocessSTIX extends PreprocessCybox {
 	private String getElementId(Element element) {
 		Attribute id = null;
 		if ((id = element.getAttribute("id")) == null) {
-			id = new Attribute("id", element.getName() + "-" + UUID.randomUUID().toString());
+			id = new Attribute("id", "stucco:" + element.getName() + "-" + UUID.randomUUID().toString());
+			element.addNamespaceDeclaration(Namespace.getNamespace("stucco", "gov.ornl.stucco"));
 			element.setAttribute(id);
 		}
 
 		return id.getValue();
 	}
 
-	/** 
-	* Traverses stix elements to find the one that should be moved out and referenced
-	*/	
+	/* 
+	 *	Traverses stix elements to find the one that should be moved out and referenced
+	 */	
 	private Map<String, Element> traverseSTIXElements(Element element, Map<String, String> namespaceMap) {
 		normalizeNamespaces(element, namespaceMap);
 		Map<String, Element> stixElements = new HashMap<String, Element>();
@@ -204,8 +195,8 @@ public class PreprocessSTIX extends PreprocessCybox {
 		return stixElements;
 	}
 
-	/**
-	 * Copies the content of element into newElement, removing content, and adding idref instead 
+	/*
+	 *	Copies the content of element into newElement, removing content, and adding idref instead 
 	 */
 	private Element setNewElement(Element element) {
 		String name = element.getName();
@@ -221,8 +212,10 @@ public class PreprocessSTIX extends PreprocessCybox {
 		return newElement;
 	}
 
-	/* in stix values of attributes may also have namespaces, but jdom does not know how to work with them,
-		 so we need to check every attribute value for prefix, and add namespace if prefix is present */
+	/* 
+	 *	in stix values of attributes may also have namespaces, but jdom does not know how to work with them,
+	 *	so we need to check every attribute value for prefix, and add namespace if prefix is present 
+	 */
 	private void normalizeNamespaces(Element element, Map<String, String> namespaceMap) {
 		List<Namespace> namespaceList = element.getNamespacesIntroduced();
 		for (Namespace namespace : namespaceList) {
@@ -240,16 +233,38 @@ public class PreprocessSTIX extends PreprocessCybox {
 		}
 	}
 
-	/**
-	 * Validates STIXPackage according to xsd
+	/*
+	 *	Preprocessing Observable, such as splitting IP, Port, URL, etc form the same object
+	 *	Preprocessing TTP, such as splitting list of Malware or Exploits from single TTP
+	 *	Preprocessing Exploit Target, such as splitting list of Vulnerabilities from single Exploit Target
 	 */
-	static boolean validate(STIXPackage stixPackage) {
-		try	{
-    	return stixPackage.validate();
-    }
-    catch (SAXException e)  {
- 			e.printStackTrace();
-    }
-   	return false;
- 	}
+	private Map<String, Element> preprocessObservableTtpEt(Map<String, Element> stixElements) {
+		Map<String, Element> map = new HashMap<String, Element>();
+		for (String id : stixElements.keySet()) {
+			Element element = stixElements.get(id);
+			String name = element.getName();
+			/* now we are looking for Observables to normalize them,
+		   such as extract IP, Port, etc.. from fields of other objects descriptions */
+			if (name.equals("Observable")) {
+				Map<String, Element> preprocessedObservable = PreprocessCybox.normalizeCybox(element);
+				if (preprocessedObservable != null) {
+					map.putAll(preprocessedObservable);
+				}
+			/* checking if TTP contains multiple malware or exploits; if so, replicating it */
+			} else if (name.equals("TTP")) {
+				Map<String, Element> preprocessedTTP = PreprocessTTP.normalizeTTP(element);
+				if (preprocessedTTP != null) {
+					map.putAll(preprocessedTTP);
+				}
+			/* checking if Exploit Target contains multiple Vulnerabilities; if so, replicating it */
+			} else if (name.equals("Exploit_Target")) {
+				Map<String, Element> preprocessedET = PreprocessExploitTarget.normalizeET(element);
+				if (preprocessedET != null) {
+					map.putAll(preprocessedET);
+				}
+			}
+		}
+
+		return map;
+	}
 }

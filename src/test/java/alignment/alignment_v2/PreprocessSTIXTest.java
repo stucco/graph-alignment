@@ -10,11 +10,12 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;					
-
+ 
 import org.xml.sax.SAXException; 
 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.Attribute; 
 import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.io.IOException;
 import org.mitre.stix.stix_1.*;
 import org.mitre.cybox.cybox_2.Observable;
 import org.mitre.cybox.cybox_2.Observables;
-import org.mitre.stix.courseofaction_1.CourseOfAction;
+import org.mitre.stix.courseofaction_1.CourseOfAction; 
 import org.mitre.stix.indicator_2.Indicator; 
 import org.mitre.stix.ttp_1.TTP;
 import org.mitre.stix.campaign_1.Campaign;
@@ -31,12 +32,12 @@ import org.mitre.stix.common_1.ExploitTargetsType;
 import org.mitre.stix.incident_1.Incident;
 import org.mitre.stix.threatactor_1.ThreatActor;
 import org.mitre.stix.common_1.TTPBaseType;
-import org.mitre.stix.common_1.CampaignBaseType;
+import org.mitre.stix.common_1.CampaignBaseType; 
 import org.mitre.stix.common_1.IndicatorBaseType;
 
 public class PreprocessSTIXTest extends PreprocessSTIX {
 	
-	/**
+	/*
 	 * Tests normalize stix: Incident with Indicator, Observable, TTP, and ExploitTarget
 	 */
 	@Test
@@ -256,7 +257,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 		}
 	}
 
-	/**
+	/*
 	 * Tests normalize stix: ExploitTarget, Observables, and CourseOfAction
 	 */
 	@Test
@@ -487,7 +488,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 		}
 	}
 
-	/**
+	/*
 	 * Tests normalize stix: nested Indicators and nested Observables
 	 */
 	@Test
@@ -657,41 +658,363 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 			assertEquals(pid.getText(), "pid");
 			Element name = properties.getChild("Name", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
 			assertEquals(name.getText(), "Unix Process Name");
-			Element portList = properties.getChild("Port_List", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
-			Element portParent = portList.getChild("Port", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
-			Element port = portParent.getChild("Port_Value", Namespace.getNamespace("PortObj", "http://cybox.mitre.org/objects#PortObject-2"));
-			String portValue = port.getText();
-			assertEquals(portValue, "80");
-			Element sessionId = properties.getChild("Session_ID", Namespace.getNamespace("UnixProcessObj", "http://cybox.mitre.org/objects#UnixProcessObject-2"));
-			assertEquals(sessionId.getText(), "123");
-
-			System.out.println("Testing Unix Account -> Account relation ... ");
-			Element relatedObjects = object.getChild("Related_Objects", Namespace.getNamespace("cybox","http://cybox.mitre.org/cybox-2"));
-			Element relatedObject = relatedObjects.getChild("Related_Object", Namespace.getNamespace("cybox","http://cybox.mitre.org/cybox-2"));
-			String accountIdref = relatedObject.getAttributeValue("idref");
-			assertTrue(stixElements.containsKey(accountIdref));
-
-			System.out.println("Testing Account ... ");
-			normalizedElement = stixElements.get(accountIdref);
-			object = normalizedElement.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
-			properties = object.getChild("Properties", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
-			pid = properties.getChild("PID", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
-			assertEquals(pid.getText(), "pid");
-			name = properties.getChild("Name", Namespace.getNamespace("ProcessObj","http://cybox.mitre.org/objects#ProcessObject-2"));
-			assertEquals(name.getText(), "Unix Process Name");
-			portList = properties.getChild("Port_List", Namespace.getNamespace("ProcessObj", "http://cybox.mitre.org/objects#ProcessObject-2"));
-			port = portList.getChild("Port", Namespace.getNamespace("ProcessObj", "http://cybox.mitre.org/objects#ProcessObject-2"));
+			Element portList = properties.getChild("Port_List", Namespace.getNamespace("ProcessObj", "http://cybox.mitre.org/objects#ProcessObject-2"));
+			Element port = portList.getChild("Port", Namespace.getNamespace("ProcessObj", "http://cybox.mitre.org/objects#ProcessObject-2"));
 			String portIdref = port.getAttributeValue("object_reference");
 			assertTrue(stixElements.containsKey(portIdref));
+			Element sessionId = properties.getChild("Session_ID", Namespace.getNamespace("UnixProcessObj", "http://cybox.mitre.org/objects#UnixProcessObject-2"));
+			assertEquals(sessionId.getText(), "123");
 
 			System.out.println("Testing Port ... ");
 			normalizedElement = stixElements.get(portIdref);
 			object = normalizedElement.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
 			properties = object.getChild("Properties", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
 			port = properties.getChild("Port_Value", Namespace.getNamespace("PortObj", "http://cybox.mitre.org/objects#PortObject-2"));
-			portValue = port.getText();
+			String portValue = port.getText();
 			assertEquals(portValue, "80");
 
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception");
+		}
+	}
+
+	/*
+	 * Tests normalize stix: TTP with multiple Malware and Exploits
+	 */
+	@Test
+	public void test_normalizeSTIX_TTP_Malware() {
+
+		System.out.println("alignment.alignment_v2.test_normalizeSTIX_TTP()");
+		try {
+			String testStixString =
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package " +
+				"    id=\"stucco:STIX_Source-f0ce33ae-7524-45bb-b397-4a1585ee2cc7\" " +
+				"    timestamp=\"2015-10-15T20:11:17.124Z\" " +
+				"    xmlns=\"http://xml/metadataSharing.xsd\" " +
+				"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " +
+				"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" " +
+				"    xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\" " +
+				"    xmlns:incident=\"http://stix.mitre.org/Incident-1\" " +
+				"    xmlns:indicator=\"http://stix.mitre.org/Indicator-2\" " +
+				"    xmlns:stix=\"http://stix.mitre.org/stix-1\" " +
+				"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\" " +
+				"    xmlns:stucco=\"gov.ornl.stucco\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\"> " +
+				"    <stix:TTPs> " +
+				" 	   <stix:TTP id=\"stucco:TTP-12345\" " +
+	      		"		     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+				"            <ttp:Description>TTP - Description</ttp:Description> " +
+				"            <ttp:Behavior> " +
+				"                <ttp:Malware> " +
+				"                    <ttp:Malware_Instance> " +
+				"                        <ttp:Type>Malware - Type 1</ttp:Type> " +
+				"                        <ttp:Name>Malware - Name 1</ttp:Name> " +
+				"                    </ttp:Malware_Instance> " +
+				"                    <ttp:Malware_Instance> " +
+				"                        <ttp:Type>Malware - Type 2</ttp:Type> " +
+				"                        <ttp:Name>Malware - Name 2</ttp:Name> " +
+				"                    </ttp:Malware_Instance> " +
+				"                </ttp:Malware> " +
+				"            </ttp:Behavior> " +
+				"        </stix:TTP> " +
+				"    </stix:TTPs> " +
+				"</stix:STIX_Package> ";
+
+			String expectedStixString = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package " +
+				"    id=\"stucco:STIX_Source-f0ce33ae-7524-45bb-b397-4a1585ee2cc7\" " +
+				"    timestamp=\"2015-10-15T20:11:17.124Z\" " +
+				"    xmlns=\"http://xml/metadataSharing.xsd\" " +
+				"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " +
+				"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" " +
+				"    xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\" " +
+				"    xmlns:incident=\"http://stix.mitre.org/Incident-1\" " +
+				"    xmlns:indicator=\"http://stix.mitre.org/Indicator-2\" " +
+				"    xmlns:stix=\"http://stix.mitre.org/stix-1\" " +
+				"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\" " +
+				"    xmlns:stucco=\"gov.ornl.stucco\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\"> " +
+				"    <stix:TTPs> " +
+				"				<stix:TTP id=\"stucco:TTP-12345\" " +
+        		"	     	xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+				"            <ttp:Description>TTP - Description</ttp:Description> " +
+				"            <ttp:Behavior> " +
+				"                <ttp:Malware> " +
+				"                    <ttp:Malware_Instance> " +
+				"                        <ttp:Type>Malware - Type 1</ttp:Type> " +
+				"                        <ttp:Name>Malware - Name 1</ttp:Name> " +
+				"                    </ttp:Malware_Instance> " +
+				"                </ttp:Malware> " +
+				"            </ttp:Behavior> " +
+				"      </stix:TTP> " +
+				"      <stix:TTP id=\"stucco:TTP-678910\" " +
+        		"	     xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+				"            <ttp:Description>TTP - Description</ttp:Description> " +
+				"            <ttp:Behavior> " +
+				"                <ttp:Malware> " +
+				"                    <ttp:Malware_Instance> " +
+				"                        <ttp:Type>Malware - Type 2</ttp:Type> " +
+				"                        <ttp:Name>Malware - Name 2</ttp:Name> " +
+				"                    </ttp:Malware_Instance> " +
+				"                </ttp:Malware> " +
+				"            </ttp:Behavior> " +
+				"        </stix:TTP> " +
+				"    </stix:TTPs> " +
+				"</stix:STIX_Package> ";
+
+			/* normalize stix package */
+			System.out.println("Testing Normalized STIX Package");
+			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(testStixString);
+
+			STIXPackage expectedElements = new STIXPackage().fromXMLString(expectedStixString);
+			TTP oldTTP = (TTP) expectedElements.getTTPs().getTTPS().get(0);
+			TTP newTTP = (TTP) expectedElements.getTTPs().getTTPS().get(1);
+			if (!oldTTP.getId().getLocalPart().equals("TTP-12345")) {
+				oldTTP = (TTP) expectedElements.getTTPs().getTTPS().get(1);
+				newTTP = (TTP) expectedElements.getTTPs().getTTPS().get(0);
+			}
+
+			System.out.println("Testing TTP ...");
+			Element normalizedTTP = stixElements.get("stucco:TTP-12345");
+			String normalizedTTPString = new XMLOutputter().outputString(normalizedTTP);
+			TTP normalizedTtp = new TTP().fromXMLString(normalizedTTPString);
+			normalizedTtp.setRelatedTTPs(null);
+			assertTrue(normalizedTtp.validate());
+			assertTrue(oldTTP.equals(normalizedTtp));
+			stixElements.remove("stucco:TTP-12345");
+
+			System.out.println("Testing TTP ...");
+			for (String id : stixElements.keySet()) {
+				normalizedTTP = stixElements.get(id);
+			}
+			normalizedTTPString = new XMLOutputter().outputString(normalizedTTP);
+			normalizedTtp = new TTP().fromXMLString(normalizedTTPString);
+			assertTrue(normalizedTtp.validate());
+			normalizedTtp.setId(null);
+			newTTP.setId(null);
+			assertTrue(newTTP.equals(normalizedTtp));
+
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception");
+		}
+	}
+
+	/*
+	 * Tests normalize stix: TTP with multiple Exploits
+	 */
+	@Test
+	public void test_normalizeSTIX_TTP_Exploits() {
+
+		System.out.println("alignment.alignment_v2.test_normalizeSTIX_TTP()");
+		try {
+			String testStixString =
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package xmlns:stix=\"http://stix.mitre.org/stix-1\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\"> " +
+				"    <stix:TTPs> " +
+				"        <stix:TTP id=\"stucco:TTP-da0a3940-4fb7-4e59-873e-4ab57fdc4d21\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+				"            <ttp:Title>TTP Title</ttp:Title> " +
+				"            <ttp:Description>TTP Description 1</ttp:Description> " +
+				"            <ttp:Description>TTP Description 2</ttp:Description> " +
+				"            <ttp:Behavior> " +
+				"                <ttp:Exploits> " +
+				"                    <ttp:Exploit> " +
+				"                        <ttp:Title>Exploit Title 1</ttp:Title> " +
+				"                        <ttp:Description>Exploit Description 1</ttp:Description> " +
+				"                    </ttp:Exploit> " +
+				"                    <ttp:Exploit> " +
+				"                        <ttp:Title>Exploit Title 2</ttp:Title> " +
+				"                        <ttp:Description>Exploit Description 2</ttp:Description> " +
+				"                    </ttp:Exploit> " +
+				"                </ttp:Exploits> " +
+				"            </ttp:Behavior> " +
+				"        </stix:TTP> " +
+				"    </stix:TTPs> " +
+				"</stix:STIX_Package> ";
+
+			String expectedStixString = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package xmlns:stix=\"http://stix.mitre.org/stix-1\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\"> " +
+				"    <stix:TTPs> " +
+				"        <stix:TTP id=\"stucco:TTP-da0a3940-4fb7-4e59-873e-4ab57fdc4d21\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+				"            <ttp:Title>TTP Title</ttp:Title> " +
+				"            <ttp:Description>TTP Description 1</ttp:Description> " +
+				"            <ttp:Description>TTP Description 2</ttp:Description> " +
+				"            <ttp:Behavior> " +
+				"                <ttp:Exploits> " +
+				"                    <ttp:Exploit> " +
+				"                        <ttp:Title>Exploit Title 1</ttp:Title> " +
+				"                        <ttp:Description>Exploit Description 1</ttp:Description> " +
+				"                    </ttp:Exploit> " +
+				"                </ttp:Exploits> " +
+				"            </ttp:Behavior> " +
+				"        </stix:TTP> " +
+				"        <stix:TTP id=\"stucco:TTP-adf9ba1f-0a6b-4fef-9db2-cb07a74fd6bb\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\"> " +
+				"            <ttp:Title>TTP Title</ttp:Title> " +
+				"            <ttp:Description>TTP Description 1</ttp:Description> " +
+				"            <ttp:Description>TTP Description 2</ttp:Description> " +
+				"            <ttp:Behavior> " +
+				"                <ttp:Exploits> " +
+				"                    <ttp:Exploit> " +
+				"                        <ttp:Title>Exploit Title 2</ttp:Title> " +
+				"                        <ttp:Description>Exploit Description 2</ttp:Description> " +
+				"                    </ttp:Exploit> " +
+				"                </ttp:Exploits> " +
+				"            </ttp:Behavior> " +
+				"        </stix:TTP> " +
+				"    </stix:TTPs> " +
+				"</stix:STIX_Package> ";
+
+			/* normalize stix package */
+			System.out.println("Testing Normalized STIX Package");
+			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(testStixString);
+
+			STIXPackage expectedElements = new STIXPackage().fromXMLString(expectedStixString);
+			TTP oldTTP = (TTP) expectedElements.getTTPs().getTTPS().get(0);
+			TTP newTTP = (TTP) expectedElements.getTTPs().getTTPS().get(1);
+			String id = oldTTP.getId().getLocalPart();
+			if (!id.equals("TTP-da0a3940-4fb7-4e59-873e-4ab57fdc4d21")) {
+				oldTTP = (TTP) expectedElements.getTTPs().getTTPS().get(1);
+				newTTP = (TTP) expectedElements.getTTPs().getTTPS().get(0);
+			}
+
+			System.out.println("Testing TTP ...");
+			Element normalizedTTP = stixElements.get("stucco:TTP-da0a3940-4fb7-4e59-873e-4ab57fdc4d21");
+			String normalizedTTPString = new XMLOutputter().outputString(normalizedTTP);
+			TTP normalizedTtp = new TTP().fromXMLString(normalizedTTPString);
+			assertTrue(normalizedTtp.validate());
+			normalizedTtp.setRelatedTTPs(null);
+			assertTrue(oldTTP.equals(normalizedTtp));
+
+			System.out.println("Testing TTP ...");
+			stixElements.remove("stucco:TTP-da0a3940-4fb7-4e59-873e-4ab57fdc4d21");
+			for (String key : stixElements.keySet()) {
+				normalizedTTP = stixElements.get(key);
+			}
+			normalizedTTPString = new XMLOutputter().outputString(normalizedTTP);
+			normalizedTtp = new TTP().fromXMLString(normalizedTTPString);
+			normalizedTtp.setId(null);
+			newTTP.setId(null);
+			assertTrue(normalizedTtp.validate());
+			assertTrue(newTTP.equals(normalizedTtp));
+
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception");
+		}
+	}
+
+	/*
+	 * Tests normalize stix: Exploit Target with multiple Vulnerabilities
+	 */
+	@Test
+	public void test_normalizeSTIX_ExploitTarget_Vulnerability() {
+
+		System.out.println("alignment.alignment_v2.test_normalizeSTIX_ExploitTarget_Vulnerability()");
+		try {
+			String testStixString =
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\" " +
+				"    xmlns:stix=\"http://stix.mitre.org/stix-1\" xmlns:stixCommon=\"http://stix.mitre.org/common-1\"> " +
+				"    <stix:Exploit_Targets> " +
+				"        <stixCommon:Exploit_Target " +
+				"            id=\"stucco:ExploitTarget-71c0bdac-4a55-4143-87e8-afee94aa2460\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\"> " +
+				"            <et:Vulnerability> " +
+				"                <et:Title>Title 1</et:Title> " +
+				"                <et:Description>Description 1</et:Description> " +
+				"            </et:Vulnerability> " +
+				"            <et:Vulnerability> " +
+				"                <et:Title>Title 2</et:Title> " +
+				"                <et:Description>Description 2</et:Description> " +
+				"            </et:Vulnerability> " +
+				"        </stixCommon:Exploit_Target> " +
+				"    </stix:Exploit_Targets> " +
+				"</stix:STIX_Package> ";
+
+			String expectedStixString = 
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
+				"<stix:STIX_Package xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\" " +
+				"    xmlns:stix=\"http://stix.mitre.org/stix-1\" xmlns:stixCommon=\"http://stix.mitre.org/common-1\"> " +
+				"    <stix:Exploit_Targets> " +
+				"        <stixCommon:Exploit_Target " +
+				"            id=\"stucco:ExploitTarget-71c0bdac-4a55-4143-87e8-afee94aa2460\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\"> " +
+				"            <et:Vulnerability> " +
+				"                <et:Title>Title 1</et:Title> " +
+				"                <et:Description>Description 1</et:Description> " +
+				"            </et:Vulnerability> " +
+				"            <et:Related_Exploit_Targets> " +
+				"                <et:Related_Exploit_Target> " +
+				"                    <stixCommon:Exploit_Target " +
+				"                        idref=\"stucco:ExploitTarget-fd4c5589-b1ac-433d-a5a1-ffc438a5cad4\" xsi:type=\"et:ExploitTargetType\"/> " +
+				"                </et:Related_Exploit_Target> " +
+				"            </et:Related_Exploit_Targets> " +
+				"        </stixCommon:Exploit_Target> " +
+				"        <stixCommon:Exploit_Target " +
+				"            id=\"stucco:ExploitTarget-fd4c5589-b1ac-433d-a5a1-ffc438a5cad4\" " +
+				"            xmlns:stucco=\"gov.ornl.stucco\" " +
+				"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\"> " +
+				"            <et:Vulnerability> " +
+				"                <et:Title>Title 2</et:Title> " +
+				"                <et:Description>Description 2</et:Description> " +
+				"            </et:Vulnerability> " +
+				"        </stixCommon:Exploit_Target> " +
+				"    </stix:Exploit_Targets> " +
+				"</stix:STIX_Package> ";
+
+			/* normalize stix package */
+			System.out.println("Testing Normalized STIX Package");
+			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(testStixString);
+
+			STIXPackage expectedElements = new STIXPackage().fromXMLString(expectedStixString);
+			ExploitTarget oldET = (ExploitTarget) expectedElements.getExploitTargets().getExploitTargets().get(0);
+			ExploitTarget newET = (ExploitTarget) expectedElements.getExploitTargets().getExploitTargets().get(1);
+			String id = oldET.getId().getLocalPart();
+			if (!id.equals("ExploitTarget-71c0bdac-4a55-4143-87e8-afee94aa2460")) {
+				oldET = (ExploitTarget) expectedElements.getExploitTargets().getExploitTargets().get(1);
+				newET = (ExploitTarget) expectedElements.getExploitTargets().getExploitTargets().get(0);
+			}
+
+			System.out.println("Testing Exploit_Target ...");
+			Element normalizedElement = stixElements.get("stucco:ExploitTarget-71c0bdac-4a55-4143-87e8-afee94aa2460");
+			String normalizedETString = new XMLOutputter().outputString(normalizedElement);
+			ExploitTarget normalizedET = new ExploitTarget().fromXMLString(normalizedETString);
+			assertTrue(normalizedET.validate());
+			normalizedET.setRelatedExploitTargets(null);
+			oldET.setRelatedExploitTargets(null);
+			assertTrue(oldET.equals(normalizedET));
+
+			System.out.println("Testing Exploit_Target ...");
+			stixElements.remove("stucco:ExploitTarget-71c0bdac-4a55-4143-87e8-afee94aa2460");
+			for (String key : stixElements.keySet()) {
+				normalizedElement = stixElements.get(key);
+			}
+			normalizedETString = new XMLOutputter().outputString(normalizedElement);
+			normalizedET = new ExploitTarget().fromXMLString(normalizedETString);
+			normalizedET.setId(null);
+			newET.setId(null);
+			assertTrue(normalizedET.validate());
+			assertTrue(newET.equals(normalizedET));
+
+		} catch (SAXException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Exception");
