@@ -11,14 +11,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.OutputStreamWriter;
+import java.io.BufferedWriter;
+import java.io.Writer;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.Iterator;
+import java.util.TreeSet; 
+import java.util.Iterator; 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +53,6 @@ public class InMemoryDBConnection {
 		indexedVertFields = new HashSet();
 		//TODO: initialize any indexes.
 	}
-
 
 	public int getVertCount(){
 		return vertices.size();
@@ -237,14 +239,12 @@ public class InMemoryDBConnection {
 					} else if (cond.equals("T.lt")) {
 						match = (vertValStr.compareTo(valStr) < 0);
 					} else if (cond.equals("T.in")) {
-						if (vertVal instanceof List) {
-							List<Object> list = (List<Object>) vertVal;
-							match = list.contains(val);
-						}
+						Set<Object> set = (HashSet<Object>) vertVal;
+						match = set.contains(val);
 					} else if (cond.equals("T.notin")) {
 						if (vertVal instanceof List) {
 							List<Object> list = (List<Object>) vertVal;
-							match = list.contains(val);
+							match = !list.contains(val);
 						}
 					}
 				}
@@ -466,7 +466,7 @@ public class InMemoryDBConnection {
 		vertIDs.put(name, vertID);
 		vertices.put(vertID, vert);
 		//TODO: update any indices
-		return vertID;
+		return vertID; 
 	}
 
 	public String addEdge(String inVertID, String outVertID, String relation) throws Exception { // throws InvalidArgumentException{
@@ -508,7 +508,7 @@ public class InMemoryDBConnection {
 			throw new Exception("cannot update name of existing vertex");
 		}
 
-		for(String k: newVert.keySet()){
+		for (String k : newVert.keySet()){
 			oldVert.put(k, newVert.get(k));
 		}
 		//TODO: update any indices
@@ -559,7 +559,56 @@ public class InMemoryDBConnection {
 		saveVertices("./vertices.ser");
 		saveEdges("./edges.ser");
 	}
+
+	public void saveVertices(String filePath) {
+		try {
+			File file = new File(filePath);
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileOutputStream fileOut = new FileOutputStream(file);
+			OutputStreamWriter osw = new OutputStreamWriter(fileOut);
+			Writer writer = new BufferedWriter(osw);
+			JSONObject wrapper = new JSONObject();
+			if(vertices.isEmpty()) {
+				writer.write(wrapper.toString());
+			}else{
+				writer.write((wrapper.put("vertices", new JSONObject(vertices))).toString(2));
+			}
+			writer.close();
+			fileOut.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void saveEdges(String filePath) {
+		try {
+			File file = new File(filePath);
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileOutputStream fileOut = new FileOutputStream(file);
+			OutputStreamWriter osw = new OutputStreamWriter(fileOut);
+			Writer writer = new BufferedWriter(osw);
+			JSONObject wrapper = new JSONObject();
+			if(edges.isEmpty()) {
+				writer.write(wrapper.toString());
+			} else {
+				JSONArray array = new JSONArray();
+				for (String key : edges.keySet()) {
+					array.put(new JSONObject(edges.get(key)));
+				}
+				writer.write((wrapper.put("edges", array)).toString(2));
+			}
+			writer.close();
+			fileOut.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
+	/*
 	public void saveVertices(String filePath) {
 		try {
 			File file = new File(filePath);
@@ -601,6 +650,7 @@ public class InMemoryDBConnection {
 			e.printStackTrace();
 		}
 	}
+	*/
 
 	public void load(boolean reset){
 		if(reset){

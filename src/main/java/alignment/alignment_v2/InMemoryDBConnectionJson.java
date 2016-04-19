@@ -19,7 +19,7 @@ public class InMemoryDBConnectionJson {
 	private InMemoryDBConnection connect = null;
 
 	public InMemoryDBConnectionJson(){
-		connect = new InMemoryDBConnection();
+		connect = new InMemoryDBConnection(); 
 	}
 
 	public int getVertCount() {
@@ -31,11 +31,25 @@ public class InMemoryDBConnectionJson {
 	}
 
 	public JSONObject getVertByID(String vertID){
-		return new JSONObject(connect.getVertByID(vertID));
+		Map<String, Object> vert = connect.getVertByID(vertID);
+		JSONObject jsonVert = new JSONObject();
+		for (String key : vert.keySet()) {
+			jsonVert.put(key, vert.get(key));
+		}
+		return jsonVert;
 	}
 
 	public JSONObject getVertByName(String vertName) throws Exception{ //TODO: real exception: "invalid state"?
-		return (connect.getVertByName(vertName) == null) ? null : new JSONObject(connect.getVertByName(vertName));
+	//	return (connect.getVertByName(vertName) == null) ? null : new JSONObject(connect.getVertByName(vertName));
+		Map<String, Object> vert = connect.getVertByName(vertName);
+		if (vert == null) {
+			return null;
+		}
+		JSONObject jsonVert = new JSONObject();
+		for (String key : vert.keySet()) {
+			jsonVert.put(key, vert.get(key));
+		}
+		return jsonVert;
 	}
 
 	public String getVertIDByName(String vertName){
