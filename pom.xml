@@ -92,5 +92,13 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		 <resources>
+			<resource>
+  			<directory>./src/main</directory>
+  			<includes>
+  				<include>resources/**/*.*</include>
+  			</includes>
+			</resource>
+  	</resources>
 	</build>
 </project>
