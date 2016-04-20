@@ -408,7 +408,13 @@ public class Align {
 	}
 
 	private JSONArray loadEdges(JSONArray edges) {
-		Iterator iterator = edges.iterator();
+		//Iterator iterator = edges.iterator(); //TODO: not available?
+		List<JSONObject> edgeList = new ArrayList<JSONObject>(edges.length());
+		for(int i=0; i<edges.length(); i++){
+			edgeList.add(edges.getJSONObject(i));
+		}
+		Iterator iterator = edgeList.iterator();
+
 		while(iterator.hasNext()) {
 			try {
 				JSONObject edge = (JSONObject) iterator.next();
