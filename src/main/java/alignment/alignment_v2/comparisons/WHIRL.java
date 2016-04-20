@@ -24,7 +24,7 @@ public class WHIRL {
 		T = new HashSet<String>();
 		s1WordsCount = new HashMap<String, Integer>();
 		s2WordsCount = new HashMap<String, Integer>();
-		rsw = new RemoveStopWords("resources/StopWords.txt");
+		rsw = new RemoveStopWords("/resources/StopWords.txt");
 		dotProduct = 0.0; 
 		similarity = 0.0;
 	}

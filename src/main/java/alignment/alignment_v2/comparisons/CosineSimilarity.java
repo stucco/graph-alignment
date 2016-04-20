@@ -12,7 +12,7 @@ public class CosineSimilarity{
 		
 		allWords = new HashSet<String>();
 		ps = new PorterStemmer();
-		rsw = new RemoveStopWords("resources/StopWords.txt");
+		rsw = new RemoveStopWords("/resources/StopWords.txt");
 	}
 
 	//removing suffixes from all words 
