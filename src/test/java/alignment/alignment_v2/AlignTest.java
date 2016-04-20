@@ -1,7 +1,7 @@
 package alignment.alignment_v2;
 
-import alignment.alignment_v2.Constraint;
-import alignment.alignment_v2.Constraint.Condition;
+import gov.pnnl.stucco.dbconnect.Condition;
+import gov.pnnl.stucco.dbconnect.DBConstraint;
 
 import java.util.Iterator;
 import java.util.List;
@@ -232,7 +232,7 @@ public class AlignTest {
 			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 			GraphConstructor graphConstructor = new GraphConstructor();
 			Align align = new Align();
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
@@ -248,9 +248,9 @@ public class AlignTest {
 			Element observable = observableCharacterization.getChild("Observable", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
 			String idref = observable.getAttributeValue("idref");
 			assertEquals(idref, "Observable-ef0e7868-0d1f-4f56-kkkk-83hgkdbvktos");
-			int vertsCount = db.getVertCount();
+			long vertsCount = db.getVertCount();
 			assertEquals(vertsCount, 2);
-			int edgeCount = db.getEdgeCount();
+			long edgeCount = db.getEdgeCount();
 			assertEquals(edgeCount, 1);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -325,7 +325,7 @@ public class AlignTest {
 			Align align = new Align();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
@@ -403,7 +403,7 @@ public class AlignTest {
 			Align align = new Align();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
@@ -452,7 +452,7 @@ public class AlignTest {
 
 		try {
 			Align align = new Align();
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			JSONObject graph = new JSONObject(graph1);
@@ -510,7 +510,7 @@ public class AlignTest {
 
 		try {
 			Align align = new Align();
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			JSONObject graph = new JSONObject(graph1);
@@ -548,17 +548,17 @@ public class AlignTest {
 			"      \"sourceDocument\": \"<cybox:Observable xmlns:cybox=\\\"http://cybox.mitre.org/cybox-2\\\" id=\\\"stucco:addressRange-33f72b4c-e6f2-4d82-88d4-2a7711ce7bfe\\\"><cybox:Title>AddressRange<\\/cybox:Title><cybox:Observable_Source><cyboxCommon:Information_Source_Type xmlns:cyboxCommon=\\\"http://cybox.mitre.org/common-2\\\">CAIDA<\\/cyboxCommon:Information_Source_Type><\\/cybox:Observable_Source><cybox:Object id=\\\"stucco:addressRange-3630349312-3630349567\\\"><cybox:Description>216.98.188.0 through 216.98.188.255<\\/cybox:Description><cybox:Properties xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" category=\\\"ipv4-addr\\\" xsi:type=\\\"AddressObj:AddressObjectType\\\"><AddressObj:Address_Value xmlns:AddressObj=\\\"http://cybox.mitre.org/objects#AddressObject-2\\\" apply_condition=\\\"ANY\\\" condition=\\\"InclusiveBetween\\\" delimiter=\\\" - \\\">216.98.188.0 - 216.98.188.255<\\/AddressObj:Address_Value><\\/cybox:Properties><\\/cybox:Object><\\/cybox:Observable>\","+
 			"      \"vertexType\": \"AddressRange\","+
 			"      \"startIP\": \"216.98.188.0\","+
-			"      \"startIPInt\": \"3630349312\","+
+			"      \"startIPInt\": 3630349312,"+
 			"      \"name\": \"216.98.188.0 - 216.98.188.255\","+
 			"      \"description\": [\"216.98.188.0 through 216.98.188.255\"],"+
 			"      \"source\": \"CAIDA\","+
-			"      \"endIPInt\": \"3630349567\","+
+			"      \"endIPInt\": 3630349567,"+
 			"      \"observableType\": \"Address\""+
 			"    },"+
 			"    \"stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241\": {"+
 			"      \"sourceDocument\": \"<cybox:Observable xmlns:cybox=\\\"http://cybox.mitre.org/cybox-2\\\" id=\\\"stucco:ip-cf1042ad-8f95-47e2-830d-4951f81f5241\\\"><cybox:Title>IP<\\/cybox:Title><cybox:Observable_Source><cyboxCommon:Information_Source_Type xmlns:cyboxCommon=\\\"http://cybox.mitre.org/common-2\\\">LoginEvent<\\/cyboxCommon:Information_Source_Type><\\/cybox:Observable_Source><cybox:Object id=\\\"stucco:ip-3232238091\\\"><cybox:Description>192.168.10.11<\\/cybox:Description><cybox:Properties xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" category=\\\"ipv4-addr\\\" xsi:type=\\\"AddressObj:AddressObjectType\\\"><AddressObj:Address_Value xmlns:AddressObj=\\\"http://cybox.mitre.org/objects#AddressObject-2\\\">216.98.188.1<\\/AddressObj:Address_Value><\\/cybox:Properties><\\/cybox:Object><\\/cybox:Observable>\","+
 			"      \"vertexType\": \"IP\","+
-			"      \"ipInt\": \"3630349313\","+
+			"      \"ipInt\": 3630349313,"+
 			"      \"name\": \"216.98.188.1\","+
 			"      \"description\": \"216.98.188.1\","+
 			"      \"source\": [\"LoginEvent\"],"+
@@ -571,7 +571,7 @@ public class AlignTest {
 			JSONObject graph = new JSONObject(graphString);
 			Align align = new Align();
 			align.load(graph);
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			JSONObject vert = null;
 			JSONObject originalVert = null;
 
@@ -591,19 +591,20 @@ public class AlignTest {
 			
 			String outVertID = null;
 			String inVertID = null;
-			List<String> edgeIDList = null;
-			String edgeID = null;
-			JSONObject edge = null;
-			JSONObject originalEdge = null;
+			//List<String> edgeIDList = null;
+			//String edgeID = null;
+			//JSONObject edge = null;
+			//JSONObject originalEdge = null;
 			/* testing IP -> AddressRange edge */
 			System.out.println("Testing IP -> Contained_Within -> AddressRange edge ...");
 			inVertID = db.getVertIDByName("216.98.188.0 - 216.98.188.255");
 			outVertID = db.getVertIDByName("216.98.188.1");
-			edgeIDList = db.getEdgeIDsByVert(inVertID, outVertID, "Contained_Within");
-			assertTrue(edgeIDList.size() == 1);
-			edgeID = edgeIDList.get(0);	
-			edge = db.getEdgeByID(edgeID);
-			assertNotNull(edge);
+			int edgeIDCount = db.getEdgeCountByRelation(inVertID, outVertID, "Contained_Within");
+			//edgeIDList = db.getEdgeIDsByVert(inVertID, outVertID, "Contained_Within");
+			assertTrue(edgeIDCount == 1);
+			//edgeID = edgeIDList.get(0);	
+			//edge = db.getEdgeByID(edgeID);
+			//assertNotNull(edge);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -677,7 +678,7 @@ public class AlignTest {
 			Align align = new Align();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 
 			JSONObject graph = new JSONObject(graphSectionOne);
 			jsonArrayToSetConverter(graph);
@@ -709,20 +710,22 @@ public class AlignTest {
 			System.out.println("Testing Indicator -> IndicatedTTP -> TTP edge ...");
 			inVertID = db.getVertIDByName("TTP-c7561b63-ab62-433e-a5c2-b330c1dcc341");
 			outVertID = db.getVertIDByName("Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb");
-			edgeIDList = db.getEdgeIDsByVert(inVertID, outVertID, "IndicatedTTP");
-			assertTrue(edgeIDList.size() == 1);
-			edgeID = edgeIDList.get(0);	
-			edge = db.getEdgeByID(edgeID);
-			assertNotNull(edge);	
+			int edgeIDCount = db.getEdgeCountByRelation(inVertID, outVertID, "IndicatedTTP");
+			//edgeIDList = db.getEdgeIDsByVert(inVertID, outVertID, "IndicatedTTP");
+			assertTrue(edgeIDCount == 1);
+			//edgeID = edgeIDList.get(0);	
+			//edge = db.getEdgeByID(edgeID);
+			//assertNotNull(edge);	
 			
 			System.out.println("Testing Indicator -> SuggestedCOA -> Course_Of_Action edge ...");
 			inVertID = db.getVertIDByName("Course_Of_Action-ae6c9867-9433-481c-80e5-4672d92811bb");
 			outVertID = db.getVertIDByName("Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb");
-			edgeIDList = db.getEdgeIDsByVert(inVertID, outVertID, "SuggestedCOA");
-			assertTrue(edgeIDList.size() == 1);
-			edgeID = edgeIDList.get(0);	
-			edge = db.getEdgeByID(edgeID);
-			assertNotNull(edge);
+			edgeIDCount = db.getEdgeCountByRelation(inVertID, outVertID, "SuggestedCOA");
+			//edgeIDList = db.getEdgeIDsByVert(inVertID, outVertID, "SuggestedCOA");
+			assertTrue(edgeIDCount == 1);
+			//edgeID = edgeIDList.get(0);	
+			//edge = db.getEdgeByID(edgeID);
+			//assertNotNull(edge);
 			
 			graph = new JSONObject(graphSectionTwo);
 			jsonArrayToSetConverter(graph);
@@ -889,25 +892,25 @@ public class AlignTest {
 			Align align = new Align();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
-			InMemoryDBConnectionJson db = align.getConnection();
+			DBConnectionJson db = align.getConnection();
 			JSONObject graph = new JSONObject(graphSectionOne);
 			jsonArrayToSetConverter(graph);
 			align.load(graph);
 			graph = new JSONObject(graphSectionTwo);
 			jsonArrayToSetConverter(graph);
 			align.load(graph);
-			List<Constraint> constraints1 = new ArrayList<Constraint>();
-			constraints1.add(new Constraint("vertexType", Condition.eq, "Indicator"));
+			List<DBConstraint> constraints1 = new ArrayList<DBConstraint>();
+			constraints1.add(db.getConstraint("vertexType", Condition.eq, "Indicator"));
 			List<String> indicatorList = db.getVertIDsByConstraints(constraints1);
 			assertTrue(indicatorList.size() == 1);
 
-			List<Constraint> constraints2 = new ArrayList<Constraint>();
-			constraints2.add(new Constraint("vertexType", Condition.eq, "TTP"));
+			List<DBConstraint> constraints2 = new ArrayList<DBConstraint>();
+			constraints2.add(db.getConstraint("vertexType", Condition.eq, "TTP"));
 			List<String> ttpList = db.getVertIDsByConstraints(constraints2);
 			assertTrue(ttpList.size() == 1);
 
-			List<Constraint> constraints3 = new ArrayList<Constraint>();
-			constraints3.add(new Constraint("vertexType", Condition.eq, "Course_Of_Action"));
+			List<DBConstraint> constraints3 = new ArrayList<DBConstraint>();
+			constraints3.add(db.getConstraint("vertexType", Condition.eq, "Course_Of_Action"));
 			List<String> coaList = db.getVertIDsByConstraints(constraints3);
 			assertTrue(coaList.size() == 1);
 			List<String> indicatedTTP = db.getInVertIDsByRelation(indicatorList.get(0), "IndicatedTTP");

@@ -17,7 +17,6 @@ import java.util.Collection;
 
 import org.json.JSONObject;  
 import org.json.JSONArray; 
-import org.json.JSONObject;
 
 import java.lang.Math;
 
@@ -30,8 +29,8 @@ import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import alignment.alignment_v2.Constraint; 
-import alignment.alignment_v2.Constraint.Condition;
+import gov.pnnl.stucco.dbconnect.Condition;
+import gov.pnnl.stucco.dbconnect.DBConstraint;
 
 /**
  * Aligning JSON graph with existing graph.
@@ -44,7 +43,7 @@ public class Align {
 	private static final int EDGE_RETRIES = 2;
 	private boolean SEARCH_FOR_DUPLICATES = false;
 	private boolean ALIGN_VERT_PROPS = false;
-	private InMemoryDBConnectionJson connection = null;
+	private DBConnectionJson connection = null;
 	private Compare compare = null;
 	private JSONObject vertsToLoad = null;
 	private JSONArray edgesToLoad = null;
@@ -55,7 +54,7 @@ public class Align {
 
 	public Align() {
 		logger = LoggerFactory.getLogger(Align.class);
-		connection = new InMemoryDBConnectionJson();
+		connection = new DBConnectionJson();
 		compare = new Compare();
 	}
 
@@ -70,7 +69,7 @@ public class Align {
 	/* 
 	 *	for test purpose only 
 	 */
-	public InMemoryDBConnectionJson getConnection() {
+	public DBConnectionJson getConnection() {
 		return connection;
 	}
 
@@ -141,14 +140,14 @@ public class Align {
 			String id = keys.next();
 			JSONObject newVertex = vertices.getJSONObject(id);
 			try {
-				List<Constraint> constraints = new ArrayList<Constraint>();
+				List<DBConstraint> constraints = new ArrayList<DBConstraint>();
 				String observableType = newVertex.optString("observableType");
 				if (!observableType.isEmpty()) {
-					constraints.add(new Constraint("observableType", Condition.eq, observableType));
+					constraints.add(connection.getConstraint("observableType", Condition.eq, observableType));
 				}
 				String vertexType = newVertex.getString("vertexType");
-				constraints.add(new Constraint("vertexType", Condition.eq, vertexType));
-				Constraint nameConstraint = null;
+				constraints.add(connection.getConstraint("vertexType", Condition.eq, vertexType));
+				DBConstraint nameConstraint = null;
 
 				/* searching by name first */
 				String duplicateVertexId = searchByName(newVertex, constraints);
@@ -222,10 +221,10 @@ public class Align {
 	/* 
 	 *	most vertex types have unique names, so db search for duplicate is pretty fast based on just one field
 	 */
-	private String searchByName(JSONObject newVertex, List<Constraint> constraints) {
-		Constraint nameConstraint = null;
+	private String searchByName(JSONObject newVertex, List<DBConstraint> constraints) {
+		DBConstraint nameConstraint = null;
 		String newVertName = newVertex.getString("name");
-		nameConstraint = new Constraint("name", Condition.eq, newVertName);
+		nameConstraint = connection.getConstraint("name", Condition.eq, newVertName); 
 		constraints.add(nameConstraint);
 		try {
 			List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
@@ -255,7 +254,7 @@ public class Align {
 	 *	to match another vertex to detect if it is a duplicate;
 	 *	in other cases, such Observable_Composition, there is a minimum amount of the same alias entries should be to consider it a dupilcate 
 	 */
-	private String searchByAlias(JSONObject newVertex, List<Constraint> constraints) {
+	private String searchByAlias(JSONObject newVertex, List<DBConstraint> constraints) {
 		String vertexType = newVertex.getString("vertexType");
 		boolean onlyOneAliasRequired = (vertexType.equals("Malware") || vertexType.equals("Campaign") || vertexType.equals("Threat_Actor"));
 		if (onlyOneAliasRequired) {
@@ -267,8 +266,8 @@ public class Align {
 		}
 	}
 
-	private String searchForDuplicateByOneRequiredAlias(JSONObject newVertex, List<Constraint> constraints) {
-		Constraint constraint = new Constraint("name", Condition.eq, newVertex.getString("name"));
+	private String searchForDuplicateByOneRequiredAlias(JSONObject newVertex, List<DBConstraint> constraints) {
+		DBConstraint constraint = connection.getConstraint("name", Condition.eq, newVertex.getString("name"));
 		constraints.add(constraint);
 		try {
 			List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
@@ -279,8 +278,9 @@ public class Align {
 					logger.info("More than one vertex was found for name: " + newVertex.getString("name"));
 				}
 			} else {
-				constraint.prop = "alias";
-				constraint.cond = Condition.in;
+				constraints.remove(constraint);
+				constraint = connection.getConstraint("alias", Condition.contains, newVertex.getString("name"));
+				constraints.add(constraint);
 				candidateIds = connection.getVertIDsByConstraints(constraints);
 				if (candidateIds.size() == 1) {
 					return candidateIds.get(0);
@@ -291,17 +291,18 @@ public class Align {
 					Iterator<Object> iter = alias.iterator();
 					while (iter.hasNext()) {
 						Object aliasEntry = iter.next();
-						constraint.prop = "name";
-						constraint.val = aliasEntry;
-						constraint.cond = Condition.eq;
+						constraints.remove(constraint);
+						constraint = connection.getConstraint("name", Condition.eq, aliasEntry);
+						constraints.add(constraint);
 						candidateIds = connection.getVertIDsByConstraints(constraints);
 						if (candidateIds.size() == 1) {
 							return candidateIds.get(0);
 						} else if (candidateIds.size() > 1) {
 							logger.info("More than one vertex was found for name: " + newVertex.getString("name"));
 						} else {
-							constraint.prop = "alias";
-							constraint.cond = Condition.in;
+							constraints.remove(constraint);
+							constraint = connection.getConstraint("alias", Condition.contains, aliasEntry);
+							constraints.add(constraint);
 							candidateIds = connection.getVertIDsByConstraints(constraints);
 							if (!candidateIds.isEmpty()) {
 								if (candidateIds.size() == 1) {
@@ -323,16 +324,18 @@ public class Align {
 		return null;
 	}
 
-	private String searchForDuplicateByAliasWithThreshold(JSONObject newVertex, List<Constraint> constraints) {
+	private String searchForDuplicateByAliasWithThreshold(JSONObject newVertex, List<DBConstraint> constraints) {
 		double threshold = 0.75;
-		Constraint constraint = new Constraint("alias", Condition.in, null);
+		DBConstraint constraint = null;
 		constraints.add(constraint);
 		try {
 			Set<Object> alias = (HashSet<Object>)newVertex.get("alias");
 			int aliasCount = alias.size();
 			Set<String> checkedIds = new HashSet<String>();
 			for (Object aliasEntry : alias) {
-				constraint.val = aliasEntry;
+				constraints.remove(constraint);
+				constraint = connection.getConstraint("alias", Condition.contains, aliasEntry);
+				constraints.add(constraint);
 				List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
 				for (String candidateId : candidateIds) {
 					if (checkedIds.contains(candidateId)) {
@@ -408,9 +411,19 @@ public class Align {
 	}
 
 	private JSONArray loadEdges(JSONArray edges) {
+<<<<<<< HEAD
 		JSONArray edgesToRetry = new JSONArray();
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
+=======
+		List<JSONObject> edgeList = new ArrayList<JSONObject>(edges.length());
+		for(int i=0; i<edges.length(); i++){
+			edgeList.add(edges.getJSONObject(i));
+		}
+		Iterator iterator = edgeList.iterator();
+
+		while(iterator.hasNext()) {
+>>>>>>> 5642d5e9f59ee8bf531cabbe7e0db0f6017ace21
 			try {
 				String outVertID = edge.getString("outVertID");
 				if (dbIDMap.containsKey(outVertID)) {
@@ -425,19 +438,25 @@ public class Align {
 					continue;
 				}
 				String relation = edge.getString("relation");
-				List<String> edgeIDsByVert = connection.getEdgeIDsByVert(inVertID, outVertID, relation);
+				int matchingEdgeCount = connection.getEdgeCountByRelation(inVertID, outVertID, relation);
 				// TODO class InMemoryDBConnection returns List of ids for the same outVertID, inVertID, and relation ....
 				// not sure why ... needs to be double checked. 
 				// if list does not contain a particular relation between two vertices, then we add it ...
-				if (edgeIDsByVert.size() > 1) {
+				if (matchingEdgeCount > 1) {
 					logger.debug("Multiple edges found with the same outVertID, inVertID, and relation!!!");
 					continue;
 				}
+<<<<<<< HEAD
 				if (edgeIDsByVert.isEmpty()) {
 					String edgeId = connection.addEdge(inVertID, outVertID, relation);
 					if (edgeId == null) {
 						edgesToRetry.put(edge);
 					}
+=======
+				if (matchingEdgeCount == 0) {
+					connection.addEdge(inVertID, outVertID, relation);
+					iterator.remove();
+>>>>>>> 5642d5e9f59ee8bf531cabbe7e0db0f6017ace21
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -451,7 +470,7 @@ public class Align {
 	/* 
 	 *	function to find duplicate vertex based on the same vertex type and fields comparison
 	 */
-	private String findDuplicateVertex(JSONObject vertex, List<Constraint> constraints) throws Exception {
+	private String findDuplicateVertex(JSONObject vertex, List<DBConstraint> constraints) throws Exception {
 		double threshold = 0.75;
 		List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
 		String vertexType = vertex.getString("vertexType");
@@ -481,12 +500,12 @@ public class Align {
 			Long endIpInt = vert.optLong("endIPInt");
 			Long startIpInt = vert.optLong("startIPInt");
 			if (endIpInt != null && startIpInt != null) {
-				List<Constraint> constraints = new ArrayList<Constraint>();
-				Constraint c = new Constraint("vertexType", Constraint.Condition.eq, "IP");
+				List<DBConstraint> constraints = new ArrayList<DBConstraint>();
+				DBConstraint c = connection.getConstraint("vertexType", Condition.eq, "IP");
 				constraints.add(c);
-				c = new Constraint("ipInt", Constraint.Condition.lte, endIpInt);
+				c = connection.getConstraint("ipInt", Condition.lte, endIpInt);
 				constraints.add(c);
-				c = new Constraint("ipInt", Constraint.Condition.gte, startIpInt);
+				c = connection.getConstraint("ipInt", Condition.gte, startIpInt);
 				constraints.add(c);
 				List<String> matchIDs = connection.getVertIDsByConstraints(constraints);
 				if (matchIDs != null) {
@@ -503,12 +522,12 @@ public class Align {
 				logger.warn("address range vert did not have int addresses: " + vert.toString());
 			}
 		} else if (vertexType.equals("IP")) {
-			List<Constraint> constraints = new ArrayList<Constraint>();
-			Constraint c = new Constraint("vertexType", Constraint.Condition.eq, "AddressRange");
+			List<DBConstraint> constraints = new ArrayList<DBConstraint>();
+			DBConstraint c = connection.getConstraint("vertexType", Condition.eq, "AddressRange"); 
 			constraints.add(c);
-			c = new Constraint("endIPInt", Constraint.Condition.gte, vert.getLong("ipInt"));
+			c = connection.getConstraint("endIPInt", Condition.gte, vert.getLong("ipInt"));
 			constraints.add(c);
-			c = new Constraint("startIPInt", Constraint.Condition.lte, vert.getLong("ipInt"));
+			c = connection.getConstraint("startIPInt", Condition.lte, vert.getLong("ipInt"));
 			constraints.add(c);
 			List<String> matchIDs = connection.getVertIDsByConstraints(constraints);
 			if (matchIDs != null) {
