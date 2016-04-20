@@ -17,7 +17,6 @@ import java.util.Collection;
 
 import org.json.JSONObject;  
 import org.json.JSONArray; 
-import org.json.JSONObject;
 
 import java.lang.Math;
 
@@ -145,11 +144,9 @@ public class Align {
 				String observableType = newVertex.optString("observableType");
 				if (!observableType.isEmpty()) {
 					constraints.add(connection.getConstraint("observableType", Condition.eq, observableType));
-							//new OldConstraint("observableType", Condition.eq, observableType));
 				}
 				String vertexType = newVertex.getString("vertexType");
 				constraints.add(connection.getConstraint("vertexType", Condition.eq, vertexType));
-						//new OldConstraint("vertexType", Condition.eq, vertexType));
 				DBConstraint nameConstraint = null;
 
 				/* searching by name first */
@@ -228,7 +225,6 @@ public class Align {
 		DBConstraint nameConstraint = null;
 		String newVertName = newVertex.getString("name");
 		nameConstraint = connection.getConstraint("name", Condition.eq, newVertName); 
-				//new OldConstraint("name", Condition.eq, newVertName);
 		constraints.add(nameConstraint);
 		try {
 			List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
@@ -272,7 +268,6 @@ public class Align {
 
 	private String searchForDuplicateByOneRequiredAlias(JSONObject newVertex, List<DBConstraint> constraints) {
 		DBConstraint constraint = connection.getConstraint("name", Condition.eq, newVertex.getString("name"));
-				//new OldConstraint("name", Condition.eq, newVertex.getString("name"));
 		constraints.add(constraint);
 		try {
 			List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
@@ -285,8 +280,6 @@ public class Align {
 			} else {
 				constraints.remove(constraint);
 				constraint = connection.getConstraint("alias", Condition.contains, newVertex.getString("name"));
-				//constraint.prop = "alias";
-				//constraint.cond = Condition.in;
 				constraints.add(constraint);
 				candidateIds = connection.getVertIDsByConstraints(constraints);
 				if (candidateIds.size() == 1) {
@@ -300,9 +293,6 @@ public class Align {
 						Object aliasEntry = iter.next();
 						constraints.remove(constraint);
 						constraint = connection.getConstraint("name", Condition.eq, aliasEntry);
-						//constraint.prop = "name";
-						//constraint.val = aliasEntry;
-						//constraint.cond = Condition.eq;
 						constraints.add(constraint);
 						candidateIds = connection.getVertIDsByConstraints(constraints);
 						if (candidateIds.size() == 1) {
@@ -312,8 +302,6 @@ public class Align {
 						} else {
 							constraints.remove(constraint);
 							constraint = connection.getConstraint("alias", Condition.contains, aliasEntry);
-							//constraint.prop = "alias";
-							//constraint.cond = Condition.in;
 							constraints.add(constraint);
 							candidateIds = connection.getVertIDsByConstraints(constraints);
 							if (!candidateIds.isEmpty()) {
@@ -338,8 +326,7 @@ public class Align {
 
 	private String searchForDuplicateByAliasWithThreshold(JSONObject newVertex, List<DBConstraint> constraints) {
 		double threshold = 0.75;
-		DBConstraint constraint = null;//connection.getConstraint("alias", Condition.contains, null);
-				//new OldConstraint("alias", Condition.in, null);
+		DBConstraint constraint = null;
 		constraints.add(constraint);
 		try {
 			Set<Object> alias = (HashSet<Object>)newVertex.get("alias");
@@ -349,7 +336,6 @@ public class Align {
 				constraints.remove(constraint);
 				constraint = connection.getConstraint("alias", Condition.contains, aliasEntry);
 				constraints.add(constraint);
-				//constraint.val = aliasEntry;
 				List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
 				for (String candidateId : candidateIds) {
 					if (checkedIds.contains(candidateId)) {
@@ -425,7 +411,6 @@ public class Align {
 	}
 
 	private JSONArray loadEdges(JSONArray edges) {
-		//Iterator iterator = edges.iterator(); //TODO: not available?
 		List<JSONObject> edgeList = new ArrayList<JSONObject>(edges.length());
 		for(int i=0; i<edges.length(); i++){
 			edgeList.add(edges.getJSONObject(i));
@@ -504,13 +489,10 @@ public class Align {
 			if (endIpInt != null && startIpInt != null) {
 				List<DBConstraint> constraints = new ArrayList<DBConstraint>();
 				DBConstraint c = connection.getConstraint("vertexType", Condition.eq, "IP");
-						//new OldConstraint("vertexType", OldConstraint.Condition.eq, "IP");
 				constraints.add(c);
 				c = connection.getConstraint("ipInt", Condition.lte, endIpInt);
-						//new OldConstraint("ipInt", OldConstraint.Condition.lte, endIpInt);
 				constraints.add(c);
 				c = connection.getConstraint("ipInt", Condition.gte, startIpInt);
-						//new OldConstraint("ipInt", OldConstraint.Condition.gte, startIpInt);
 				constraints.add(c);
 				List<String> matchIDs = connection.getVertIDsByConstraints(constraints);
 				if (matchIDs != null) {
@@ -529,13 +511,10 @@ public class Align {
 		} else if (vertexType.equals("IP")) {
 			List<DBConstraint> constraints = new ArrayList<DBConstraint>();
 			DBConstraint c = connection.getConstraint("vertexType", Condition.eq, "AddressRange"); 
-					//new OldConstraint("vertexType", OldConstraint.Condition.eq, "AddressRange");
 			constraints.add(c);
 			c = connection.getConstraint("endIPInt", Condition.gte, vert.getLong("ipInt"));
-					//new OldConstraint("endIPInt", OldConstraint.Condition.gte, vert.getLong("ipInt"));
 			constraints.add(c);
 			c = connection.getConstraint("startIPInt", Condition.lte, vert.getLong("ipInt"));
-					//new OldConstraint("startIPInt", OldConstraint.Condition.lte, vert.getLong("ipInt"));
 			constraints.add(c);
 			List<String> matchIDs = connection.getVertIDsByConstraints(constraints);
 			if (matchIDs != null) {

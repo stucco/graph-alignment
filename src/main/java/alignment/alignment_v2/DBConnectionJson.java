@@ -60,7 +60,6 @@ public class DBConnectionJson {
 	}
 
 	public JSONObject getVertByName(String vertName){
-	//	return (connect.getVertByName(vertName) == null) ? null : new JSONObject(connect.getVertByName(vertName));
 		Map<String, Object> vert = getVertByNameL(vertName);
 		if (vert == null) {
 			return null;
@@ -110,11 +109,6 @@ public class DBConnectionJson {
 		return connect.getVertIDsByRelation(vertID, relation);
 	}
 	
-	/*
-	public List<String> getEdgeIDsByVert(String inVertID, String outVertID, String relation){
-		return connect.getEdgeIDsByVert(inVertID, outVertID, relation);
-	}
-	*/
 	public int getEdgeCountByRelation(String inVertID, String outVertID, String relation){
 		return connect.getEdgeCountByRelation(inVertID, outVertID, relation);
 	}
@@ -122,15 +116,6 @@ public class DBConnectionJson {
 	public List<String> getVertIDsByConstraints(List<DBConstraint> constraints){
 		return connect.getVertIDsByConstraints(constraints);
 	}
-	
-	/*
-	public JSONObject getEdgeByID(String edgeID){
-		return new JSONObject(connect.getEdgeByID(edgeID));
-	}
-	
-	public JSONObject removeEdgeByID(String edgeID){
-		return new JSONObject (connect.removeEdgeByID(edgeID));
-	}*/
 	
 	public void removeVertByID(String vertID){
 		connect.removeVertByID(vertID);
@@ -155,24 +140,6 @@ public class DBConnectionJson {
 		}
 		connect.updateVertex(VertID, vert);
 	}
-	
-	/*
-	public void save() {
-		connect.save();
-	}
-
-	public void saveVertices(String filePath) {
-		connect.saveVertices(filePath);
-	}
-
-	public void saveEdges(String filePath) {
-		connect.saveEdges(filePath);
-	}
-
-	public void load(boolean reset) {
-		connect.load(reset);
-	}
-	*/
 	
 	/**
      * get the vertex's property map using the vertex's canonical name

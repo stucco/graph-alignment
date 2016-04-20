@@ -901,19 +901,16 @@ public class AlignTest {
 			align.load(graph);
 			List<DBConstraint> constraints1 = new ArrayList<DBConstraint>();
 			constraints1.add(db.getConstraint("vertexType", Condition.eq, "Indicator"));
-			//constraints1.add(new DBConstraint("vertexType", Condition.eq, "Indicator"));
 			List<String> indicatorList = db.getVertIDsByConstraints(constraints1);
 			assertTrue(indicatorList.size() == 1);
 
 			List<DBConstraint> constraints2 = new ArrayList<DBConstraint>();
 			constraints2.add(db.getConstraint("vertexType", Condition.eq, "TTP"));
-			//constraints2.add(new OldConstraint("vertexType", Condition.eq, "TTP"));
 			List<String> ttpList = db.getVertIDsByConstraints(constraints2);
 			assertTrue(ttpList.size() == 1);
 
 			List<DBConstraint> constraints3 = new ArrayList<DBConstraint>();
 			constraints3.add(db.getConstraint("vertexType", Condition.eq, "Course_Of_Action"));
-			//constraints3.add(new OldConstraint("vertexType", Condition.eq, "Course_Of_Action"));
 			List<String> coaList = db.getVertIDsByConstraints(constraints3);
 			assertTrue(coaList.size() == 1);
 			List<String> indicatedTTP = db.getInVertIDsByRelation(indicatorList.get(0), "IndicatedTTP");
