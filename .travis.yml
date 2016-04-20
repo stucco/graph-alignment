@@ -2,16 +2,12 @@ language: java
 jdk:
   - oraclejdk7
   - openjdk7
-services:
-  - elasticsearch
 install:
   - cat /proc/meminfo
   - cat /proc/cpuinfo
   - dpkg --get-selections
-  - ./install-tinkergraph-test-server.sh
-  - ./start-test-server.sh &
-  - sleep 300
-  - echo "done waiting for server to start"
+  - export STUCCO_DB_TYPE=INMEMORY
+  - export STUCCO_DB_CONFIG='./config/inmemory.yml'
 after_success:
   - wget https://raw.githubusercontent.com/stucco/test/master/rerun-test.sh
   - chmod a+x ./rerun-test.sh
