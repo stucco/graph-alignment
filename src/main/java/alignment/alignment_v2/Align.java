@@ -441,10 +441,8 @@ public class Align {
 					continue;
 				}
 				if (edgeIDsByVert.isEmpty()) {
-					String edgeId = connection.addEdge(inVertID, outVertID, relation);
-					if (edgeId != null) {
-						iterator.remove();
-					}
+					connection.addEdge(inVertID, outVertID, relation);
+					iterator.remove();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
