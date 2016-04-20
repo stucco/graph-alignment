@@ -59,7 +59,7 @@ public class DBConnectionJson {
 		return jsonVert;
 	}
 
-	public JSONObject getVertByName(String vertName) throws Exception{ //TODO: real exception: "invalid state"?
+	public JSONObject getVertByName(String vertName){
 	//	return (connect.getVertByName(vertName) == null) ? null : new JSONObject(connect.getVertByName(vertName));
 		Map<String, Object> vert = getVertByNameL(vertName);
 		if (vert == null) {
@@ -76,7 +76,7 @@ public class DBConnectionJson {
 		return getVertIDByNameL(vertName);
 	}
 	
-	public JSONArray getInEdges(String outVertID) throws Exception {
+	public JSONArray getInEdges(String outVertID){
 		List<Map<String, Object>> inEdges = connect.getInEdges(outVertID);
 		JSONArray array = new JSONArray();
 		for (Map<String, Object> inEdge : inEdges) {
@@ -87,7 +87,7 @@ public class DBConnectionJson {
 		return array;
 	}
 
-	public JSONArray getOutEdges(String inVertID) throws Exception {
+	public JSONArray getOutEdges(String inVertID){
 		List<Map<String, Object>> outEdges = connect.getInEdges(inVertID);
 		JSONArray array = new JSONArray();
 		for (Map<String, Object> outEdge : outEdges) {
@@ -98,20 +98,20 @@ public class DBConnectionJson {
 		return array;
 	}
 
-	public List<String> getInVertIDsByRelation(String outVertID, String relation) throws Exception{//TODO: real exception: "invalid argument"?
+	public List<String> getInVertIDsByRelation(String outVertID, String relation){
 		return connect.getInVertIDsByRelation(outVertID, relation);
 	}
 	
-	public List<String> getOutVertIDsByRelation(String inVertID, String relation) throws Exception{//TODO: real exception: "invalid argument"?
+	public List<String> getOutVertIDsByRelation(String inVertID, String relation){
 		return connect.getOutVertIDsByRelation(inVertID, relation);
 	}
 	
-	public List<String> getVertIDsByRelation(String vertID, String relation) throws Exception{//TODO: real exception: "invalid argument"?
+	public List<String> getVertIDsByRelation(String vertID, String relation){
 		return connect.getVertIDsByRelation(vertID, relation);
 	}
 	
 	/*
-	public List<String> getEdgeIDsByVert(String inVertID, String outVertID, String relation) throws Exception{//TODO: real exception: "invalid argument"?
+	public List<String> getEdgeIDsByVert(String inVertID, String outVertID, String relation){
 		return connect.getEdgeIDsByVert(inVertID, outVertID, relation);
 	}
 	*/
@@ -119,7 +119,7 @@ public class DBConnectionJson {
 		return connect.getEdgeCountByRelation(inVertID, outVertID, relation);
 	}
 	
-	public List<String> getVertIDsByConstraints(List<DBConstraint> constraints) throws Exception{//TODO: real exception: "invalid argument"?
+	public List<String> getVertIDsByConstraints(List<DBConstraint> constraints){
 		return connect.getVertIDsByConstraints(constraints);
 	}
 	
@@ -132,11 +132,11 @@ public class DBConnectionJson {
 		return new JSONObject (connect.removeEdgeByID(edgeID));
 	}*/
 	
-	public void removeVertByID(String vertID) throws Exception{ //TODO: real exception: "invalid state"?
+	public void removeVertByID(String vertID){
 		connect.removeVertByID(vertID);
 	}
 	
-	public String addVertex(JSONObject vertex) throws Exception{ //TODO: real exception: "invalid argument"?
+	public String addVertex(JSONObject vertex){
 		Map<String, Object> vert = new HashMap<String, Object>();
 		for (Object key : vertex.keySet()) {
 			vert.put(key.toString(), vertex.get(key.toString()));
@@ -144,11 +144,11 @@ public class DBConnectionJson {
 		return connect.addVertex(vert);
 	}
 			
-	public void addEdge(String inVertID, String outVertID, String relation) throws Exception{ //TODO: real exception: "invalid argument"?
+	public void addEdge(String inVertID, String outVertID, String relation){
 		connect.addEdge(inVertID, outVertID, relation);
 	}
 	
-	public void updateVertex(String VertID, JSONObject vertex) throws Exception{ //TODO: real exception: "invalid argument"?
+	public void updateVertex(String VertID, JSONObject vertex){
 		Map<String, Object> vert = new HashMap<String, Object>();
 		for (Object key : vertex.keySet()) {
 			vert.put(key.toString(), vertex.get(key.toString()));
