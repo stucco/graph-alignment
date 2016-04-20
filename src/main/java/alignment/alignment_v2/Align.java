@@ -408,10 +408,10 @@ public class Align {
 	}
 
 	private JSONArray loadEdges(JSONArray edges) {
-		Iterator iterator = edges.iterator();
-		while(iterator.hasNext()) {
+		JSONArray edgesToRetry = new JSONArray();
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
 			try {
-				JSONObject edge = (JSONObject) iterator.next();
 				String outVertID = edge.getString("outVertID");
 				if (dbIDMap.containsKey(outVertID)) {
 					outVertID = dbIDMap.get(outVertID);
@@ -431,21 +431,21 @@ public class Align {
 				// if list does not contain a particular relation between two vertices, then we add it ...
 				if (edgeIDsByVert.size() > 1) {
 					logger.debug("Multiple edges found with the same outVertID, inVertID, and relation!!!");
-					iterator.remove();
 					continue;
 				}
 				if (edgeIDsByVert.isEmpty()) {
 					String edgeId = connection.addEdge(inVertID, outVertID, relation);
-					if (edgeId != null) {
-						iterator.remove();
+					if (edgeId == null) {
+						edgesToRetry.put(edge);
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				edgesToRetry.put(edge);
 			}
 		}
 	
-		return edgesToLoad;
+		return edgesToRetry;
 	}
 
 	/* 
