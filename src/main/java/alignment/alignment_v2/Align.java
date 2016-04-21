@@ -411,19 +411,9 @@ public class Align {
 	}
 
 	private JSONArray loadEdges(JSONArray edges) {
-<<<<<<< HEAD
 		JSONArray edgesToRetry = new JSONArray();
 		for (int i = 0; i < edges.length(); i++) {
 			JSONObject edge = edges.getJSONObject(i);
-=======
-		List<JSONObject> edgeList = new ArrayList<JSONObject>(edges.length());
-		for(int i=0; i<edges.length(); i++){
-			edgeList.add(edges.getJSONObject(i));
-		}
-		Iterator iterator = edgeList.iterator();
-
-		while(iterator.hasNext()) {
->>>>>>> 5642d5e9f59ee8bf531cabbe7e0db0f6017ace21
 			try {
 				String outVertID = edge.getString("outVertID");
 				if (dbIDMap.containsKey(outVertID)) {
@@ -439,6 +429,7 @@ public class Align {
 				}
 				String relation = edge.getString("relation");
 				int matchingEdgeCount = connection.getEdgeCountByRelation(inVertID, outVertID, relation);
+				//List<String> edgeIDsByVert = connection.getEdgeIDsByVert(inVertID, outVertID, relation);
 				// TODO class InMemoryDBConnection returns List of ids for the same outVertID, inVertID, and relation ....
 				// not sure why ... needs to be double checked. 
 				// if list does not contain a particular relation between two vertices, then we add it ...
@@ -446,17 +437,15 @@ public class Align {
 					logger.debug("Multiple edges found with the same outVertID, inVertID, and relation!!!");
 					continue;
 				}
-<<<<<<< HEAD
-				if (edgeIDsByVert.isEmpty()) {
-					String edgeId = connection.addEdge(inVertID, outVertID, relation);
-					if (edgeId == null) {
-						edgesToRetry.put(edge);
-					}
-=======
+				//if (edgeIDsByVert.isEmpty()) {
+				//	String edgeId = connection.addEdge(inVertID, outVertID, relation);
+				//	if (edgeId == null) {
+				//		edgesToRetry.put(edge);
+				//	}
+				//}
+				//TODO: no longer updates retry list, like above used to.  revisit.
 				if (matchingEdgeCount == 0) {
 					connection.addEdge(inVertID, outVertID, relation);
-					iterator.remove();
->>>>>>> 5642d5e9f59ee8bf531cabbe7e0db0f6017ace21
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -466,6 +455,7 @@ public class Align {
 	
 		return edgesToRetry;
 	}
+
 
 	/* 
 	 *	function to find duplicate vertex based on the same vertex type and fields comparison
