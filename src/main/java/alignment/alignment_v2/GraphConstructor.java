@@ -284,13 +284,19 @@ public class GraphConstructor {
 				}
 				/* this case is for composite propertyValue with pattern; like cpe with part, vendor, product, etc
 				   which require content of a set of elements arranged according a pattern */
-				String propertyValue = null;
+				boolean componentsFound = false;
+				Object propertyValue = null;
 				for (Element foundElement : foundElementList) {
 					String elementName = foundElement.getName();
 					propertyValue = processElementContent(foundElement, propertyInfo);
-					pattern = (propertyValue == null) ? pattern.replace(elementName, "") : pattern.replace(elementName, propertyValue); 
+					if (propertyValue == null) {
+						pattern = pattern.replace(elementName, ""); 
+					} else {
+						pattern = pattern.replace(elementName, propertyValue.toString()); 
+						componentsFound = true;
+					}
 				}
-				return (pattern.isEmpty()) ? null : pattern;
+				return (pattern.isEmpty() || !componentsFound) ? null : pattern;
 			}
 		} else { /* this is a case when cardinality = set */
 			/* testing for cardinality = set, and returning a set of resulting values */
@@ -299,9 +305,9 @@ public class GraphConstructor {
 				return null;
 			}
 			if (pattern.isEmpty()) {
-				Set<String> set = new HashSet<String>();
+				Set<Object> set = new HashSet<Object>();
 				for (Element foundElement : foundElementList) {
-					String propertyValue = processElementContent(foundElement, propertyInfo);
+					Object propertyValue = processElementContent(foundElement, propertyInfo);
 					if (propertyValue != null) {
 						set.add(propertyValue);
 					}
@@ -320,8 +326,8 @@ public class GraphConstructor {
 	/* 
 	 *	turning element content into vertex properties, such as looking for description, name, etc. 
 	 */
-	private String processElementContent(Element foundElement, JSONObject propertyInfo) {
-		String propertyValue = null;
+	private Object processElementContent(Element foundElement, JSONObject propertyInfo) {
+		Object propertyValue = null;
 		if (foundElement.getAttribute("idref") != null) {
 			String idref = foundElement.getAttributeValue("idref");
 			propertyValue = getReferencedElementName(idref);
@@ -337,14 +343,14 @@ public class GraphConstructor {
 		//		Split[] propertyValueList = propertyValue.split(delimiter);
 		//	}
 
-		if (propertyValue == null || propertyValue.isEmpty()) {
+		if (propertyValue == null || propertyValue.equals("")) {
 			return null;
 		}
 		/* regex required in cases like differ IP and AddressRange, where besides value everything else is the same */
 		if (propertyInfo.has("regex")) {
 			String regexPattern = propertyInfo.getString("regex");
 			Pattern p = Pattern.compile(regexPattern);
-			Matcher m = p.matcher(propertyValue);
+			Matcher m = p.matcher(propertyValue.toString());
 			if (m.find()) {
 				propertyValue = m.group(1);
 			}
@@ -352,11 +358,21 @@ public class GraphConstructor {
 		/* required in cases like convert IP to long, etc. */
 		if (propertyInfo.has("applyFunction")) {
 			if (propertyInfo.getString("applyFunction").equals("ipToLong")) {
-				long ipInt = ipToLong(propertyValue); 
-				propertyValue = String.valueOf(ipInt); 
+				long ipInt = ipToLong(propertyValue.toString()); 
+				return ipInt;
+			//	propertyValue = String.valueOf(ipInt); 
 			} 
 		}
-		return propertyValue;
+
+		String type = propertyInfo.optString("type");
+		switch (type) {
+			case "string":
+				return propertyValue.toString();
+			case "long":
+				return new Long(propertyValue.toString());
+			default: 
+				return propertyValue;
+		}
 	}
 
 	/* 
