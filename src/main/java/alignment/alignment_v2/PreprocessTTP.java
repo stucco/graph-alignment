@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Iterator;
 
+import java.io.Serializable;
+
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.Format;
 import org.jdom2.Element;
@@ -52,7 +54,7 @@ abstract class PreprocessTTP {
 		propOrder = Collections.unmodifiableMap(map);
 	}
 
-	private static class TTPComparator implements Comparator<Element> {
+	private static class TTPComparator implements Comparator<Element>, Serializable {
 		public int compare(Element e1, Element e2) {
 			return propOrder.get(e1.getName()).compareTo(propOrder.get(e2.getName()));
 		}	
