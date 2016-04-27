@@ -12,9 +12,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
 	<dependencies>
 		<dependency>
-			<groupId>gov.pnnl.stucco</groupId>
+			<groupId>gov.pnnl.stucco</groupId> 
 			<artifactId>DBConnect</artifactId>
 			<version>0.5.0</version>
 		</dependency>
@@ -85,9 +86,11 @@
 		</plugins>
 		 <resources>
 			<resource>
-  			<directory>./src/main</directory>
+  			<directory>src/main/resources</directory>
   			<includes>
-  				<include>resources/**/*.*</include>
+  				<include>StopWords.txt</include>
+  				<include>ontology/cybox_ontology.json</include>
+  				<include>ontology/stucco_ontology.json</include>
   			</includes>
 			</resource>
   	</resources>
