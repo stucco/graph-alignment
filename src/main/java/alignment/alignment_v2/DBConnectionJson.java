@@ -53,8 +53,8 @@ public class DBConnectionJson {
 	public JSONObject getVertByID(String vertID){
 		Map<String, Object> vert = connect.getVertByID(vertID);
 		JSONObject jsonVert = new JSONObject();
-		for (String key : vert.keySet()) {
-			jsonVert.put(key, vert.get(key));
+		for (Map.Entry<String, Object> entry : vert.entrySet()) {
+			jsonVert.put(entry.getKey(), entry.getValue());
 		}
 		return jsonVert;
 	}
@@ -65,8 +65,8 @@ public class DBConnectionJson {
 			return null;
 		}
 		JSONObject jsonVert = new JSONObject();
-		for (String key : vert.keySet()) {
-			jsonVert.put(key, vert.get(key));
+		for (Map.Entry<String, Object> entry : vert.entrySet()) {
+			jsonVert.put(entry.getKey(), entry.getValue());
 		}
 		return jsonVert;
 	}
@@ -174,8 +174,11 @@ public class DBConnectionJson {
      * @return ID
      */
     private List<String> getVertIDsByNameL(String vertName){
-    	if(vertName == null || vertName == "")
+    	if (vertName == null) {
             return null;
+      } else if (vertName.equals("")) {
+      	return null;
+      }
     	List<DBConstraint> constraints = new ArrayList<DBConstraint>(1);
     	DBConstraint c1 = connect.getConstraint("name", Condition.eq, vertName );
     	constraints.add( c1 );
