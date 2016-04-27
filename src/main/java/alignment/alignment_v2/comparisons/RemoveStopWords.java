@@ -1,37 +1,39 @@
 package alignment.alignment_v2.comparisons;
 
 //in constructor function takes a file with stop words
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
 
-public class RemoveStopWords {
+import org.apache.commons.io.LineIterator;
+import org.apache.commons.io.IOUtils;
 
-	private BufferedReader br;
-	private Set<String> hm;
-
-	public RemoveStopWords(String file)	{
-
-		try	{
-			br = new BufferedReader (new FileReader (file));	
-			String str = new String();
-			hm = new HashSet<String>();
-
-			while ((str = br.readLine()) != null)	{
-				hm.add(str);
+public abstract class RemoveStopWords {
+	private static final String _stop_words_file = "StopWords.txt";
+	private static Set<String> hm;
+	static {
+		try {
+			LineIterator iterator = IOUtils.lineIterator(RemoveStopWords.class.getClassLoader().getResourceAsStream(_stop_words_file), "UTF-8");
+			try {
+				Set<String> set = new HashSet<String>();
+				while (iterator.hasNext()) {
+					set.add(iterator.next());
+				}
+				hm = Collections.unmodifiableSet(set);
+			} finally {
+				iterator.close();
 			}
-
-		} catch (FileNotFoundException e)	{
+		}	catch (FileNotFoundException e)	{
 			e.printStackTrace();
 		} catch (IOException e)	{
 			e.printStackTrace();
-		}
+		} 
 	}
 
-	boolean containsString (String str)	{	
+	public static boolean containsString (String str)	{	
 		return hm.contains(str);
 	}
 }
