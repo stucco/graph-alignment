@@ -77,7 +77,6 @@ public class Compare extends PreprocessSTIX {
 	
 	private static double compareDate (String timeOne, String timeTwo) {
 		String format = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
-		Date date = new Date();
 		try {
 			SimpleDateFormat df = new SimpleDateFormat(format);
   			return compareDate(df.parse(timeOne).getTime(), df.parse(timeTwo).getTime());
