@@ -3,12 +3,12 @@ jdk:
   - oraclejdk7
   - openjdk7
   - oraclejdk8
+env: 
+  - STUCCO_DB_TYPE=INMEMORY STUCCO_DB_CONFIG='./config/inmemory.yml'
 install:
   - cat /proc/meminfo
   - cat /proc/cpuinfo
   - dpkg --get-selections
-  - export STUCCO_DB_TYPE=INMEMORY
-  - export STUCCO_DB_CONFIG='./config/inmemory.yml'
   - mvn -q --non-recursive scm:checkout -Dmodule.name=graph-db-connection
   - cd graph-db-connection
   - mvn -e clean install -Dmaven.test.skip=true
