@@ -40,7 +40,7 @@ public class PreprocessCyboxTest {
 	 */
 	@Test
 	public void test_flow_address_ip_port() {
-		System.out.println("alignment.alignment_v2.test_flow_address_ip_port()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessCyboxTest.test_flow_address_ip_port()");
 		try {
 			String xml = 
 			  "<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -202,7 +202,7 @@ public class PreprocessCyboxTest {
 	 */
 	//@Test
 	public void test_httpsession_dnsrecord_address_ip_port_domainname() {
-		System.out.println("alignment.alignment_v2.test_dnsrecord_address_ip_port_domainname()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessCyboxTest.test_dnsrecord_address_ip_port_domainname()");
 		try {
 			String xml = 
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -311,7 +311,7 @@ public class PreprocessCyboxTest {
 
 	//@Test
 	public void test_samples() {
-		System.out.println("alignment.test_samples()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessCyboxTest.test_samples()");
 		try {
 			File folder = new File("./resources/samples/samples/");
 			for (File file : folder.listFiles()) {
