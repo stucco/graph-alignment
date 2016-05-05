@@ -1,5 +1,9 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
+import gov.ornl.stucco.alignment.Align;
+import gov.ornl.stucco.alignment.DBConnectionJson;
+import gov.ornl.stucco.alignment.GraphConstructor;
+import gov.ornl.stucco.alignment.PreprocessSTIX;
 import gov.pnnl.stucco.dbconnect.Condition;
 import gov.pnnl.stucco.dbconnect.DBConstraint;
 
@@ -12,11 +16,11 @@ import java.util.HashSet;
 import java.util.Collection; 
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import org.json.JSONObject;
 import org.json.JSONArray; 
- 
 import org.mitre.stix.stix_1.STIXPackage; 
 
 import java.io.StringReader;  

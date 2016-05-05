@@ -1,4 +1,4 @@
-package alignment.alignment_v2.comparisons;
+package gov.ornl.stucco.alignment.comparisons;
 
 //in constructor function takes a file with stop words
 import java.util.Collections;

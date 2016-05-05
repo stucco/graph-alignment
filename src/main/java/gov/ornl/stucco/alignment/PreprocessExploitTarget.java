@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import java.util.Collections;
 import java.util.Comparator;

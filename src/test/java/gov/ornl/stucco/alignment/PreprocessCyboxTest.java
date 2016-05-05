@@ -1,6 +1,9 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import static org.junit.Assert.*;
+import gov.ornl.stucco.alignment.GraphConstructor;
+import gov.ornl.stucco.alignment.PreprocessCybox;
+import gov.ornl.stucco.alignment.PreprocessSTIX;
 
 import javax.xml.namespace.QName;
 
@@ -12,23 +15,20 @@ import java.util.HashMap;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
-
 import org.junit.Test;				 
-
 import org.jdom2.Element;
 import org.jdom2.Document;
 import org.jdom2.Namespace;
 import org.jdom2.Attribute; 
 import org.jdom2.output.XMLOutputter; 
 import org.jdom2.output.Format;
-
 import org.mitre.cybox.cybox_2.Observable; 
 import org.mitre.cybox.cybox_2.Observables;
 import org.mitre.stix.stix_1.STIXPackage;
+
 import java.io.StringReader;  
 import java.io.IOException;
 import java.io.File;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 

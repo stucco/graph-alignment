@@ -1,4 +1,6 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
+
+import gov.ornl.stucco.alignment.comparisons.CosineSimilarity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,13 +8,10 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
 import java.lang.Math;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
-
-import alignment.alignment_v2.comparisons.CosineSimilarity;
 
 import java.text.ParseException; 
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package alignment.alignment_v2.comparisons;
+package gov.ornl.stucco.alignment.comparisons;
 
 //Porter Stemmer
 //taken and modified from 

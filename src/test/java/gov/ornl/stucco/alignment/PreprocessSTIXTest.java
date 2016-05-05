@@ -1,6 +1,7 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import static org.junit.Assert.*;
+import gov.ornl.stucco.alignment.PreprocessSTIX;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,9 +11,8 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;					
- 
-import org.xml.sax.SAXException; 
 
+import org.xml.sax.SAXException; 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Attribute; 
