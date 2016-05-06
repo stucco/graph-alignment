@@ -77,10 +77,8 @@
 				<artifactId>maven-scm-plugin</artifactId>
 				<version>1.9</version>
 				<configuration>
-					<connectionUrl>scm:git:https://github.com/stucco/graph-db-connection.git</connectionUrl>
-					<checkoutDirectory>graph-db-connection</checkoutDirectory>
-					<scmVersionType>branch</scmVersionType>
-					<scmVersion>ornl-integration</scmVersion>
+					<connectionUrl>scm:git:https://github.com/stucco/${module.name}.git</connectionUrl>
+					<checkoutDirectory>${module.name}</checkoutDirectory>
 				</configuration>
 			</plugin>
 		</plugins>
