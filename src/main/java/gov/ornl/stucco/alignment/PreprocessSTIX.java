@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import javax.xml.namespace.QName;
 import org.xml.sax.SAXException;
@@ -240,8 +240,8 @@ public class PreprocessSTIX {
 	 */
 	private Map<String, Element> preprocessObservableTtpEt(Map<String, Element> stixElements) {
 		Map<String, Element> map = new HashMap<String, Element>();
-		for (String id : stixElements.keySet()) {
-			Element element = stixElements.get(id);
+		for (Map.Entry<String, Element> entry : stixElements.entrySet()) {
+			Element element = entry.getValue();
 			String name = element.getName();
 			/* now we are looking for Observables to normalize them,
 		   such as extract IP, Port, etc.. from fields of other objects descriptions */

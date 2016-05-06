@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import java.io.IOException;
 
@@ -463,7 +463,6 @@ public class Align {
 	private String findDuplicateVertex(JSONObject vertex, List<DBConstraint> constraints) throws Exception {
 		double threshold = 0.75;
 		List<String> candidateIds = connection.getVertIDsByConstraints(constraints);
-		String vertexType = vertex.getString("vertexType");
 		double bestScore = 0.0;
 		String bestId = null;
 		for (String candidateId : candidateIds) {

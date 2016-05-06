@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -88,12 +88,12 @@ public class GraphConstructor {
 	private void constructGraph() {	
 		/* turning elements into vertices first, so if any of them are not valid or 
 		   do not contain required fields we would not create edges for those vertices */
-		for (String id : stixElements.keySet()) {
+		for (Map.Entry<String, Element> entry : stixElements.entrySet()) {
 			/* some vertices are created out of order; example is when required field value is in references element */
-			if (vertices.has(id)) {
+			if (vertices.has(entry.getKey())) {
 				continue;
 			}
-			Element element = stixElements.get(id);
+			Element element = entry.getValue();
 			String vertexType = determineVertexType(element); 
 			JSONObject newVertex = constructVertex(element, vertexType);
 			vertices.put(element.getAttributeValue("id"), newVertex);
@@ -103,8 +103,8 @@ public class GraphConstructor {
 		XPathFactory xpfac = XPathFactory.instance();
 		String path = ".//*[@object_reference or @idref]";
 		XPathExpression xp = xpfac.compile(path);
-		for (String id : stixElements.keySet()) {
-			Element outElement = stixElements.get(id);
+		for (Map.Entry<String, Element> entry : stixElements.entrySet()) {
+			Element outElement = entry.getValue();
 			String outVertID = outElement.getAttributeValue("id");
 			/* if out vertex with this id was not valid and not created, so we do not need to construct an edge for it */
 			if (!vertices.has(outVertID)) {
@@ -369,7 +369,7 @@ public class GraphConstructor {
 			case "string":
 				return propertyValue.toString();
 			case "long":
-				return new Long(propertyValue.toString());
+				return Long.valueOf(propertyValue.toString());
 			default: 
 				return propertyValue;
 		}
@@ -636,26 +636,5 @@ public class GraphConstructor {
 		}
 
 		return propertyValue;
-	}
-		
-	/* 
-	 *	Using UUID as a json key to vertex is convenient while turning xml into a graph, 
-   *	but for alignment using name as a json key for vertex is faster 
-   */
-	private void substituteIdForName() {
-		Map<String, String> idToNameMap = new HashMap<String, String>();
-		for (Object key : vertices.keySet()) {
-			String id = key.toString();
-			String name = vertices.getJSONObject(id).getString("name");
-			if (!id.equals(name)) {
-				idToNameMap.put(id, name);
-			}
-		}
-
-		for (String id : idToNameMap.keySet()) {
-			JSONObject vert = vertices.getJSONObject(id);
-			vertices.put(idToNameMap.get(id), vert); 
-			vertices.remove(id);
-		}
 	}
 }

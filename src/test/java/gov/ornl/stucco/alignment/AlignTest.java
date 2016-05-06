@@ -1,5 +1,9 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
+import gov.ornl.stucco.alignment.Align;
+import gov.ornl.stucco.alignment.DBConnectionJson;
+import gov.ornl.stucco.alignment.GraphConstructor;
+import gov.ornl.stucco.alignment.PreprocessSTIX;
 import gov.pnnl.stucco.dbconnect.Condition;
 import gov.pnnl.stucco.dbconnect.DBConstraint;
 
@@ -12,11 +16,11 @@ import java.util.HashSet;
 import java.util.Collection; 
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import org.json.JSONObject;
 import org.json.JSONArray; 
- 
 import org.mitre.stix.stix_1.STIXPackage; 
 
 import java.io.StringReader;  
@@ -135,7 +139,7 @@ public class AlignTest {
 
 	@Test 
 	public void testStixIDUpdate() {
-		System.out.println("[RUNNING:] alignment.alignment_v2.testStixIDUpdate()");
+		System.out.println("[RUNNING:] gov.ornl.stucco.alignment.testStixIDUpdate()");
 		String graphString1 = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
 			"<stix:STIX_Package"+
@@ -259,7 +263,7 @@ public class AlignTest {
 
 	@Test 
 	public void testDuplicateIPByName() {
-		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateIPByName()");
+		System.out.println("[RUNNING:] gov.ornl.stucco.alignment.testDuplicateIPByName()");
 
 		String graphString1 = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -347,7 +351,7 @@ public class AlignTest {
 
 	@Test 
 	public void testDuplicateVulnerabilityByType() {
-		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateVulnerabilityByType()");
+		System.out.println("[RUNNING:] gov.ornl.stucco.alignment.testDuplicateVulnerabilityByType()");
 
 		String graphString1 = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -426,7 +430,7 @@ public class AlignTest {
 
 	@Test 
 	public void testDuplicateMalwareByAlias() {
-		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateMalwareByAlias()");
+		System.out.println("[RUNNING:] gov.ornl.stucco.alignment.testDuplicateMalwareByAlias()");
 
 		String graph1 = 
 			"{\"vertices\": {\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\": { " +
@@ -477,7 +481,7 @@ public class AlignTest {
 
 	@Test 
 	public void testDuplicateIndicatorByAlias() {
-		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateIndicatorByAlias()");
+		System.out.println("[RUNNING:] gov.ornl.stucco.alignment.testDuplicateIndicatorByAlias()");
 
 		String graph1 = 
 			"{\"vertices\": {\"fireeye:indicator-0036bca2-8c0a-4f09-934d-89a98fc41850\": { " +
@@ -538,7 +542,7 @@ public class AlignTest {
 
 	@Test
 	public void testEdgeLoad() {
-		System.out.println("[Running] alignment.alignment_v2.AlignTest.testEdgeLoad()");
+		System.out.println("[Running] gov.ornl.stucco.alignment.AlignTest.testEdgeLoad()");
 
 		String graphString = 
 			"{"+
@@ -612,7 +616,7 @@ public class AlignTest {
 		
 	@Test
 	public void testLoadIndicatorDuplicateTest() {	
-		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadIndicatorDuplicateTest()");
+		System.out.println("[Running] gov.ornl.stucco.alignment.AlignTest.testLoadIndicatorDuplicateTest()");
 		
 		String graphSectionOne = 
 			"{"+
@@ -745,7 +749,7 @@ public class AlignTest {
 	
 	@Test
 	public void testLoadNestedIndicatorsTest() {
-		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadNestedIndicatorsTest()");
+		System.out.println("[Running] gov.ornl.stucco.alignment.AlignTest.testLoadNestedIndicatorsTest()");
 		
 			String graphSectionOne = 
 				"{"+

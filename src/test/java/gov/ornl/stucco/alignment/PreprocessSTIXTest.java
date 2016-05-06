@@ -1,6 +1,7 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import static org.junit.Assert.*;
+import gov.ornl.stucco.alignment.PreprocessSTIX;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,9 +11,8 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import javax.xml.namespace.QName;					
- 
-import org.xml.sax.SAXException; 
 
+import org.xml.sax.SAXException; 
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.Attribute; 
@@ -43,7 +43,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 	@Test
 	public void test_normalizeSTIX_Incident_with_Indicator_Observable_TTP_ExploitTarget() {
 
-		System.out.println("alignment.alignment_v2.test_normalizeSTIX_Incident_with_Indicator_Observable_TTP_ExploitTarget()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessSTIXTest.test_normalizeSTIX_Incident_with_Indicator_Observable_TTP_ExploitTarget()");
 		try {
 			String testStixString =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -263,7 +263,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 	@Test
 	public void test_normalizeSTIX_ExploitTarget_Observables_COA() {
 
-		System.out.println("alignment.alignment_v2.test_normalizeSTIX_ExploitTarget_Observables_COA()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessSTIXTest.test_normalizeSTIX_ExploitTarget_Observables_COA()");
 		try {
 		
 			String testStixString =
@@ -494,7 +494,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 	@Test
 	public void test_normalizeSTIX_Indicator_Observable() {
 
-		System.out.println("alignment.alignment_v2.test_normalizeSTIX_Indicator_Observable()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessSTIXTest.test_normalizeSTIX_Indicator_Observable()");
 		try {
 			String testStixString =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -685,7 +685,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 	@Test
 	public void test_normalizeSTIX_TTP_Malware() {
 
-		System.out.println("alignment.alignment_v2.test_normalizeSTIX_TTP()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessSTIXTest.test_normalizeSTIX_TTP()");
 		try {
 			String testStixString =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -810,7 +810,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 	@Test
 	public void test_normalizeSTIX_TTP_Exploits() {
 
-		System.out.println("alignment.alignment_v2.test_normalizeSTIX_TTP()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessSTIXTest.test_normalizeSTIX_TTP()");
 		try {
 			String testStixString =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -923,7 +923,7 @@ public class PreprocessSTIXTest extends PreprocessSTIX {
 	@Test
 	public void test_normalizeSTIX_ExploitTarget_Vulnerability() {
 
-		System.out.println("alignment.alignment_v2.test_normalizeSTIX_ExploitTarget_Vulnerability()");
+		System.out.println("gov.ornl.stucco.alignment.PreprocessSTIXTest.test_normalizeSTIX_ExploitTarget_Vulnerability()");
 		try {
 			String testStixString =
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
