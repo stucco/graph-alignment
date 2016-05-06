@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.Iterator;
+
+import java.io.Serializable;
 
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.Format;
@@ -52,7 +54,7 @@ abstract class PreprocessTTP {
 		propOrder = Collections.unmodifiableMap(map);
 	}
 
-	private static class TTPComparator implements Comparator<Element> {
+	private static class TTPComparator implements Comparator<Element>, Serializable {
 		public int compare(Element e1, Element e2) {
 			return propOrder.get(e1.getName()).compareTo(propOrder.get(e2.getName()));
 		}	

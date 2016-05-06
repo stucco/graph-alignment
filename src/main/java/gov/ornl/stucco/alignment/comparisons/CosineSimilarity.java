@@ -1,18 +1,16 @@
-package alignment.alignment_v2.comparisons;
+package gov.ornl.stucco.alignment.comparisons;
 
 import java.util.*;
 
 public class CosineSimilarity{
 
 	private PorterStemmer ps;
-	private RemoveStopWords rsw;
 	private Set<String> allWords;
 
 	public CosineSimilarity()	{
 		
 		allWords = new HashSet<String>();
 		ps = new PorterStemmer();
-		rsw = new RemoveStopWords("/resources/StopWords.txt");
 	}
 
 	//removing suffixes from all words 
@@ -24,7 +22,7 @@ public class CosineSimilarity{
 		int count;
 	
 		for (int j = 0; j < str.length; j++)  {
-			if (rsw.containsString(str[j])) continue;	//removing stop words
+			if (RemoveStopWords.containsString(str[j])) continue;	//removing stop words
 			str[j] = str[j].toLowerCase();    
 			str[j] = str[j].replaceAll("\\W", "").trim();
 			ps.add(str[j].toCharArray(), str[j].length());

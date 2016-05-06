@@ -1,7 +1,10 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.alignment;
 
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+import gov.ornl.stucco.alignment.GraphConstructor;
+import gov.ornl.stucco.alignment.PreprocessSTIX;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -9,20 +12,16 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-
 import java.io.IOException;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
- 
+
 import org.json.JSONObject;
 import org.json.JSONArray; 
-
 import org.jdom2.output.XMLOutputter;  
 import org.jdom2.output.Format;
 import org.jdom2.xpath.*;
 import org.jdom2.*;
-
 import org.xml.sax.SAXException;
 import org.mitre.stix.stix_1.*; 
 import org.mitre.cybox.cybox_2.Observable;

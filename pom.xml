@@ -1,20 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>alignment</groupId>
-	<artifactId>alignment_v2</artifactId>
-	<version>2.0.1</version>
+	<groupId>gov.ornl.stucco</groupId>
+	<artifactId>alignment</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>alignment_v2</name>
+	<name>alignment</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
 	<dependencies>
 		<dependency>
-			<groupId>gov.pnnl.stucco</groupId>
+			<groupId>gov.pnnl.stucco</groupId> 
 			<artifactId>DBConnect</artifactId>
 			<version>0.5.0</version>
 		</dependency>
@@ -85,9 +86,11 @@
 		</plugins>
 		 <resources>
 			<resource>
-  			<directory>./src/main</directory>
+  			<directory>src/main/resources</directory>
   			<includes>
-  				<include>resources/**/*.*</include>
+  				<include>StopWords.txt</include>
+  				<include>ontology/cybox_ontology.json</include>
+  				<include>ontology/stucco_ontology.json</include>
   			</includes>
 			</resource>
   	</resources>
