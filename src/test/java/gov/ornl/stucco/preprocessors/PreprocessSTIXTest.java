@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.preprocessors;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package alignment.alignment_v2.comparisons;
+package gov.ornl.stucco.comparisons;
 
 import java.util.*;
 //import java.util.stream.*;

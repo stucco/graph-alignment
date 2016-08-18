@@ -1,4 +1,6 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.preprocessors;
+
+import gov.ornl.stucco.ConfigFileLoader;
 
 import java.util.Map;
 import java.util.HashMap;

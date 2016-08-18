@@ -1,4 +1,6 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco;
+
+import gov.ornl.stucco.preprocessors.PreprocessSTIX;
 
 import gov.pnnl.stucco.dbconnect.Condition;
 import gov.pnnl.stucco.dbconnect.DBConstraint;

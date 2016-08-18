@@ -1,4 +1,4 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco;
 
 import java.util.Map;
 import java.util.HashMap;

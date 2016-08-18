@@ -1,4 +1,6 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco.preprocessors;
+
+import gov.ornl.stucco.GraphConstructor;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,7 @@
-package alignment.alignment_v2;
+package gov.ornl.stucco;
+
+import gov.ornl.stucco.preprocessors.PreprocessSTIX;
+import gov.ornl.stucco.comparisons.CosineSimilarity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +14,6 @@ import java.lang.Math;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
-
-import alignment.alignment_v2.comparisons.CosineSimilarity;
 
 import java.text.ParseException; 
 import java.text.SimpleDateFormat;
