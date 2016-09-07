@@ -731,12 +731,6 @@
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
-            },
-            "publishedDate":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Published_DateTime']",
-               "description":"published date",
-               "type":"number",
-               "cardinality":"single"
             }
          },
          "required":[  
