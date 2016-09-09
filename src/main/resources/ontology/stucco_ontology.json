@@ -748,12 +748,15 @@
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+<<<<<<< HEAD
             },
             "publishedDate":{  
                "xpath": ["Exploit_Target/Vulnerability/Published_DateTime"],
                "description":"published date",
                "type":"number",
                "cardinality":"single"
+=======
+>>>>>>> 520c5bb9459afa94dd3392f3119933ae0f185d21
             }
          },
          "required":[  
