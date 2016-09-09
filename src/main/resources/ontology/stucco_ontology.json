@@ -252,7 +252,8 @@
          "description":"address range",
          "type":"object",
          "regex": {
-            "xpath": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and @*[local-name()='type']=\"AddressObj:AddressObjectType\"]/*[local-name()='Address_Value']",
+            "observableType": "Address",
+            "xpath": "Observable/Object/Properties/",
             "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5]).+([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
          },
          "properties":{  
@@ -262,7 +263,9 @@
                "default": "AddressRange"
             },
             "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": [
+                  "Observable/Object/Properties/Address_Value"
+               ],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -270,13 +273,17 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+               "xpath": [
+                  "Observable/Object/Description"
+               ],
                "description":"description",
                "type":"string",
                "cardinality":"set"
             },
             "endIP":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": [
+                  "Observable/Object/Properties/Address_Value"
+               ],
                "description":"end IP",
                "type":"string",
                "cardinality":"single",
@@ -286,7 +293,7 @@
                "regex":"^.* - (.*$)"
             },
             "startIP":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": ["Observable/Object/Properties/Address_Value"],
                "description":"start IP",
                "type":"string",
                "cardinality":"single",
@@ -296,7 +303,7 @@
                "regex":"(^.*) - .*$"
             },
             "startIPInt":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": ["Observable/Object/Properties/Address_Value"],
                "description":"start IP, as integer",
                "type":"long",
                "cardinality":"single",
@@ -307,18 +314,18 @@
                "applyFunction":"ipToLong"
             },
             "location":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Location']/*[local-name() = 'Name']",
+               "xpath": ["Observable/Object/Location/Name"],
                "description":"Country Name",
                "type":"string",
                "cardinality":"single"
             },
             "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+               "xpath": ["Observable/Observable_Source/Information_Source_Type"],
                "description":"Data source for this vertex",
                "cardinality":"set"
             },
             "endIPInt":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": ["Observable/Object/Properties/Address_Value"],
                "description":"end IP, as integer",
                "type":"long",
                "cardinality":"single",
@@ -396,7 +403,7 @@
          "vertexType":"Exploit",
          "description":"Exploit characteristics",
          "type": "object",
-         "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']",
+         "xpath": ["TTP/Behavior/Exploits/Exploit"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -404,7 +411,7 @@
                "default": "Exploit"
             },
             "name":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Title']",
+               "xpath": ["TTP/Behavior/Exploits/Exploit/Title"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -412,19 +419,22 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Description']",
+               "xpath": ["TTP/Behavior/Exploits/Exploit/Description"],
                "description":"descriptive summary of this Exploit family",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Exploits']/*[local-name() = 'Exploit']/*[local-name() = 'Short_Description']",
+               "xpath": ["TTP/Behavior/Exploits/Exploit/Short_Description"],
                "description":"additional text description of this Exploit",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "TTP/Information_Source/Identity/Name", 
+                  "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -493,7 +503,7 @@
          "description":"A specific IP address",
          "type": "object",
          "regex": {
-            "xpath": ".[local-name()='Observable']/*[local-name()='Object']/*[local-name()='Properties' and @*[local-name()='type']=\"AddressObj:AddressObjectType\"]/*[local-name()='Address_Value']",
+            "observableType": "Address",
             "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
          },
          "properties":{  
@@ -503,7 +513,7 @@
                "default": "IP"
             },
             "name":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": ["Observable/Object/Properties/Address_Value"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -511,12 +521,12 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Description']",
+               "xpath": ["Observable/Object/Description"],
                "type":"string",
                "cardinality":"set"
             },
             "ipInt":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+               "xpath": ["Observable/Object/Properties/Address_Value"],
                "description":"start IP, as integer",
                "type":"long",
                "cardinality":"single",
@@ -526,7 +536,7 @@
                "applyFunction":"ipToLong"
             },
             "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+               "xpath": ["Observable/Observable_Source/Information_Source_Type"],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -586,7 +596,7 @@
          "vertexType":"Malware",
          "description":"Any malicious software. This can refer to either a stored binary or a running instance. Malware can contain code to launch an exploit. Malware can itself be an asset that an attacker uses in future attacks (eg. a backdoor left on a compromised system.) or can automatically launch additional attacks on behalf of the original attacker. Malware can be hosted by or communicate with servers controlled by the attacker. Malware can contain code to load other malware. Malware can reuse components from other malware samples.",
          "type": "object",
-         "xpath": ".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']",
+         "xpath": [ "TTP/Behavior/Malware"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -594,29 +604,32 @@
                "default": "Malware"
             },
             "description":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Description']",
+               "xpath": ["TTP/Behavior/Malware/Malware_Instance/Description"],
                "description":"descriptive summary of this malware family",
                "type":"string",
                "cardinality":"set"
             },   
             "shortDescription":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Short_Description']",
+               "xpath": ["TTP/Behavior/Malware/Malware_Instance/Short_Description"],
                "description":"additional text description of this Malware",
                "type":"string",
                "cardinality":"set"
             },
             "alias":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Malware']/*[local-name() = 'Malware_Instance']/*[local-name() = 'Name']",
+               "xpath": ["TTP/Behavior/Malware/Malware_Instance/Name"],
                "cardinality":"set"
             },
             "details":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Behavior']/*[local-name() = 'Attack_Patterns']/*[local-name() = 'Attack_Pattern']/*[local-name() = 'Description']",
+               "xpath": ["TTP/Behavior/Attack_Patterns/Attack_Pattern/Description"],
                "description":"additional text description of this malware",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "TTP/Information_Source/Identity/Name",
+                  "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -699,7 +712,7 @@
          "vertexType":"Vulnerability",
          "description":"Vulnerability",
          "type": "object",
-         "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']",
+         "xpath": ["Exploit_Target/Vulnerability"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -707,7 +720,7 @@
                "default": "Vulnerability"
             },
             "name":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'CVE_ID']",
+               "xpath": ["Exploit_Target/Vulnerability/CVE_ID"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -715,25 +728,29 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Description']",
+               "xpath": ["Exploit_Target/Vulnerability/Description"],
                "description":"description",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Short_Description']",
+               "xpath": ["Exploit_Target/Vulnerability/Short_Description"],
                "description":"short description",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Source'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Exploit_Target/Vulnerability/Source",
+                  "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name",
+                  "Exploit_Target/Information_Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
             },
             "publishedDate":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Vulnerability']/*[local-name() = 'Published_DateTime']",
+               "xpath": ["Exploit_Target/Vulnerability/Published_DateTime"],
                "description":"published date",
                "type":"number",
                "cardinality":"single"
@@ -795,7 +812,7 @@
          "vertexType":"Weakness",
          "description":"weakness",
          "type": "object",
-         "xpath": ".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']",
+         "xpath": ["Exploit_Target/Weakness"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -803,7 +820,7 @@
                "default": "Weakness"
             },
             "name":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']/*[local-name() = 'CWE_ID']",
+               "xpath": ["Exploit_Target/Weakness/CWE_ID"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -811,13 +828,16 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Weakness']/*[local-name() = 'Description']",
+               "xpath": ["Exploit_Target/Weakness/Description"],
                "description":"description",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Exploit_Target/Information_Source/Identity/Name",
+                  "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -874,7 +894,7 @@
          "vertexType": "Campaign",
          "description": "Instance of Threat Actor observed through sets of Incidents and/or TTP",
          "type": "object",
-         "xpath": ".[local-name() = 'Campaign']",
+         "xpath": ["Campaign"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -899,11 +919,14 @@
                "cardinality":"set"
             },
             "alias":{  
-               "xpath":".[local-name() = 'Campaign']/*[local-name() = 'Names']/*[local-name() = 'Name']",
+               "xpath": ["Campaign/Names/Name"],
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Campaign']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Campaign']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Campaign/Information_Source/Identity/Name",
+                  "Campaign/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -975,7 +998,7 @@
          "vertexType": "Course_Of_Action",
          "description": "Measures to be taken to address cyber threat",
          "type": "object",
-         "xpath": ".[local-name() = 'Course_Of_Action']",
+         "xpath": ["Course_Of_Action"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -1000,11 +1023,14 @@
                "cardinality":"set"
             },
             "alias":{  
-               "xpath":".[local-name() = 'Course_Of_Action']/*[local-name() = 'Parameter_Observables']/*[local-name() = 'Observable']",
+               "xpath": ["Course_Of_Action/Parameter_Observables/Observable"],
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Course_Of_Action']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Course_Of_Action']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Course_Of_Action/Information_Source/Identity/Name",
+                  "Course_Of_Action/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -1066,7 +1092,7 @@
          "vertexType": "Exploit_Target",
          "description": "Exploit Targets are vulnerabilities or weaknesses",
          "type": "object",
-         "xpath": ".[local-name() = 'Exploit_Target']",
+         "xpath": ["Exploit_Target"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -1091,7 +1117,10 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Exploit_Target']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Exploit_Target/Information_Source/Identity/Name",
+                  "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -1153,7 +1182,7 @@
          "vertexType": "Incident",
          "description": "Instances of Indicators and/or Threat Actors performing specific threat actions",
          "type": "object",
-         "xpath": ".[local-name() = 'Incident']",
+         "xpath": ["Incident"],
          "properties": {  
             "name": {
                "type": "string",
@@ -1178,11 +1207,19 @@
                "cardinality":"set"
             },
             "alias":{  
-               "xpath":".[local-name() = 'Incident']/*[local-name() = 'External_ID'] | .[local-name() = 'Incident']/*[local-name() = 'Related_Observables']/*[local-name() = 'Related_Observable']/*[local-name() = 'Observable'] | .[local-name() = 'Incident']/*[local-name() = 'Leveraged_TTPs']/*[local-name() = 'Leveraged_TTP']/*[local-name() = 'TTP'] | .[local-name() = 'Incident']/*[local-name() = 'Attributed_Threat_Actors']/*[local-name() = 'Threat_Actor']/*[local-name() = 'Threat_Actor']",
+               "xpath": [  
+                  "Incident/External_ID",
+                  "Incident/Related_Observables/Related_Observable/Observable",
+                  "Incident/Leveraged_TTPs/Leveraged_TTP/TTP",
+                  "Incident/Attributed_Threat_Actors/Threat_Actor/Threat_Actor"
+               ],
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Incident']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Incident']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Incident/Information_Source/Identity/Name",
+                  "Incident/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -1273,7 +1310,7 @@
          "vertexType": "Indicator",
          "description": "Indicating Observable patterns combined with additional contextual information",
          "type": "object",
-         "xpath": ".[local-name() = 'Indicator']",
+         "xpath": ["Indicator"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -1286,23 +1323,32 @@
                "description": "UUID of this Indicator"
             },
             "description":{  
-               "xpath":"*[local-name() = 'Description']",
+               "xpath": ["Description"],
                "description":"descriptive summary of this Indicator",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath":"*[local-name() = 'Short_Description']",
+               "xpath": ["Short_Description"],
                "description":"short descriptive summary of this Indicator",
                "type":"string",
                "cardinality":"set"
             },
             "alias":{  
-               "xpath":".[local-name() = 'Indicator']/*[local-name() = 'Alternative_ID'] | .[local-name() = 'Indicator']/*[local-name() = 'Indicated_TTP']/*[local-name() = 'TTP'] | .[local-name() = 'Indicator']/*[local-name() = 'Related_Campaigns']/*[local-name() = 'Related_Campaign']/*[local-name() = 'Campaign'] | .[local-name() = 'Indicator']/*[local-name() = 'Observable']| .[local-name() = 'Indicator']/*[local-name() = 'Suggested_COAs']/*[local-name() = 'Suggested_COA']/*[local-name() = 'Course_Of_Action']",
+               "xpath": [
+                  "Indicator/Alternative_ID",
+                  "Indicator/Indicated_TTP/TTP",
+                  "Indicator/Related_Campaigns/Related_Campaign/Campaign",
+                  "Indicator/Observable",
+                  "Indicator/Suggested_COAs/Suggested_COA/Course_Of_Action"
+               ],
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Indicator']/*[local-name() = 'Producer']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Indicator']/*[local-name() = 'Producer']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Indicator/Producer/Identity/Name",
+                  "Indicator/Producer/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -1381,7 +1427,7 @@
          "vertexType": "Threat_Actor",
          "description": "Characterizations of malicious actors or adversaries representing a cyber attack",
          "type": "object",
-         "xpath": ".[local-name() = 'Threat_Actor']",
+         "xpath": ["Threat_Actor"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -1389,30 +1435,33 @@
                "default": "Threat_Actor"
             },
             "name":{  
-               "xpath":".[local-name() = 'Threat_Actor']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": ["Threat_Actor/Identity/Name"],
                "cardinality":"single",
                "comparisonFunction":"exact",
                "comparisonWeight":1.0,
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath":"*[local-name() = 'Description']",
+               "xpath": ["Description"],
                "description":"descriptive summary of this Threat_Actor",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath":"*[local-name() = 'Short_Description']",
+               "xpath": ["Short_Description"],
                "description":"short descriptive summary of this Threat_Actor",
                "type":"string",
                "cardinality":"set"
             },
             "alias":{  
-               "xpath":".[local-name() = 'Threat_Actor']/*[local-name() = 'Identity']/*[local-name() = 'Related_Identities']/*[local-name() = 'Related_Identity']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": ["Threat_Actor/Identity/Related_Identities/Related_Identity/Identity/Name"],
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Threat_Actor']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'Threat_Actor']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "Threat_Actor/Information_Source/Identity/Name",
+                  "Threat_Actor/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -1479,7 +1528,7 @@
          "vertexType": "TTP",
          "description": "Adversary Tactics, Techniques and Procedures leveraged by adversary, such as malware, exploits, tools, etc",
          "type": "object",
-         "xpath": ".[local-name() = 'TTP']",
+         "xpath": ["TTP"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -1499,7 +1548,10 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Identity']/*[local-name() = 'Name'] | .[local-name() = 'TTP']/*[local-name() = 'Information_Source']/*[local-name() = 'Contributing_Sources']/*[local-name() = 'Source']/*[local-name() = 'Identity']/*[local-name() = 'Name']",
+               "xpath": [
+                  "TTP/Information_Source/Identity/Name",
+                  "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
+               ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
@@ -1567,7 +1619,7 @@
          "vertexType": "Observable",
          "description": "Observable is representing a description of a single cyber observable through",
          "type": "object",
-         "xpath": ".[local-name() = 'Observable']",
+         "xpath": ["Observable"],
          "properties":{  
             "vertexType":{  
                "type":"string",
@@ -1581,7 +1633,7 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath":".[local-name() = 'Observable']/*[local-name() = 'Observable_Source']/*[local-name() = 'Information_Source_Type']",
+               "xpath": ["Observable/Observable_Source/Information_Source_Type"],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"

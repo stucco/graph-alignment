@@ -1,270 +1,781 @@
+//TODO: clean, add ttp and exploit_target preprocessing
+//TODO: edit observable preprocessing to handle observable events ... and when there are no objects ...
+//TODO: fix xpath/path with OR
 package gov.ornl.stucco.preprocessors;
 
-import javax.xml.namespace.QName;
-import org.xml.sax.SAXException;
+import gov.ornl.stucco.ConfigFileLoader;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;  
-import java.util.UUID;
-import java.util.Iterator;
+import java.util.UUID;  
+import java.util.Iterator; 
+import java.util.ArrayDeque;  
+import java.io.StringWriter; 
 
-import java.io.StringReader;  
+import java.io.StringReader;     
 import java.io.IOException;
 
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.output.Format;
+import org.jdom2.output.Format; 
 import org.jdom2.Document;
-import org.jdom2.Element;
+import org.jdom2.Element; 
 import org.jdom2.Namespace;
-import org.jdom2.Attribute;
-import org.jdom2.Content;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.StAXStreamBuilder;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.StreamFilter;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.events.XMLEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.json.JSONObject;
+
 public class PreprocessSTIX {
 
-	private static final Logger logger = LoggerFactory.getLogger(PreprocessSTIX.class);
+  public class Vertex {
+    public String id;
+    public String xml;
+    public String type;
+    public String observableType;
+    public Map<String, List<String>> contentPaths;
 
-	private static final Namespace xsiNS = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-	private static final Map<String, Namespace> stixElementMap;
-	private static final Set<String> stixParentElementSet;
+    public Vertex() {}
 
-/**
- * Normalizing STIX packges by removing nested elements.
- *
- * @author Maria Vincent
- */
+    public void print() {
+      System.out.println("ID: " + id);
+      System.out.println("XML: " + xml);
+      System.out.println("observableType: " + observableType);
+      
+      Element e = parseXMLText(xml).getRootElement();
+      XMLOutputter xml = new XMLOutputter();
+      xml.setFormat(Format.getPrettyFormat());
+      System.out.println(xml.outputString(e));
+      
+      for (String path : contentPaths.keySet()) {
+        System.out.println(path + ": " + contentPaths.get(path));
+      }
+    }
+  }
 
-	static {
-		/* stix elements wrapers */
-		Set<String> set = new HashSet<String>();
-		set.add("stix:Observables");
-		set.add("stix:Indicators");
-		set.add("stix:TTPs"); 
-		set.add("stix:Exploit_Targets");
-		set.add("stix:Incidents");
-		set.add("stix:Courses_Of_Action");
-		set.add("stix:Campaigns");
-		set.add("stix:Threat_Actors");
-		stixParentElementSet = Collections.unmodifiableSet(set);
+  private Map<String, Vertex> vertices;
 
-		Map<String, Namespace> map = new HashMap<String, Namespace>();
-		map.put("Observable", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
-		map.put("Exploit_Target", Namespace.getNamespace("et", "http://stix.mitre.org/ExploitTarget-1"));
-		map.put("Course_Of_Action", Namespace.getNamespace("coa", "http://stix.mitre.org/CourseOfAction-1"));
-		map.put("Indicator", Namespace.getNamespace("indicator", "http://stix.mitre.org/Indicator-2"));
-		map.put("TTP", Namespace.getNamespace("ttp", "http://stix.mitre.org/TTP-1"));
-		map.put("Incident", Namespace.getNamespace("incident", "http://stix.mitre.org/Incident-1"));
-		map.put("Campaign", Namespace.getNamespace("campaign", "http://stix.mitre.org/Campaign-1"));
-		map.put("Threat_Actor", Namespace.getNamespace("ta", "http://stix.mitre.org/ThreatActor-1"));
-		stixElementMap = Collections.unmodifiableMap(map);
-	}
+  private static final Logger logger = LoggerFactory.getLogger(StaxParser.class);
+  private static final Map<String, Namespace> stixElementMap;
+  private static final Map<String, String> stixTypes;
+  private static Map<String, String> globalNS;
+  private static XMLInputFactory inputFactory;
+  private static XMLOutputFactory outputFactory;
 
-	/*
-	 *	Parses xml String and converts it to jdom2 Document
-	 */ 
-	public static Document parseXMLText(String documentText) {
-		try {
-			SAXBuilder saxBuilder = new SAXBuilder();
-			Document document = saxBuilder.build(new StringReader(documentText));
-			return document;
+  /**
+   * Normalizing STIX packges by removing nested elements.
+   *
+   * @author Maria Vincent
+   */
 
-		} catch (JDOMException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+  static {
+    /* stix elements wrapers */
+    Map<String, String> map = new HashMap<String, String>();
+    map.put("Indicator", "indicator:IndicatorType");
+    map.put("TTP", "ttp:TTPType"); 
+    map.put("Exploit_Target", "et:ExploitTargetType");
+    map.put("Incident", "incident:IncidentType");
+    map.put("Course_Of_Action", "coa:CourseOfActionType");
+    map.put("Campaign", "campaign:CampaignType");
+    map.put("Threat_Actor", "ta:ThreatActorType");
+    stixTypes = Collections.unmodifiableMap(map);
 
-	/*
-	 *	Normalizes (refactors) stix core elements (Observable, Indicator, COA, etc ...) 
-	 *	by cloning content, appending it to the proper parent element, and adding reference to it from its original location
-	 */
-	public Map<String, Element> normalizeSTIX(String stixString) {
-		Map<String, Element> stixElements = new HashMap<String, Element>();
-		/* wrapping entire doc into one common root 
-		to avoid exception when there is a list of packages one after another */
-		stixString = stixString.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
-		stixString = "<root>" + stixString + "</root>";
-		Document document = parseXMLText(stixString);
-		if (document == null) {
-			return null;
-		}
-		List<Element> packageList = document.getRootElement().getChildren(); 
-		Iterator<Element> packageIterator = packageList.iterator();
-		while(packageIterator.hasNext()) {
-			Element pack = packageIterator.next();
-			Map<String, Element> map = normalizeSTIXPackage(pack);
-			stixElements.putAll(map);
-			packageIterator.remove();
-		}
+    Map<String, Namespace> nsmap = new HashMap<String, Namespace>();
+    nsmap.put("Observable", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
+    nsmap.put("Exploit_Target", Namespace.getNamespace("et", "http://stix.mitre.org/ExploitTarget-1"));
+    nsmap.put("Course_Of_Action", Namespace.getNamespace("coa", "http://stix.mitre.org/CourseOfAction-1"));
+    nsmap.put("Indicator", Namespace.getNamespace("indicator", "http://stix.mitre.org/Indicator-2"));
+    nsmap.put("TTP", Namespace.getNamespace("ttp", "http://stix.mitre.org/TTP-1"));
+    nsmap.put("Incident", Namespace.getNamespace("incident", "http://stix.mitre.org/Incident-1"));
+    nsmap.put("Campaign", Namespace.getNamespace("campaign", "http://stix.mitre.org/Campaign-1"));
+    nsmap.put("Threat_Actor", Namespace.getNamespace("ta", "http://stix.mitre.org/ThreatActor-1"));
+    stixElementMap = Collections.unmodifiableMap(nsmap);
+  }
 
-		return stixElements;
-	}
+  public PreprocessSTIX() {
+    outputFactory = XMLOutputFactory.newInstance();
+    inputFactory = XMLInputFactory.newInstance();
+    inputFactory.setProperty(inputFactory.IS_COALESCING, true);
+  }
 
-	private Map<String, Element> normalizeSTIXPackage(Element stixPackage) {
-		/* constructing a map of namespaces (prefix mapped to uri); 
-		   jdom does not extract all the namespaces required by element, so we need to do it manually */
-		Map<String, String> namespaceMap = new HashMap<String, String>();
-		List<Namespace> namespaceList = stixPackage.getNamespacesIntroduced();
-		for (Namespace namespace : namespaceList) {
-			namespaceMap.put(namespace.getPrefix(), namespace.getURI());
-		}
-		Map<String, Element> stixElements = new HashMap<String, Element>();
-		/* looking for the elements that should be referenced and storing them in stixElements map */
-		List<Element> outerElementList = stixPackage.getChildren();
-		Iterator<Element> outerElementIterator = outerElementList.iterator();
-		while (outerElementIterator.hasNext()) {
-			Element outerElement = outerElementIterator.next();
-			/* if it is STIX_Header or STIX_RelatedPackages, then we do not need to warry about them;
-				 we only keep Observables, Indicators, etc .. */
-			if (stixParentElementSet.contains(outerElement.getQualifiedName())) { 
-				/* this round extracts Observable from Observables and etc. */
-				List<Element> elementList = outerElement.getChildren();
-				Iterator<Element> elementListIterator = elementList.iterator();
-				while (elementListIterator.hasNext()) {
-					Element element = elementListIterator.next();
-					//TODO: add mover vertex types, such as Kill_Chain, Pools ...
-					if (!stixElementMap.containsKey(element.getName())) {
-						continue;
-					}
-					elementListIterator.remove();
-					/* now we need to normalize namespaces of extracted elements, 
-					   and travers their children to pull out imbeded Observables, COAs, etc.. */
-					normalizeNamespaces(element, namespaceMap);
-					String id = getElementId(element);
-					List<Element> contentList  = element.getChildren();
-					for (Element content : contentList) {
-						Map<String, Element> map = traverseSTIXElements(content, namespaceMap);
-						stixElements.putAll(map);
-					}
-					element.setNamespace(stixElementMap.get(element.getName()));
-					stixElements.put(id, element);
-				}
-			}
-			outerElementIterator.remove();
-		}
-		
-		stixElements.putAll(preprocessObservableTtpEt(stixElements));
+  public void print(Element e) {
+    XMLOutputter xml = new XMLOutputter();
+    xml.setFormat(Format.getPrettyFormat());
+    System.out.println(xml.outputString(e));
+  }
 
-		return stixElements;
-	}				
+  /*
+  * Parses xml String and converts it to jdom2 Document
+  */ 
+  public static Document parseXMLText(String documentText) {
+    Document doc = null;
+    try {
+      XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+      XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(documentText));
+      StAXStreamBuilder builder = new StAXStreamBuilder();
+      doc = builder.build(reader);
+    } catch (XMLStreamException e) {
+      e.printStackTrace();
+    } catch (JDOMException e) {
+      e.printStackTrace();
+    }
 
-	private String getElementId(Element element) {
-		Attribute id = null;
-		if ((id = element.getAttribute("id")) == null) {
-			id = new Attribute("id", "stucco:" + element.getName() + "-" + UUID.randomUUID().toString());
-			element.addNamespaceDeclaration(Namespace.getNamespace("stucco", "gov.ornl.stucco"));
-			element.setAttribute(id);
-		}
+    return doc;
+  }
 
-		return id.getValue();
-	}
+  public void print(String xml) {
+    System.out.println(xml);
+    Element e = parseXMLText(xml).getRootElement();
+    XMLOutputter out = new XMLOutputter();
+    out.setFormat(Format.getPrettyFormat());
+    System.out.println(out.outputString(e));
+  }
 
-	/* 
-	 *	Traverses stix elements to find the one that should be moved out and referenced
-	 */	
-	private Map<String, Element> traverseSTIXElements(Element element, Map<String, String> namespaceMap) {
-		normalizeNamespaces(element, namespaceMap);
-		Map<String, Element> stixElements = new HashMap<String, Element>();
-		String name = element.getName();
-		if (stixElementMap.containsKey(name) && element.getAttribute("idref") == null && 
-			(name.equals("Observable") || element.getAttribute("type", xsiNS) != null)) {
-			Element newElement = setNewElement(element);
-			stixElements.put(newElement.getAttributeValue("id"), newElement);
-			List<Element> children = newElement.getChildren();
-			for (Element child : children) {
-				stixElements.putAll(traverseSTIXElements(child, namespaceMap));
-			}
-		} else {
-			List<Element> children = element.getChildren();
-			for (Element child : children) {
-				stixElements.putAll(traverseSTIXElements(child, namespaceMap));
-			}
-		}
+  public Map<String, Vertex> normalizeSTIX(String stixString) {
+    vertices = new HashMap<String, Vertex>();
+    globalNS = new HashMap<String, String>();
+    
+    stixString = stixString.replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
+    stixString = "<root>" + stixString + "</root>";
 
-		return stixElements;
-	}
+    try {
+      StringWriter sw = new StringWriter();
+      XMLStreamWriter writer = outputFactory.createXMLStreamWriter(sw);
 
-	/*
-	 *	Copies the content of element into newElement, removing content, and adding idref instead 
-	 */
-	private Element setNewElement(Element element) {
-		String name = element.getName();
-		if (element.getAttribute("id") == null) {
-			element.setAttribute(new Attribute("id", name + "-" + UUID.randomUUID().toString()));
-		}
-		Element newElement = element.clone().detach();
-		newElement.setNamespace(stixElementMap.get(name));
-		element.removeContent();
-		Attribute id = element.getAttribute("id");
-		id.setName("idref");
+      XMLStreamReader reader = inputFactory.createFilteredReader(inputFactory.createXMLStreamReader(new StringReader(stixString)),
+        new StreamFilter() {
+          public boolean accept(XMLStreamReader reader) {
+            return !reader.isWhiteSpace();
+          }
+        }
+      );
+      while (reader.hasNext() && reader.getEventType() != XMLEvent.END_DOCUMENT) {
+        if (reader.getEventType() == XMLEvent.START_ELEMENT) {
+          String localName = reader.getLocalName();
+          if (stixElementMap.containsKey(localName)) {
+            sw.getBuffer().setLength(0);
+            if (localName.equals("Observable")) {
+              writeObservable(reader, writer, sw);
+            } else {
+              writeElement(reader, writer, sw);
+            }
+          } else {
+            readNamespaces(reader);
+          }
+        }
+        reader.next();
+      }
 
-		return newElement;
-	}
+      writer.close();
+      reader.close();
+    } catch (XMLStreamException e) {
+      e.printStackTrace();
+    } 
 
-	/* 
-	 *	in stix values of attributes may also have namespaces, but jdom does not know how to work with them,
-	 *	so we need to check every attribute value for prefix, and add namespace if prefix is present 
-	 */
-	private void normalizeNamespaces(Element element, Map<String, String> namespaceMap) {
-		List<Namespace> namespaceList = element.getNamespacesIntroduced();
-		for (Namespace namespace : namespaceList) {
-			namespaceMap.put(namespace.getPrefix(), namespace.getURI());
-		}
-		List<Attribute> attrList = element.getAttributes();
-		for (Attribute attr : attrList) {
-			String value = attr.getValue();
-			if (value.contains(":")) {
-				String prefix = value.split(":")[0];
-				if (namespaceMap.containsKey(prefix)) {
-					element.addNamespaceDeclaration(Namespace.getNamespace(prefix, namespaceMap.get(prefix)));
-				}
-			}
-		}
-	}
+    return vertices;
+  }
 
-	/*
-	 *	Preprocessing Observable, such as splitting IP, Port, URL, etc form the same object
-	 *	Preprocessing TTP, such as splitting list of Malware or Exploits from single TTP
-	 *	Preprocessing Exploit Target, such as splitting list of Vulnerabilities from single Exploit Target
-	 */
-	private Map<String, Element> preprocessObservableTtpEt(Map<String, Element> stixElements) {
-		Map<String, Element> map = new HashMap<String, Element>();
-		for (Map.Entry<String, Element> entry : stixElements.entrySet()) {
-			Element element = entry.getValue();
-			String name = element.getName();
-			/* now we are looking for Observables to normalize them,
-		   such as extract IP, Port, etc.. from fields of other objects descriptions */
-			if (name.equals("Observable")) {
-				Map<String, Element> preprocessedObservable = PreprocessCybox.normalizeCybox(element);
-				if (preprocessedObservable != null) {
-					map.putAll(preprocessedObservable);
-				}
-			/* checking if TTP contains multiple malware or exploits; if so, replicating it */
-			} else if (name.equals("TTP")) {
-				Map<String, Element> preprocessedTTP = PreprocessTTP.normalizeTTP(element);
-				if (preprocessedTTP != null) {
-					map.putAll(preprocessedTTP);
-				}
-			/* checking if Exploit Target contains multiple Vulnerabilities; if so, replicating it */
-			} else if (name.equals("Exploit_Target")) {
-				Map<String, Element> preprocessedET = PreprocessExploitTarget.normalizeET(element);
-				if (preprocessedET != null) {
-					map.putAll(preprocessedET);
-				}
-			}
-		}
+  private void readNamespaces(XMLStreamReader reader) {
+    for (int i = 0; i < reader.getNamespaceCount(); i++) {
+      String prefix = reader.getNamespacePrefix(i);
+      String uri = reader.getNamespaceURI(i);
+      globalNS.put(prefix, uri);
+    }
+  }
 
-		return map;
-	}
+  private String writeElement(XMLStreamReader reader, XMLStreamWriter writer, StringWriter sw) throws XMLStreamException {
+    Vertex vertex = new Vertex();
+    vertex.type = reader.getLocalName();
+    vertex.contentPaths = new HashMap<String, List<String>>();
+    vertex.id = reader.getAttributeValue(null, "id");
+
+    Set<String> idrefSet = new HashSet<String>();
+    ArrayDeque<String> path = new ArrayDeque<String>();
+    Map<String, String> vertNS = new HashMap<String, String>();
+    boolean done = false;
+    String pathString = null;
+
+    initElement(reader, writer, vertNS, path, vertex);
+
+    reader.next();
+
+    while (reader.hasNext()) {
+      switch (reader.getEventType()) {
+        case XMLEvent.START_ELEMENT:
+          String localName = reader.getLocalName();
+          
+          path.add(localName);
+          pathString = toString(path);
+          if (!vertex.contentPaths.containsKey(pathString)) {
+            vertex.contentPaths.put(pathString, null);
+          }
+          
+          if (stixElementMap.containsKey(localName) && !reader.getNamespaceURI().equals("http://stix.mitre.org/TTP-1") && reader.getAttributeValue(null, "idref") == null) {
+            String prefix = reader.getPrefix();
+            String namespaceURI = reader.getNamespaceURI();
+            vertNS.put(prefix, namespaceURI);
+
+            StringWriter newSw = new StringWriter();
+            XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
+            String idref = (localName.equals("Observable")) ? writeObservable(reader, newWriter, newSw) : writeElement(reader, newWriter, newSw);
+
+            writer.writeEmptyElement(prefix, localName, namespaceURI);  
+            writeIdrefAttribute(writer, idref, vertNS);
+    
+            if (!localName.equals("Observable")) { 
+              writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", stixTypes.get(localName));
+              Namespace ns = stixElementMap.get(localName);
+              prefix = ns.getPrefix();
+              namespaceURI = ns.getURI();
+              vertNS.put(prefix, namespaceURI);
+            }
+            path.removeLast();
+          } else {
+            writeStartElement(reader, writer, localName, vertNS);
+          }
+          break;
+        case XMLEvent.END_ELEMENT:
+          done = writeEndElement(writer, path);
+          break;
+        case XMLEvent.CHARACTERS:
+          writeCharacters(reader, writer, pathString, vertex.contentPaths);
+          break;
+      }
+        if (done) {
+          break;
+        } else {
+          reader.next();
+        }
+    }
+
+    vertex.xml = sw.toString().replaceFirst(" ", toString(vertNS));
+    vertices.put(vertex.id, vertex);
+
+    return vertex.id;
+  }
+
+  private String writeObservable(XMLStreamReader reader, XMLStreamWriter writer, StringWriter sw) throws XMLStreamException {
+    Vertex vertex = new Vertex();
+    vertex.type = "Observable";
+    vertex.id = reader.getAttributeValue(null, "id");
+    vertex.contentPaths = new HashMap<String, List<String>>();
+
+    Set<String> idrefSet = new HashSet<String>();
+    ArrayDeque<String> path = new ArrayDeque<String>();
+    Map<String, String> vertNS = new HashMap<String, String>();
+    Set<String> emptyElements = new HashSet<String>();
+
+    boolean done = false;
+
+    initElement(reader, writer, vertNS, path, vertex);
+
+    reader.next();
+
+    while (reader.hasNext()) {
+      switch (reader.getEventType()) {
+        case XMLEvent.START_ELEMENT:
+          String localName = reader.getLocalName();
+
+          if (localName.equals("Properties")) {
+            if (reader.getAttributeValue(null, "object_reference") == null) {
+              String type = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+              JSONObject cyboxType = null;
+              if (type != null) {
+                type = type.split(":")[1]; 
+                cyboxType = ConfigFileLoader.cyboxObjects.getJSONObject(type);
+              }
+              if (path.getLast().equals("Object")) {
+                if (vertex.observableType != null) {
+                  logger.debug("vertex.observableType IS NOT NULL!");
+                } else {
+                  vertex.observableType = cyboxType.getString("typeName");
+                }
+                writeStartElement(reader, writer, localName, vertNS);
+                vertNS.putAll(writeObservableProperties(reader, writer, sw, cyboxType, buildString(toString(path), "/Properties"), vertex));
+                path.add(localName);
+                String pathString = toString(path);
+                if (!vertex.contentPaths.containsKey(pathString)) {
+                  vertex.contentPaths.put(pathString, null);
+                }
+                continue;
+              } else {
+                String prefix = reader.getPrefix();
+                String namespaceURI = reader.getNamespaceURI();
+                vertNS.put(prefix, namespaceURI);
+                globalNS.put(prefix, namespaceURI);
+                
+                writer.writeEmptyElement(prefix, localName, namespaceURI);
+
+                String attrPrefix = null;
+                String attrURI = null;
+                String idref = reader.getAttributeValue(null, "id");
+                if (idref == null) {
+                  idref = makeID("Observable");
+                  vertNS.put("stucco", "gov.ornl.stucco");
+                  globalNS.put("stucco", "gov.ornl.stucco");
+                  attrPrefix = "stucco";
+                  attrURI = "gov.ornl.stucco";
+                } else {
+                  attrPrefix = getQNamePrefix(idref);
+                  if (globalNS.containsKey(attrPrefix)) {
+                    attrURI = globalNS.get(attrPrefix);
+                    vertNS.put(attrPrefix, attrURI);
+                  }
+                }
+
+                writer.writeAttribute("object_reference", idref);
+                writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type"));
+                vertNS.put(cyboxType.getString("prefix"), cyboxType.getString("URI"));
+                vertNS.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
+                writeNewObservable(reader, type, cyboxType, idref, attrPrefix, attrURI);
+              }
+            } else {
+              writeStartElement(reader, writer, localName, vertNS);
+            }
+
+          } else if (localName.equals("Observable")) {
+            if (path.getLast().equals("Observable_Composition")) {
+              if (vertex.observableType != null) {
+                logger.debug("OBSERVABLE_COMPOSITION WAS FOUND, BUT vertex.observableType IS ALREADY DEFINED!");
+              } else {
+                vertex.observableType = "Observable_Composition";
+              }
+            }
+            String prefix = reader.getPrefix();
+            String namespaceURI = reader.getNamespaceURI();
+            vertNS.put(prefix, namespaceURI);
+
+            StringWriter newSw = new StringWriter();
+            XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
+            String idref = writeObservable(reader, newWriter, newSw);
+
+            String idrefPrefix = getQNamePrefix(idref);
+            if (globalNS.containsKey(idrefPrefix)) {
+              String idrefURI = globalNS.get(idrefPrefix);
+              vertNS.put(idrefPrefix, idrefURI);
+            }
+
+            writer.writeEmptyElement(prefix, localName, namespaceURI);  
+            writeIdrefAttribute(writer, idref, vertNS);
+
+          } else {
+            writeStartElement(reader, writer, localName, vertNS);
+            path.add(localName);
+            String pathString = toString(path);
+            if (!vertex.contentPaths.containsKey(pathString)) {
+              vertex.contentPaths.put(pathString, null);
+            }
+          }
+
+          break;
+        case XMLEvent.END_ELEMENT:
+          done = writeEndElement(writer, path);
+          break;
+        case XMLEvent.CHARACTERS:
+          writeCharacters(reader, writer, toString(path), vertex.contentPaths);
+          break;
+      }
+        if (done) {
+          break;
+        } else {
+          reader.next();
+        }
+    }
+
+    String xml = sw.toString();
+    if (vertex.id == null) {
+      vertex.id = makeID(vertex.type);
+      vertNS.put("stucco", "gov.ornl.stucco");
+      globalNS.put("stucco", "gov.ornl.stucco");
+      xml = xml.replaceFirst(" ", new StringBuilder(" id=\"").append(vertex.id).append("\" ").toString());
+      vertex.id = makeID(vertex.type);
+    } else {
+      String idPrefix = getQNamePrefix(vertex.id);
+      if (globalNS.containsKey(idPrefix)) {
+        vertNS.put(idPrefix, globalNS.get(idPrefix));
+      }
+    }
+    Namespace ns = stixElementMap.get(vertex.type);
+    vertNS.put(ns.getPrefix(), ns.getURI());
+    vertex.xml = xml.replaceFirst(" ", toString(vertNS));
+    vertices.put(vertex.id, vertex);
+    return vertex.id;
+  }
+
+  private Map<String, String> writeObservableProperties(XMLStreamReader reader, XMLStreamWriter writer, StringWriter sw, JSONObject cyboxType, String prePath, Vertex vertex) throws XMLStreamException {
+    Set<String> idrefSet = new HashSet<String>();
+    Set<String> emptyElements = new HashSet<String>();
+    ArrayDeque<String> path = new ArrayDeque<String>();
+    Map<String, String> vertNS = new HashMap<String, String>();
+    boolean done = false;
+    String pathString = null;
+
+    reader.next();
+    while (reader.hasNext()) {
+      switch(reader.getEventType()) {
+        case XMLEvent.START_ELEMENT:
+          String localName = reader.getLocalName();
+          path.add(localName);
+          pathString = buildString(prePath, "/", toString(path));
+          if (!vertex.contentPaths.containsKey(pathString)) {
+            vertex.contentPaths.put(pathString, null);
+          }
+
+          String propertyType = getPropertyType(localName, cyboxType);
+          if (ConfigFileLoader.cyboxObjects.has(propertyType)) {
+            JSONObject cyboxObject = ConfigFileLoader.cyboxObjects.optJSONObject(propertyType);
+            if (cyboxObject.has("objectReference")) {
+              writer.writeEmptyElement(reader.getPrefix(), localName, reader.getNamespaceURI());
+
+              String objectReference = reader.getAttributeValue(null, "id");
+              String attrPrefix = null;
+              String attrURI = null;
+              if (objectReference == null) {
+                objectReference = makeID("Observable");
+                attrPrefix = "stucco";
+                attrURI = "gov.ornl.stucco";
+                vertNS.put(attrPrefix, attrURI);
+                globalNS.put(attrPrefix, attrURI);
+              } else {
+                attrPrefix = getQNamePrefix(objectReference);
+                if (globalNS.containsKey(attrPrefix)) {
+                  attrURI = globalNS.get(attrPrefix);
+                  vertNS.put(attrPrefix, attrURI);
+                } else {
+                  logger.debug("Could not find URI for prefix: " + attrPrefix);
+                }
+              }
+
+              writer.writeAttribute("object_reference", objectReference);
+              writeNewObservable(reader, propertyType, cyboxObject, objectReference, attrPrefix, attrURI);
+              emptyElements.add(localName);
+              path.removeLast();
+            } else { 
+              writeStartElement(reader, writer, localName, vertNS);
+              vertNS.putAll(writeObservableProperties(reader, writer, sw, ConfigFileLoader.cyboxObjects.optJSONObject(propertyType), pathString, vertex));
+            }
+            continue;
+          } else {
+            writeStartElement(reader, writer, localName, vertNS);
+          }
+          break;
+        case XMLEvent.END_ELEMENT:
+          if (!path.isEmpty()) {
+          }
+          done = (emptyElements.contains(reader.getLocalName())) ? path.isEmpty() : writeEndElement(writer, path);
+          break;
+        case XMLEvent.CHARACTERS:
+          if (pathString == null) {
+             writeCharacters(reader, writer, prePath, vertex.contentPaths);
+          } else {
+             writeCharacters(reader, writer, pathString, vertex.contentPaths);
+          }
+         
+          done = path.isEmpty();
+          break;
+      }
+      reader.next();
+      if (done) {
+        if (reader.getEventType() == XMLEvent.START_ELEMENT) {
+          done = false;
+          continue;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return vertNS;
+  }
+
+  private void writeNewObservable(XMLStreamReader reader, String type, JSONObject cyboxType, String id, String idPrefix, String idURI) throws XMLStreamException {
+    StringWriter sw = new StringWriter();
+    XMLOutputFactory factory = XMLOutputFactory.newInstance();
+    XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
+    Map<String, String> vertNS = new HashMap<String, String>();
+    Vertex vertex = new Vertex();
+    vertex.contentPaths = new HashMap<String, List<String>>();
+    vertex.type = "Observable";
+    vertex.observableType = cyboxType.getString("typeName");
+
+    vertex.id = id;
+    if (idPrefix != null) {
+      vertNS.put(idPrefix, idURI);
+    }
+
+    vertNS.put("cybox", "http://cybox.mitre.org/cybox-2");
+    vertNS.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    vertNS.put(cyboxType.getString("prefix"), cyboxType.getString("URI"));
+    
+    writer.writeStartElement("cybox", "Observable", "http://cybox.mitre.org/cybox-2");
+    writer.writeAttribute("id", vertex.id);
+    writer.writeStartElement("cybox", "Object", "http://cybox.mitre.org/cybox-2");
+    writer.writeStartElement("cybox", "Properties", "http://cybox.mitre.org/cybox-2");
+    writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", cyboxType.getString("prefix") + ":" + type);
+
+    vertNS.putAll(writeObservableProperties(reader, writer, sw, cyboxType, "Observable/Object/Properties", vertex));
+    
+    writer.writeEndElement();
+    writer.writeEndElement();
+    writer.writeEndElement();
+    
+    Namespace ns = stixElementMap.get(vertex.type);
+    vertNS.put(ns.getPrefix(), ns.getURI());
+    String xml = sw.toString();
+    vertex.xml = xml.replaceFirst(" ", toString(vertNS));
+    vertices.put(vertex.id, vertex);
+  }
+
+  private void writeStartElement(XMLStreamReader reader, XMLStreamWriter writer, String localName, Map<String, String> vertNS) throws XMLStreamException {
+    String prefix = reader.getPrefix();
+    String namespaceURI = reader.getNamespaceURI();
+    vertNS.put(prefix, namespaceURI);
+    globalNS.put(prefix, namespaceURI);
+    writer.writeStartElement(prefix, localName, namespaceURI);
+    writeNamespaces(reader, vertNS);
+    writeAttributes(reader, writer, vertNS);
+  }
+
+  private void writeNamespaces(XMLStreamReader reader, Map<String, String> vertNS) {
+    for (int i = 0; i < reader.getNamespaceCount(); i++) {
+        String prefix = reader.getNamespacePrefix(i);
+        String namespaceURI = reader.getNamespaceURI(i);
+        globalNS.put(prefix, namespaceURI);
+        vertNS.put(prefix, namespaceURI);
+    }
+  }
+
+  private void writeAttributes(XMLStreamReader reader, XMLStreamWriter writer, Map<String, String> vertNS) throws XMLStreamException {
+    for (int i = 0; i < reader.getAttributeCount(); i++) {
+      String attValue = reader.getAttributeValue(i);
+      String attName = reader.getAttributeLocalName(i);
+
+      String prefix = getQNamePrefix(attValue);
+      if (prefix != null && globalNS.containsKey(prefix)) {
+        vertNS.put(prefix, globalNS.get(prefix));
+      } 
+
+      String attUri = reader.getAttributeNamespace(i);
+      if (attUri != null) {
+        prefix = reader.getAttributePrefix(i);
+        writer.writeAttribute(prefix, attUri, attName, attValue);
+        vertNS.put(prefix, attUri);
+        globalNS.put(prefix, attUri);
+      } else {
+        writer.writeAttribute(attName, attValue);
+      }
+    }
+  }
+
+  private boolean writeEndElement(XMLStreamWriter writer, ArrayDeque<String> path) throws XMLStreamException {
+    writer.writeEndElement();
+    if (!path.isEmpty()) {
+      path.removeLast();
+    }
+    boolean done = path.isEmpty();
+
+    return done;
+  }
+
+  private void writeCharacters(XMLStreamReader reader, XMLStreamWriter writer, String pathString, Map<String, List<String>> contentPaths) throws XMLStreamException {
+    if (reader.hasText()) {
+      List<String> list = contentPaths.get(pathString);
+      if (list == null) {
+        list = new ArrayList<String>();
+      }
+      list.add(reader.getText());
+      contentPaths.put(pathString, list);
+    }
+    writer.writeCharacters(reader.getTextCharacters(), reader.getTextStart(), reader.getTextLength());
+  }
+
+  private void setPath(ArrayDeque<String> path, Map<String, List<String>> contentPaths, String localName) {
+    path.add(localName);
+    String pathString = toString(path);
+    if (!contentPaths.containsKey(pathString)) {
+      contentPaths.put(pathString, null);
+    }
+  }
+
+  private void writeIdrefAttribute(XMLStreamWriter writer, String idref, Map<String, String> vertNS) throws XMLStreamException {
+    writer.writeAttribute("idref", idref);
+    String idrefPrefix = getQNamePrefix(idref);
+    if (globalNS.containsKey(idrefPrefix)) {
+      String idrefURI = globalNS.get(idrefPrefix);
+      vertNS.put(idrefPrefix, idrefURI);
+    }
+  }
+
+  private void initElement(XMLStreamReader reader, XMLStreamWriter writer, Map<String, String> vertNS, ArrayDeque<String> path, Vertex vertex) throws XMLStreamException {
+    String localName = reader.getLocalName();
+    Namespace ns = stixElementMap.get(localName);
+    String prefix = ns.getPrefix();
+    String namespaceURI = ns.getURI();
+    vertNS.put(prefix, namespaceURI);
+    globalNS.put(prefix, namespaceURI);
+    writer.writeStartElement(prefix, localName, namespaceURI);
+    writeNamespaces(reader, vertNS);
+    writeAttributes(reader, writer, vertNS);
+    if (vertex.id == null) {
+      vertex.id = makeID(vertex.type);
+      vertNS.put("stucco", "gov.ornl.stucco");
+      globalNS.put("stucco", "gov.ornl.stucco");
+      writer.writeAttribute("id", vertex.id);
+    }
+    vertex.contentPaths.put(vertex.type, null);
+    path.add(localName);
+  }
+
+  private String getQNamePrefix(String qname) {
+    String prefix = null;
+
+    if (qname.contains(":")) {
+      prefix = qname.split(":")[0];
+    }
+
+    return prefix;
+  }
+
+  private static String getPropertyType(String propertyName, JSONObject cyboxType) {
+    JSONObject elements = cyboxType.optJSONObject("elements");
+    if (elements != null) {
+      if (elements.has(propertyName)) {
+        String childType = elements.getJSONObject(propertyName).getString("type");
+        return (childType.isEmpty()) ? null : childType;
+      }
+    } 
+    String base = cyboxType.getString("base");
+    JSONObject baseObject = ConfigFileLoader.cyboxObjects.optJSONObject(base);
+    if (baseObject != null) {
+      elements = baseObject.optJSONObject("elements");
+      if (elements != null) {
+        JSONObject childType = elements.optJSONObject(propertyName);
+        return (childType == null) ? null : childType.getString("type");
+      }
+    }
+
+    return null;
+  }
+
+  private String makeID(String type) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("stucco:");
+    sb.append(type);
+    sb.append("-");
+    sb.append(UUID.randomUUID().toString());
+    
+    return sb.toString();
+  }
+  
+  private String toString(ArrayDeque<String> set) {
+    if (set.isEmpty()) {
+      return "";
+    }
+
+    StringBuilder sb = new StringBuilder();
+    Iterator<String> iter = set.iterator();
+    while (iter.hasNext()) {
+      sb.append("/");
+      sb.append(iter.next());
+    }
+    sb.deleteCharAt(0);
+  
+    return sb.toString(); 
+  }
+
+  private String toString(Map<String, String> map) {
+    StringBuilder sb = new StringBuilder();
+
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      sb.append(" xmlns:");
+      sb.append(entry.getKey());
+      sb.append("=\"");
+      sb.append(entry.getValue());
+      sb.append("\"");
+    }
+    sb.append(" ");
+
+    return sb.toString();
+  }
+
+  public void print(int eventType) {
+    switch (eventType) {
+        case XMLEvent.START_ELEMENT:
+          System.out.println(" ** START_ELEMENT ** ");
+          break;
+
+        case XMLEvent.END_ELEMENT:
+            System.out.println(" ** END_ELEMENT ** ");
+            break;
+
+        case XMLEvent.PROCESSING_INSTRUCTION:
+            System.out.println(" ** PROCESSING_INSTRUCTION ** ");
+            break;
+
+        case XMLEvent.CHARACTERS:
+            System.out.println(" ** CHARACTERS ** ");
+            break;
+
+        case XMLEvent.COMMENT:
+            System.out.println(" ** COMMENT ** ");
+            break;
+
+        case XMLEvent.START_DOCUMENT:
+            System.out.println(" ** START_DOCUMENT ** ");
+            break;
+
+        case XMLEvent.END_DOCUMENT:
+            System.out.println(" ** END_DOCUMENT ** ");
+            break;
+
+        case XMLEvent.ENTITY_REFERENCE:
+            System.out.println(" ** ENTITY_REFERENCE ** ");
+            break;
+
+        case XMLEvent.ATTRIBUTE:
+            System.out.println(" ** ATTRIBUTE ** ");
+            break;
+
+        case XMLEvent.DTD:
+            System.out.println(" ** DTD ** ");
+            break;
+
+        case XMLEvent.CDATA:
+            System.out.println(" ** CDATA ** ");
+            break;
+
+        case XMLEvent.SPACE:
+            System.out.println(" ** SPACE ** ");
+            break;
+    }
+  }
+
+  /**
+  * concatenates multiple substrings 
+  */
+  protected static String buildString(Object... substrings) {
+      StringBuilder str = new StringBuilder();
+      for (Object substring : substrings) {
+          str.append(substring);
+      }
+
+      return str.toString();
+  }
 }

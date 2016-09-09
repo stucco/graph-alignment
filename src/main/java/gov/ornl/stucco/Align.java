@@ -36,7 +36,7 @@ import gov.pnnl.stucco.dbconnect.DBConstraint;
  * Aligning JSON graph with existing graph.
  *
  * @author Maria Vincent
- */
+ */ 
 
 public class Align {
 	private static final int VERTEX_RETRIES = 2;
@@ -78,6 +78,7 @@ public class Align {
 			return false;
 		}
 
+		System.out.println("Loading .... ");
 		try {
 			stixIDMap = new HashMap<String, String>();
 			dbIDMap = new HashMap<String, String>();
