@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;  
 import java.util.UUID;  
-import java.util.Iterator; 
-import java.util.ArrayDeque;  
+import java.util.Iterator;  
+import java.util.ArrayDeque;    
 import java.io.StringWriter; 
 
 import java.io.StringReader;     
@@ -44,20 +44,22 @@ import org.json.JSONObject;
 
 public class PreprocessSTIX {
 
-  public class Vertex {
+  public class Vertex { 
     public String id;
     public String xml;
     public String type;
     public String observableType;
-    public Map<String, List<String>> contentPaths;
+    public Map<String, List<Object>> contentPaths;
+    public Map<String, List<String>> referencePaths;
 
     public Vertex() {}
 
     public void print() {
       System.out.println("ID: " + id);
-      System.out.println("XML: " + xml);
+      System.out.println("type: " + type);
       System.out.println("observableType: " + observableType);
-      
+      System.out.println("XML: " + xml);
+    
       Element e = parseXMLText(xml).getRootElement();
       XMLOutputter xml = new XMLOutputter();
       xml.setFormat(Format.getPrettyFormat());
@@ -66,12 +68,15 @@ public class PreprocessSTIX {
       for (String path : contentPaths.keySet()) {
         System.out.println(path + ": " + contentPaths.get(path));
       }
+      for (String key : referencePaths.keySet()) {
+        System.out.println(key + ": " + referencePaths.get(key));
+      }
     }
   }
 
   private Map<String, Vertex> vertices;
 
-  private static final Logger logger = LoggerFactory.getLogger(StaxParser.class);
+  private static final Logger logger = LoggerFactory.getLogger(PreprocessSTIX.class);
   private static final Map<String, Namespace> stixElementMap;
   private static final Map<String, String> stixTypes;
   private static Map<String, String> globalNS;
@@ -202,7 +207,8 @@ public class PreprocessSTIX {
   private String writeElement(XMLStreamReader reader, XMLStreamWriter writer, StringWriter sw) throws XMLStreamException {
     Vertex vertex = new Vertex();
     vertex.type = reader.getLocalName();
-    vertex.contentPaths = new HashMap<String, List<String>>();
+    vertex.contentPaths = new HashMap<String, List<Object>>();
+    vertex.referencePaths = new HashMap<String, List<String>>();
     vertex.id = reader.getAttributeValue(null, "id");
 
     Set<String> idrefSet = new HashSet<String>();
@@ -222,30 +228,34 @@ public class PreprocessSTIX {
           
           path.add(localName);
           pathString = toString(path);
-          if (!vertex.contentPaths.containsKey(pathString)) {
-            vertex.contentPaths.put(pathString, null);
-          }
-          
-          if (stixElementMap.containsKey(localName) && !reader.getNamespaceURI().equals("http://stix.mitre.org/TTP-1") && reader.getAttributeValue(null, "idref") == null) {
-            String prefix = reader.getPrefix();
-            String namespaceURI = reader.getNamespaceURI();
-            vertNS.put(prefix, namespaceURI);
 
-            StringWriter newSw = new StringWriter();
-            XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
-            String idref = (localName.equals("Observable")) ? writeObservable(reader, newWriter, newSw) : writeElement(reader, newWriter, newSw);
-
-            writer.writeEmptyElement(prefix, localName, namespaceURI);  
-            writeIdrefAttribute(writer, idref, vertNS);
-    
-            if (!localName.equals("Observable")) { 
-              writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", stixTypes.get(localName));
-              Namespace ns = stixElementMap.get(localName);
-              prefix = ns.getPrefix();
-              namespaceURI = ns.getURI();
+          if (stixElementMap.containsKey(localName) && !reader.getNamespaceURI().equals("http://stix.mitre.org/TTP-1")) {
+            String idref = reader.getAttributeValue(null, "idref");
+            if (idref == null) {
+              String prefix = reader.getPrefix();
+              String namespaceURI = reader.getNamespaceURI();
               vertNS.put(prefix, namespaceURI);
+
+              StringWriter newSw = new StringWriter();
+              XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
+              idref = (localName.equals("Observable")) ? writeObservable(reader, newWriter, newSw) : writeElement(reader, newWriter, newSw);
+              addToReferenceList(vertex.referencePaths, pathString, idref);
+
+              writer.writeEmptyElement(prefix, localName, namespaceURI);  
+              writeIdrefAttribute(writer, idref, vertNS);
+      
+              if (!localName.equals("Observable")) { 
+                writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", stixTypes.get(localName));
+                Namespace ns = stixElementMap.get(localName);
+                prefix = ns.getPrefix();
+                namespaceURI = ns.getURI();
+                vertNS.put(prefix, namespaceURI);
+              }
+              path.removeLast();
+            } else {
+              addToReferenceList(vertex.referencePaths, pathString, idref);
+              writeStartElement(reader, writer, localName, vertNS);
             }
-            path.removeLast();
           } else {
             writeStartElement(reader, writer, localName, vertNS);
           }
@@ -270,11 +280,22 @@ public class PreprocessSTIX {
     return vertex.id;
   }
 
+  private void addToReferenceList(Map<String, List<String>> referencePaths, String pathString, String idref) {
+    if (referencePaths.containsKey(pathString)) {
+      referencePaths.get(pathString).add(idref); 
+    } else {
+      List<String> list = new ArrayList<String>();
+      list.add(idref);
+      referencePaths.put(pathString, list);
+    }
+  }
+
   private String writeObservable(XMLStreamReader reader, XMLStreamWriter writer, StringWriter sw) throws XMLStreamException {
     Vertex vertex = new Vertex();
     vertex.type = "Observable";
     vertex.id = reader.getAttributeValue(null, "id");
-    vertex.contentPaths = new HashMap<String, List<String>>();
+    vertex.contentPaths = new HashMap<String, List<Object>>();
+    vertex.referencePaths = new HashMap<String, List<String>>();
 
     Set<String> idrefSet = new HashSet<String>();
     ArrayDeque<String> path = new ArrayDeque<String>();
@@ -292,70 +313,70 @@ public class PreprocessSTIX {
         case XMLEvent.START_ELEMENT:
           String localName = reader.getLocalName();
 
-          if (localName.equals("Properties")) {
-            if (reader.getAttributeValue(null, "object_reference") == null) {
-              String type = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
-              JSONObject cyboxType = null;
-              if (type != null) {
-                type = type.split(":")[1]; 
-                cyboxType = ConfigFileLoader.cyboxObjects.getJSONObject(type);
-              }
-              if (path.getLast().equals("Object")) {
-                if (vertex.observableType != null) {
-                  logger.debug("vertex.observableType IS NOT NULL!");
-                } else {
-                  vertex.observableType = cyboxType.getString("typeName");
-                }
-                writeStartElement(reader, writer, localName, vertNS);
-                vertNS.putAll(writeObservableProperties(reader, writer, sw, cyboxType, buildString(toString(path), "/Properties"), vertex));
-                path.add(localName);
-                String pathString = toString(path);
-                if (!vertex.contentPaths.containsKey(pathString)) {
-                  vertex.contentPaths.put(pathString, null);
-                }
-                continue;
-              } else {
-                String prefix = reader.getPrefix();
-                String namespaceURI = reader.getNamespaceURI();
-                vertNS.put(prefix, namespaceURI);
-                globalNS.put(prefix, namespaceURI);
-                
-                writer.writeEmptyElement(prefix, localName, namespaceURI);
-
-                String attrPrefix = null;
-                String attrURI = null;
-                String idref = reader.getAttributeValue(null, "id");
-                if (idref == null) {
-                  idref = makeID("Observable");
-                  vertNS.put("stucco", "gov.ornl.stucco");
-                  globalNS.put("stucco", "gov.ornl.stucco");
-                  attrPrefix = "stucco";
-                  attrURI = "gov.ornl.stucco";
-                } else {
-                  attrPrefix = getQNamePrefix(idref);
-                  if (globalNS.containsKey(attrPrefix)) {
-                    attrURI = globalNS.get(attrPrefix);
-                    vertNS.put(attrPrefix, attrURI);
-                  }
-                }
-
-                writer.writeAttribute("object_reference", idref);
-                writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type"));
-                vertNS.put(cyboxType.getString("prefix"), cyboxType.getString("URI"));
-                vertNS.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-
-                writeNewObservable(reader, type, cyboxType, idref, attrPrefix, attrURI);
-              }
-            } else {
-              writeStartElement(reader, writer, localName, vertNS);
+          String idref = reader.getAttributeValue(null, "idref");
+          if (idref == null) {
+            idref = reader.getAttributeValue(null, "object_reference");
+          }
+          if (idref != null) {
+            addToReferenceList(vertex.referencePaths, buildString(toString(path), "/", localName), idref);
+            writeStartElement(reader, writer, localName, vertNS);
+            path.add(localName);
+          } else if (localName.equals("Properties")) {
+            String type = reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type");
+            JSONObject cyboxType = null;
+            if (type != null) {
+              type = type.split(":")[1]; 
+              cyboxType = ConfigFileLoader.cyboxObjects.getJSONObject(type);
             }
+            if (path.getLast().equals("Object")) {
+              if (vertex.observableType != null) {
+                logger.debug("vertex.observableType IS NOT NULL!");
+              } else {
+                vertex.observableType = type;
+              }
+              writeStartElement(reader, writer, localName, vertNS);
+              path.add(localName);
+              vertNS.putAll(writeObservableProperties(reader, writer, sw, cyboxType, toString(path), vertex));
+              continue;
+            } else {
+              String prefix = reader.getPrefix();
+              String namespaceURI = reader.getNamespaceURI();
+              vertNS.put(prefix, namespaceURI);
+              globalNS.put(prefix, namespaceURI);
+              
+              writer.writeEmptyElement(prefix, localName, namespaceURI);
 
+              String attrPrefix = null;
+              String attrURI = null;
+              idref = reader.getAttributeValue(null, "id");
+
+              if (idref == null) {
+                idref = makeID("Observable");
+                vertNS.put("stucco", "gov.ornl.stucco");
+                globalNS.put("stucco", "gov.ornl.stucco");
+                attrPrefix = "stucco";
+                attrURI = "gov.ornl.stucco";
+              } else {
+                attrPrefix = getQNamePrefix(idref);
+                if (globalNS.containsKey(attrPrefix)) {
+                  attrURI = globalNS.get(attrPrefix);
+                  vertNS.put(attrPrefix, attrURI);
+                }
+              }
+              addToReferenceList(vertex.referencePaths, buildString(toString(path), "/", localName), idref);
+              writer.writeAttribute("object_reference", idref);
+              writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", reader.getAttributeValue("http://www.w3.org/2001/XMLSchema-instance", "type"));
+              vertNS.put(cyboxType.getString("prefix"), cyboxType.getString("URI"));
+              vertNS.put("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
+              writeNewObservable(reader, type, cyboxType, idref, attrPrefix, attrURI);
+            }
           } else if (localName.equals("Observable")) {
             if (path.getLast().equals("Observable_Composition")) {
               if (vertex.observableType != null) {
                 logger.debug("OBSERVABLE_COMPOSITION WAS FOUND, BUT vertex.observableType IS ALREADY DEFINED!");
               } else {
-                vertex.observableType = "Observable_Composition";
+                vertex.observableType = "ObservableComposition";
               }
             }
             String prefix = reader.getPrefix();
@@ -364,7 +385,8 @@ public class PreprocessSTIX {
 
             StringWriter newSw = new StringWriter();
             XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
-            String idref = writeObservable(reader, newWriter, newSw);
+            idref = writeObservable(reader, newWriter, newSw);
+            addToReferenceList(vertex.referencePaths, buildString(toString(path), "/", localName), idref);
 
             String idrefPrefix = getQNamePrefix(idref);
             if (globalNS.containsKey(idrefPrefix)) {
@@ -378,10 +400,6 @@ public class PreprocessSTIX {
           } else {
             writeStartElement(reader, writer, localName, vertNS);
             path.add(localName);
-            String pathString = toString(path);
-            if (!vertex.contentPaths.containsKey(pathString)) {
-              vertex.contentPaths.put(pathString, null);
-            }
           }
 
           break;
@@ -416,6 +434,7 @@ public class PreprocessSTIX {
     vertNS.put(ns.getPrefix(), ns.getURI());
     vertex.xml = xml.replaceFirst(" ", toString(vertNS));
     vertices.put(vertex.id, vertex);
+
     return vertex.id;
   }
 
@@ -424,80 +443,91 @@ public class PreprocessSTIX {
     Set<String> emptyElements = new HashSet<String>();
     ArrayDeque<String> path = new ArrayDeque<String>();
     Map<String, String> vertNS = new HashMap<String, String>();
+
     boolean done = false;
     String pathString = null;
 
     reader.next();
-    while (reader.hasNext()) {
-      switch(reader.getEventType()) {
-        case XMLEvent.START_ELEMENT:
-          String localName = reader.getLocalName();
-          path.add(localName);
-          pathString = buildString(prePath, "/", toString(path));
-          if (!vertex.contentPaths.containsKey(pathString)) {
-            vertex.contentPaths.put(pathString, null);
-          }
+    if (reader.getEventType() != XMLEvent.END_ELEMENT) {
+      while (reader.hasNext()) {
 
-          String propertyType = getPropertyType(localName, cyboxType);
-          if (ConfigFileLoader.cyboxObjects.has(propertyType)) {
-            JSONObject cyboxObject = ConfigFileLoader.cyboxObjects.optJSONObject(propertyType);
-            if (cyboxObject.has("objectReference")) {
-              writer.writeEmptyElement(reader.getPrefix(), localName, reader.getNamespaceURI());
+        switch(reader.getEventType()) {
+          case XMLEvent.START_ELEMENT:
+            String localName = reader.getLocalName();
+            path.add(localName);
+            pathString = buildString(prePath, "/", toString(path));
 
-              String objectReference = reader.getAttributeValue(null, "id");
-              String attrPrefix = null;
-              String attrURI = null;
-              if (objectReference == null) {
-                objectReference = makeID("Observable");
-                attrPrefix = "stucco";
-                attrURI = "gov.ornl.stucco";
-                vertNS.put(attrPrefix, attrURI);
-                globalNS.put(attrPrefix, attrURI);
-              } else {
-                attrPrefix = getQNamePrefix(objectReference);
-                if (globalNS.containsKey(attrPrefix)) {
-                  attrURI = globalNS.get(attrPrefix);
-                  vertNS.put(attrPrefix, attrURI);
-                } else {
-                  logger.debug("Could not find URI for prefix: " + attrPrefix);
-                }
-              }
+            String propertyType = getPropertyType(localName, cyboxType);
 
-              writer.writeAttribute("object_reference", objectReference);
-              writeNewObservable(reader, propertyType, cyboxObject, objectReference, attrPrefix, attrURI);
-              emptyElements.add(localName);
-              path.removeLast();
-            } else { 
-              writeStartElement(reader, writer, localName, vertNS);
-              vertNS.putAll(writeObservableProperties(reader, writer, sw, ConfigFileLoader.cyboxObjects.optJSONObject(propertyType), pathString, vertex));
+            String idref = reader.getAttributeValue(null, "idref");
+            if (idref == null) {
+              idref = reader.getAttributeValue(null, "object_reference");
             }
+            if (idref != null) {
+              addToReferenceList(vertex.referencePaths, pathString, idref);
+              writeStartElement(reader, writer, localName, vertNS);
+            } else if (ConfigFileLoader.cyboxObjects.has(propertyType)) {
+              JSONObject cyboxObject = ConfigFileLoader.cyboxObjects.optJSONObject(propertyType);
+              if (cyboxObject.has("objectReference")) {
+                String prefix = reader.getPrefix();
+                String namespaceURI = reader.getNamespaceURI();
+                writer.writeEmptyElement(prefix, localName, namespaceURI);
+                vertNS.put(prefix, namespaceURI);
+
+                String objectReference = reader.getAttributeValue(null, "id");
+                String attrPrefix = null;
+                String attrURI = null;
+                if (objectReference == null) {
+                  objectReference = makeID("Observable");
+                  attrPrefix = "stucco";
+                  attrURI = "gov.ornl.stucco";
+                  vertNS.put(attrPrefix, attrURI);
+                  globalNS.put(attrPrefix, attrURI);
+                } else {
+                  attrPrefix = getQNamePrefix(objectReference);
+                  if (globalNS.containsKey(attrPrefix)) {
+                    attrURI = globalNS.get(attrPrefix);
+                    vertNS.put(attrPrefix, attrURI);
+                  } else {
+                    logger.debug("Could not find URI for prefix: " + attrPrefix);
+                  }
+                }
+
+                addToReferenceList(vertex.referencePaths, pathString, objectReference);
+                writer.writeAttribute("object_reference", objectReference);
+                writeNewObservable(reader, propertyType, cyboxObject, objectReference, attrPrefix, attrURI);
+                emptyElements.add(localName);
+                path.removeLast();
+              } else { 
+                writeStartElement(reader, writer, localName, vertNS);
+                vertNS.putAll(writeObservableProperties(reader, writer, sw, ConfigFileLoader.cyboxObjects.optJSONObject(propertyType), pathString, vertex));
+              }
+              continue;
+            } else {
+              writeStartElement(reader, writer, localName, vertNS);
+            }
+            break;
+          case XMLEvent.END_ELEMENT:
+            done = (emptyElements.contains(reader.getLocalName())) ? path.isEmpty() : writeEndElement(writer, path);
+            break;
+          case XMLEvent.CHARACTERS:
+            if (pathString == null) {
+               writeCharacters(reader, writer, prePath, vertex.contentPaths);
+            } else {
+               writeCharacters(reader, writer, pathString, vertex.contentPaths);
+            }
+           
+            done = path.isEmpty();
+            break;
+        }
+        reader.next();
+        if (done) {
+          if (reader.getEventType() == XMLEvent.START_ELEMENT) {
+            done = false;
             continue;
           } else {
-            writeStartElement(reader, writer, localName, vertNS);
+            break;
           }
-          break;
-        case XMLEvent.END_ELEMENT:
-          if (!path.isEmpty()) {
-          }
-          done = (emptyElements.contains(reader.getLocalName())) ? path.isEmpty() : writeEndElement(writer, path);
-          break;
-        case XMLEvent.CHARACTERS:
-          if (pathString == null) {
-             writeCharacters(reader, writer, prePath, vertex.contentPaths);
-          } else {
-             writeCharacters(reader, writer, pathString, vertex.contentPaths);
-          }
-         
-          done = path.isEmpty();
-          break;
-      }
-      reader.next();
-      if (done) {
-        if (reader.getEventType() == XMLEvent.START_ELEMENT) {
-          done = false;
-          continue;
-        } else {
-          break;
         }
       }
     }
@@ -511,9 +541,10 @@ public class PreprocessSTIX {
     XMLStreamWriter writer = factory.createXMLStreamWriter(sw);
     Map<String, String> vertNS = new HashMap<String, String>();
     Vertex vertex = new Vertex();
-    vertex.contentPaths = new HashMap<String, List<String>>();
+    vertex.contentPaths = new HashMap<String, List<Object>>();
+    vertex.referencePaths = new HashMap<String, List<String>>();
     vertex.type = "Observable";
-    vertex.observableType = cyboxType.getString("typeName");
+    vertex.observableType = type; //cyboxType.getString("typeName");
 
     vertex.id = id;
     if (idPrefix != null) {
@@ -531,7 +562,7 @@ public class PreprocessSTIX {
     writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", cyboxType.getString("prefix") + ":" + type);
 
     vertNS.putAll(writeObservableProperties(reader, writer, sw, cyboxType, "Observable/Object/Properties", vertex));
-    
+
     writer.writeEndElement();
     writer.writeEndElement();
     writer.writeEndElement();
@@ -594,24 +625,16 @@ public class PreprocessSTIX {
     return done;
   }
 
-  private void writeCharacters(XMLStreamReader reader, XMLStreamWriter writer, String pathString, Map<String, List<String>> contentPaths) throws XMLStreamException {
+  private void writeCharacters(XMLStreamReader reader, XMLStreamWriter writer, String pathString, Map<String, List<Object>> contentPaths) throws XMLStreamException {
     if (reader.hasText()) {
-      List<String> list = contentPaths.get(pathString);
+      List<Object> list = contentPaths.get(pathString);
       if (list == null) {
-        list = new ArrayList<String>();
+        list = new ArrayList<Object>();
       }
       list.add(reader.getText());
       contentPaths.put(pathString, list);
     }
     writer.writeCharacters(reader.getTextCharacters(), reader.getTextStart(), reader.getTextLength());
-  }
-
-  private void setPath(ArrayDeque<String> path, Map<String, List<String>> contentPaths, String localName) {
-    path.add(localName);
-    String pathString = toString(path);
-    if (!contentPaths.containsKey(pathString)) {
-      contentPaths.put(pathString, null);
-    }
   }
 
   private void writeIdrefAttribute(XMLStreamWriter writer, String idref, Map<String, String> vertNS) throws XMLStreamException {
@@ -639,7 +662,6 @@ public class PreprocessSTIX {
       globalNS.put("stucco", "gov.ornl.stucco");
       writer.writeAttribute("id", vertex.id);
     }
-    vertex.contentPaths.put(vertex.type, null);
     path.add(localName);
   }
 
