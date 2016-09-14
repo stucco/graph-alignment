@@ -1,6 +1,7 @@
 package gov.ornl.stucco;
 
 import gov.ornl.stucco.preprocessors.PreprocessSTIX;
+import gov.ornl.stucco.preprocessors.PreprocessSTIX.Vertex;
 
 import gov.pnnl.stucco.dbconnect.Condition;
 import gov.pnnl.stucco.dbconnect.DBConstraint;
@@ -20,7 +21,7 @@ import org.json.JSONObject;
 import org.json.JSONArray; 
  
 import org.mitre.stix.stix_1.STIXPackage; 
-
+ 
 import java.io.StringReader;  
 import java.io.IOException;
 
@@ -235,13 +236,13 @@ public class AlignTest {
 			GraphConstructor graphConstructor = new GraphConstructor();
 			Align align = new Align();
 			DBConnectionJson db = align.getConnection();
-			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
+			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
 			stixElements = preprocessSTIX.normalizeSTIX(graphString2);
 			graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
-			JSONObject malware = db.getVertByName("Scanner");
+			JSONObject malware = db.getVertByName("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
 			String sourceDocument = malware.getString("sourceDocument");
 			Element malwareXml = parseXMLText(sourceDocument).getRootElement();
 			Element resources = malwareXml.getChild("Resources", Namespace.getNamespace("ttp", "http://stix.mitre.org/TTP-1"));
@@ -328,7 +329,7 @@ public class AlignTest {
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			DBConnectionJson db = align.getConnection();
-			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
+			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
 			stixElements = preprocessSTIX.normalizeSTIX(graphString2);
@@ -406,7 +407,7 @@ public class AlignTest {
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			DBConnectionJson db = align.getConnection();
-			Map<String, Element> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
+			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
 			JSONObject graph = graphConstructor.constructGraph(stixElements);
 			align.load(graph);
 			stixElements = preprocessSTIX.normalizeSTIX(graphString2);
@@ -434,8 +435,9 @@ public class AlignTest {
 			"{\"vertices\": {\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\": { " +
 			"  \"sourceDocument\": \"<ttp:TTP xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\" xmlns:stucco=\\\"gov.ornl.stucco\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" id=\\\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\\\" xsi:type=\\\"ttp:TTPType\\\"><ttp:Title>Malware<\\/ttp:Title><ttp:Behavior><ttp:Malware><ttp:Malware_Instance id=\\\"stucco:malware-scanner\\\"><ttp:Type>Scanner<\\/ttp:Type><ttp:Name>Scanner Name<\\/ttp:Name><ttp:Title>Scanner<\\/ttp:Title><ttp:Description>Scanner Description1<\\/ttp:Description><\\/ttp:Malware_Instance><\\/ttp:Malware><\\/ttp:Behavior><ttp:Resources><ttp:Infrastructure><ttp:Observable_Characterization cybox_major_version=\\\"2.0\\\" cybox_minor_version=\\\"1.0\\\"><cybox:Observable xmlns:cybox=\\\"http://cybox.mitre.org/cybox-2\\\" idref=\\\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\\\" /><\\/ttp:Observable_Characterization><\\/ttp:Infrastructure><\\/ttp:Resources><ttp:Information_Source><stixCommon:Contributing_Sources xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\"><stixCommon:Source><stixCommon:Identity><stixCommon:Name>1d4.us<\\/stixCommon:Name><\\/stixCommon:Identity><\\/stixCommon:Source><\\/stixCommon:Contributing_Sources><\\/ttp:Information_Source><\\/ttp:TTP>\", " +
 			"  \"vertexType\": \"Malware\", " +
-			"  \"name\": \"Scanner Name\", " +
+			"  \"name\": \"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\", " +
 			"  \"description\": [\"Scanner Description1\"], " +
+			"  \"alias\": [\"Scanner\"]," +
 			"  \"source\": [\"1d4.us\"] " +
 			"}}} ";
 
@@ -443,9 +445,10 @@ public class AlignTest {
 			"{\"vertices\": {\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc4\": { " +
 			"  \"sourceDocument\": \"<ttp:TTP xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\" xmlns:stucco=\\\"gov.ornl.stucco\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" id=\\\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\\\" xsi:type=\\\"ttp:TTPType\\\"><ttp:Title>Malware<\\/ttp:Title><ttp:Behavior><ttp:Malware><ttp:Malware_Instance id=\\\"stucco:malware-scanner\\\"><ttp:Type>Scanner<\\/ttp:Type><ttp:Name>Scanner<\\/ttp:Name><ttp:Name>Scanner Alias<\\/ttp:Name><ttp:Name>Scanner Name<\\/ttp:Name><ttp:Title>Scanner Description<\\/ttp:Title><ttp:Description>Scanner Description2<\\/ttp:Description><\\/ttp:Malware_Instance><\\/ttp:Malware><\\/ttp:Behavior><ttp:Resources><ttp:Infrastructure><ttp:Observable_Characterization cybox_major_version=\\\"2.0\\\" cybox_minor_version=\\\"1.0\\\"><cybox:Observable xmlns:cybox=\\\"http://cybox.mitre.org/cybox-2\\\" idref=\\\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\\\" /><\\/ttp:Observable_Characterization><\\/ttp:Infrastructure><\\/ttp:Resources><ttp:Information_Source><stixCommon:Contributing_Sources xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\"><stixCommon:Source><stixCommon:Identity><stixCommon:Name>Source<\\/stixCommon:Name><\\/stixCommon:Identity><\\/stixCommon:Source><\\/stixCommon:Contributing_Sources><\\/ttp:Information_Source><\\/ttp:TTP>\", " +
 			"  \"vertexType\": \"Malware\", " +
-			"  \"name\": \"Scanner\", " +
+			"  \"name\": \"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc4\", " +
 			"  \"description\": [\"Scanner Description2\"], " +
 			"  \"alias\": [ " +
+			"		 \"Scanner\", " +
 			"    \"Scanner Name\", " +
 			"    \"Scanner Alias\" " +
 			"  ], " +
@@ -464,7 +467,7 @@ public class AlignTest {
 			jsonArrayToSetConverter(graph);
 			align.load(graph);
 
-			JSONObject malware = db.getVertByName("Scanner Name");
+			JSONObject malware = db.getVertByName("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
 			assertEquals(malware.getString("vertexType"), "Malware");
 			Set<Object> descriptionSet = (HashSet<Object>) malware.get("description");
 			assertTrue(descriptionSet.contains("Scanner Description1"));
@@ -477,7 +480,8 @@ public class AlignTest {
 		}
 	}
 
-	@Test 
+	//removed alias from indicator ... 
+	//@Test 
 	public void testDuplicateIndicatorByAlias() {
 		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateIndicatorByAlias()");
 
