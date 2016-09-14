@@ -24,7 +24,7 @@ import org.json.JSONArray;
 import org.jdom2.output.XMLOutputter;  
 import org.jdom2.output.Format;
 import org.jdom2.xpath.*;
-import org.jdom2.*;
+import org.jdom2.*; 
 
 import org.xml.sax.SAXException;
 import org.mitre.stix.stix_1.*;  
@@ -73,7 +73,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testVulnerabilityExploit() throws Exception {
 
-		System.out.println("[RUNNING] GraphConstructorTest.testVulnerabilityExploit()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testVulnerabilityExploit()");
 
 		String stix1 =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -193,7 +193,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testMalwareIP() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testMalwareIP()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testMalwareIP()");
 		
 		String stix =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -315,9 +315,148 @@ public class GraphConstructorTest {
 	}
 
 	@Test 
+	public void testMalwareDuplicateIP() throws Exception {
+		
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testMalwareDuplicateIP()");
+		
+		String stix =
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
+			"<stix:STIX_Package"+
+			"    id=\"stucco:onedfourdotus-2260698e-056d-401a-a608-40a94bdf120b\""+
+			"    timestamp=\"2015-12-08T19:04:57.617Z\""+
+			"    xmlns=\"http://xml/metadataSharing.xsd\""+
+			"    xmlns:AddressObj=\"http://cybox.mitre.org/objects#AddressObject-2\""+
+			"    xmlns:cybox=\"http://cybox.mitre.org/cybox-2\""+
+			"    xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\""+
+			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
+			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\""+
+			"    xmlns:stucco=\"gov.ornl.stucco\" xmlns:ttp=\"http://stix.mitre.org/TTP-1\">"+
+			"    <stix:STIX_Header>"+
+			"        <stix:Title>IP Addresses of SSH Scanners</stix:Title>"+
+			"        <stix:Information_Source>"+
+			"            <stixCommon:Identity>"+
+			"                <stixCommon:Name>1d4.us</stixCommon:Name>"+
+			"            </stixCommon:Identity>"+
+			"        </stix:Information_Source>"+
+			"    </stix:STIX_Header>"+
+			"    <stix:Observables cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
+			"        <cybox:Observable id=\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\">"+
+			"            <cybox:Title>IP</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>1d4.us</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:ip-1730444733\">"+
+			"                <cybox:Description>103.36.125.189</cybox:Description>"+
+			"                <cybox:Properties category=\"ipv4-addr\""+
+			"                    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
+			"                    <AddressObj:Address_Value>103.36.125.189</AddressObj:Address_Value>"+
+			"                </cybox:Properties>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"        <cybox:Observable id=\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea63000\">"+
+			"            <cybox:Title>IP</cybox:Title>"+
+			"            <cybox:Observable_Source>"+
+			"                <cyboxCommon:Information_Source_Type>HTTPRequest</cyboxCommon:Information_Source_Type>"+
+			"            </cybox:Observable_Source>"+
+			"            <cybox:Object id=\"stucco:ip-1730444733\">"+
+			"                <cybox:Description>Description</cybox:Description>"+
+			"                <cybox:Properties category=\"ipv4-addr\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"AddressObj:AddressObjectType\">"+
+			"                    <AddressObj:Address_Value>103.36.125.189</AddressObj:Address_Value>"+
+			"                </cybox:Properties>"+
+			"            </cybox:Object>"+
+			"        </cybox:Observable>"+
+			"    </stix:Observables>"+
+			"    <stix:TTPs>"+
+			"        <stix:TTP"+
+			"            id=\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\""+
+			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ttp:TTPType\">"+
+			"            <ttp:Title>Malware</ttp:Title>"+
+			"            <ttp:Behavior>"+
+			"                <ttp:Malware>"+
+			"                    <ttp:Malware_Instance id=\"stucco:malware-scanner\">"+
+			"                        <ttp:Type>Scanner</ttp:Type>"+
+			"                        <ttp:Name>Scanner</ttp:Name>"+
+			"                        <ttp:Title>Scanner</ttp:Title>"+
+			"                        <ttp:Description>Scanner</ttp:Description>"+
+			"                    </ttp:Malware_Instance>"+
+			"                </ttp:Malware>"+
+			"            </ttp:Behavior>"+
+			"            <ttp:Resources>"+
+			"                <ttp:Infrastructure>"+
+			"                    <ttp:Observable_Characterization"+
+			"                        cybox_major_version=\"2.0\" cybox_minor_version=\"1.0\">"+
+			"                        <cybox:Observable idref=\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\"/>"+
+			"                    </ttp:Observable_Characterization>"+
+			"                </ttp:Infrastructure>"+
+			"            </ttp:Resources>"+
+			"            <ttp:Information_Source>"+
+			"                <stixCommon:Contributing_Sources>"+
+			"                    <stixCommon:Source>"+
+			"                        <stixCommon:Identity>"+
+			"                            <stixCommon:Name>1d4.us</stixCommon:Name>"+
+			"                        </stixCommon:Identity>"+
+			"                    </stixCommon:Source>"+
+			"                </stixCommon:Contributing_Sources>"+
+			"            </ttp:Information_Source>"+
+			"        </stix:TTP>"+
+			"    </stix:TTPs>"+
+			"</stix:STIX_Package>";	
+
+		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		GraphConstructor graphConstructor = new GraphConstructor();
+		JSONObject graph = graphConstructor.constructGraph(stixElements);
+		JSONObject vertices = graph.getJSONObject("vertices");
+
+		System.out.println("Testing Malware Vertex ... ");
+		String id = "stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3";
+		//Element sourceElement = stixElements.get(id);
+		assertTrue(vertices.has("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3"));
+		JSONObject vertex = vertices.getJSONObject("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
+		assertEquals(vertex.getString("vertexType"), "Malware");
+		assertEquals(vertex.getString("name"), "stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
+		assertEquals(vertex.get("source").toString(), "[1d4.us]");
+		assertEquals(vertex.get("description").toString(), "[Scanner]");
+		
+		System.out.println("Testing IP Vertex ... ");
+		id = "Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229";
+		//sourceElement = stixElements.get(id);
+		assertTrue(vertices.has("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229") || vertices.has("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea63000"));
+		vertex = vertices.optJSONObject("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229");
+		if (vertex == null) {
+			vertex = vertices.optJSONObject("Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea63000");
+		}
+		assertEquals(vertex.getString("vertexType"), "IP");
+		assertEquals(vertex.getString("name"), "103.36.125.189");
+		assertEquals(vertex.getLong("ipInt"), ipToLong("103.36.125.189"));
+		assertTrue(vertex.get("source").toString().contains("1d4.us"));
+		assertTrue(vertex.get("description").toString().contains("103.36.125.189"));
+		
+		JSONArray edges = graph.getJSONArray("edges");
+		
+		System.out.println("Testing Malware -> Uses_IP -> IP Edge ...");
+		boolean edgeExists = false;
+		for (int i = 0; i < edges.length(); i++) {
+			JSONObject edge = edges.getJSONObject(i);
+			String inVertID = edge.getString("inVertID");
+			String inVertName = vertices.getJSONObject(inVertID).getString("name");
+			String outVertID = edge.getString("outVertID");
+			String outVertName = vertices.getJSONObject(outVertID).getString("name");
+			String relation = edge.getString("relation");
+			if (inVertName.equals("103.36.125.189") && 
+				outVertName.equals("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3") && 
+				relation.equals("UsesIP")) {
+				edgeExists = true;
+				break;
+			}
+		}
+		assertTrue(edgeExists);
+	}
+
+	@Test 
 	public void testFlowAddressIpPort() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testFlowAddressIpPort()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testFlowAddressIpPort()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -658,7 +797,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testOrganizationAddressRangeAS() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testOrganizationAddressRangeAS()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testOrganizationAddressRangeAS()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -777,9 +916,7 @@ public class GraphConstructorTest {
 		
 		System.out.println("Testing AddressRange Vertex ... ");
 		id = "stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95";
-		//sourceElement = stixElements.get(id);
-		System.out.println("HERE");
-		System.out.println(vertices.has("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95"));
+
 		assertTrue(vertices.has("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95"));
 		vertex = vertices.getJSONObject("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95");
 		System.out.println(vertex.toString(2));
@@ -836,7 +973,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testSoftware() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testSoftware()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testSoftware()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -901,7 +1038,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testDNSRecordIpDNSName() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testDNSRecordIpDNSName()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testDNSRecordIpDNSName()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -1142,7 +1279,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testServicePort() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testServicePort()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testServicePort()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -1254,7 +1391,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testHTTPRequestIpPortDNSName() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testHTTPRequestIpPortDNSName()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testHTTPRequestIpPortDNSName()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -1495,7 +1632,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testHostSoftware() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testHostSoftware()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testHostSoftware()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -1605,7 +1742,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testHostSoftwareAccountIp() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testHostSoftwareAccountIp()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testHostSoftwareAccountIp()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -1886,7 +2023,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testVulnerabilityWithSolution() throws Exception {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testVulnerabilityWithSolution()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testVulnerabilityWithSolution()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -2002,7 +2139,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testIncident() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testIncident()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testIncident()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -2140,7 +2277,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testCourseOfAction() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testCourseOfAction()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testCourseOfAction()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -2216,7 +2353,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testIndicator() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testIndicator()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testIndicator()");
 		
 		String stix = 
 			"   <stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " +
@@ -2364,7 +2501,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testThreatActor() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testThreatActor()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testThreatActor()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -2442,7 +2579,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testTTP() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testTTP()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testTTP()");
 		
 		String stix = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " +
@@ -2508,7 +2645,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testAllStixElements() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testAllStixElements()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testAllStixElements()");
 		try {	
 			String stix = 
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -2820,7 +2957,7 @@ public class GraphConstructorTest {
 	@Test 
 	public void testCyboxElements() {
 		
-		System.out.println("[RUNNING] GraphConstructorTest.testAllCyboxElements()");
+		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testAllCyboxElements()");
 	
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		GraphConstructor graphConstructor = new GraphConstructor();

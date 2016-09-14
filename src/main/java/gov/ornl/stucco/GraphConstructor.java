@@ -15,7 +15,7 @@ import java.util.Iterator;
 import org.json.JSONObject;
 import org.json.JSONArray;   
 
-import org.jdom2.output.XMLOutputter;
+import org.jdom2.output.XMLOutputter; 
 import org.jdom2.output.Format;
 import org.jdom2.Element; 
 import org.jdom2.Namespace;
@@ -104,17 +104,19 @@ public class GraphConstructor {
 				String inVertexType = null;
 				if (vertices.has(idref)) {
 					inVertID = idref;
-					inVertexType = vertices.getJSONObject(inVertID).getString("vertexType");
-				} else if (duplicateMap.containsKey(inVertID)) {
-					inVertID = duplicateMap.get(idref);
-					inVertexType = vertices.getJSONObject(inVertID).getString("vertexType");
-				} else {
-					Vertex inV = (stixElements.containsKey(idref)) ? stixElements.get(idref) : null;
-					if (inV == null) {
-						logger.debug("Could not find outVertex to construct an edge with outVertID = " + outVertID);
-					} else {
-						inVertID = constructSubgraph(idref, inV, vertexTypes);
+				} else if (stixElements.containsKey(idref)) {
+					Vertex inV = stixElements.get(idref);
+					inVertID = constructSubgraph(idref, inV, vertexTypes);
+					if (!inVertID.equals(idref)) {
+						updateXMLString(vertices.getJSONObject(outVertID), idref, inVertID);
 					}
+				} else if (duplicateMap.containsKey(idref)) {
+					inVertID = duplicateMap.get(idref);
+					updateXMLString(vertices.getJSONObject(outVertID), idref, inVertID);
+				} else {
+					logger.debug("Could not find outVertex to construct an edge with outVertID = " + outVertID);
+
+					return outVertID;
 				}
 				
 				if (inVertID != null) {
@@ -157,19 +159,71 @@ public class GraphConstructor {
 		boolean duplicate = false;
 		//TODO: add additional comparison for malware and campaign based on their alias
 		//TODO: merge properties of duplicates
-		if (vertBookkeeping.containsKey(vertexType)) {
-			Map<Object, String> vertNameBookkeeping = vertBookkeeping.get(vertexType);
+		String type = (newVertex.has("observableType")) ? newVertex.getString("observableType") : vertexType;
+		if (vertBookkeeping.containsKey(type)) {
+			Map<Object, String> vertNameBookkeeping = vertBookkeeping.get(type);
 			Object vertName = newVertex.get("name");
 			if (vertNameBookkeeping.containsKey(vertName)) {
 				String duplicateId = vertNameBookkeeping.get(vertName);
 				duplicateMap.put(id, duplicateId);
-				
+				JSONObject existingVertex = vertices.getJSONObject(duplicateId);
+				alignVertProps(newVertex, existingVertex);
+
 				return duplicateId; 
-			} 
+			} else {
+				vertNameBookkeeping.put(vertName, id);
+			}
+		} else {
+			Map<Object, String> vertNameBookkeeping = new HashMap<Object, String>();
+			vertNameBookkeeping.put(newVertex.get("name"), id);
+			vertBookkeeping.put(type, vertNameBookkeeping);
 		}
+
 		vertices.put(id, newVertex);
 
 		return id;
+	}
+
+	private void alignVertProps(JSONObject newVertex, JSONObject existingVertex) {
+		JSONObject vertProperties = ConfigFileLoader.getVertexOntology(newVertex.getString("vertexType")).getJSONObject("properties");
+		for (Object keyObject : vertProperties.keySet()) {
+			String key = keyObject.toString();
+			if (!newVertex.has(key)) {
+				continue;
+			}
+			// TODO: removed sourceDocument alignment since all stix elements must be in particular order
+			// to add new element, it's index must be known; 
+			// it would require massive config file or use of stix java library; both options are computationally expensive
+			if (key.equals("sourceDocument")) {
+				// TODO: come up with an ideo of how to combine xml ... since in stix all elements must be in particular order
+				//	maybe when stix will move to JSON it will be easier
+				continue;
+			} else {
+				String cardinality = vertProperties.getJSONObject(key).getString("cardinality");
+				if (cardinality.equals("set")) {
+					Set<Object> set = (HashSet<Object>) newVertex.get(key);
+					if (key.equals("alias")) {
+						set.add(newVertex.getString("name"));
+						set.remove(existingVertex.getString("name"));
+					}
+					if (existingVertex.has(key)) {
+						set.addAll((HashSet<Object>) existingVertex.get(key));
+					} 
+					/* MUST be casted to Object in order to keep it as a set, otherwise it will convert it to JSONArray */
+					existingVertex.put(key, (Object)set);
+				}
+			}
+		}
+	}
+
+	/* 	
+	 *	updating xml strings idref to match new vertex id, if duplicate was detected
+	 */ 
+	private void updateXMLString(JSONObject vertex, String oldIdref, String newIdref) {
+		String sourceDocument = vertex.getString("sourceDocument");
+		//TODO: should it be replaceAll? kept it as replaceFirst for now ...
+		sourceDocument = sourceDocument.replaceFirst(oldIdref, newIdref);
+		vertex.put("sourceDocument", sourceDocument);
 	}
 
 	/* 
