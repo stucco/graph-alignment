@@ -277,7 +277,7 @@ public class GraphConstructor {
 	private JSONObject constructVertex(Vertex v, String vertexType) {
 		JSONObject newVertex = new JSONObject();
 		JSONObject properties = ConfigFileLoader.getVertexOntology(vertexType).getJSONObject("properties");
-		for (String property : properties.keySet()) {
+		for (String property : (Set<String>)properties.keySet()) {
 			JSONObject propertyInfo = properties.getJSONObject(property);
 			if (propertyInfo.has("path")) {
 				Object content = getElementContent(v, propertyInfo);
