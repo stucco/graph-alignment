@@ -33,7 +33,7 @@
     "base": "anyType"
   },
   "ARPCacheObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'ARP_Cache_Entry']/*[local-name() = 'IP_Address']",
+    "namePath": ["Observable/Object/Properties/ARP_Cache_Entry/IP_Address"],
     "prefix": "ARPCacheObj",
     "elements": {"ARP_Cache_Entry": {
       "maxOccurs": "unbounded",
@@ -112,7 +112,7 @@
     "base": "anyType"
   },
   "FileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "FileObj",
     "elements": {
       "File_Extension": {"type": "StringObjectPropertyType"},
@@ -167,7 +167,7 @@
     "base": "anyType"
   },
   "WindowsDriverObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Driver_Name']",
+    "namePath": ["Observable/Object/Properties/Driver_Name"],
     "prefix": "WinDriverObj",
     "elements": {
       "IRP_MJ_QUERY_VOLUME_INFORMATION": {"type": "UnsignedLongObjectPropertyType"},
@@ -231,7 +231,7 @@
     "base": "anyType"
   },
   "AddressObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Address_Value']",
+    "namePath": ["Observable/Object/Properties/Address_Value"],
     "prefix": "AddressObj",
     "elements": {
       "VLAN_Name": {"type": "StringObjectPropertyType"},
@@ -254,7 +254,7 @@
     "base": "anyType"
   },
   "WindowsEventLogObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'EID']",
+    "namePath": ["Observable/Object/Properties/EID"],
     "prefix": "WinEventLogObj",
     "elements": {
       "EID": {"type": "LongObjectPropertyType"},
@@ -323,7 +323,7 @@
     "base": "anyType"
   },
   "ASObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "ASObj",
     "elements": {
       "Number": {"type": "NonNegativeIntegerObjectPropertyType"},
@@ -401,7 +401,10 @@
     "base": "BaseObjectPropertyType"
   },
   "UserSessionObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Effective_Group' or local-name() = 'Effective_User']",
+    "namePath": [
+      "Observable/Object/Properties/Effective_Group",
+      "Observable/Object/Properties/Effective_User"
+    ],
     "prefix": "UserSessionObj",
     "elements": {
       "Effective_Group_ID": {"type": "StringObjectPropertyType"},
@@ -529,7 +532,7 @@
     "base": "ControlledVocabularyStringType"
   },
   "ProcessObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "ProcessObj",
     "elements": {
       "Port_List": {"type": "PortListType"},
@@ -555,7 +558,7 @@
     "base": "ObjectPropertiesType"
   },
   "WindowsKernelHookObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hooking_Module']",
+    "namePath": ["Observable/Object/Properties/Hooking_Module"],
     "prefix": "WinKernelHookObj",
     "elements": {
       "Hooking_Address": {"type": "UnsignedLongObjectPropertyType"},
@@ -662,7 +665,7 @@
     "base": "anyType"
   },
   "WindowsRegistryKeyObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Key']",
+    "namePath": ["Observable/Object/Properties/Key"],
     "prefix": "WinRegistryKeyObj",
     "elements": {
       "Hive": {"type": "RegistryHiveType"},
@@ -698,7 +701,7 @@
     "base": "anyType"
   },
   "URLHistoryObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'URL_History_Entry']/*[local-name() = 'URL']",
+    "namePath": ["Observable/Object/Properties/URL_History_Entry/URL"],
     "prefix": "URLHistoryObj",
     "elements": {
       "Browser_Information": {"type": "ToolInformationType"},
@@ -780,7 +783,7 @@
     "base": "anyType"
   },
   "ImageFileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "ImageFileObj",
     "elements": {
       "Image_Width": {"type": "IntegerObjectPropertyType"},
@@ -850,7 +853,7 @@
     "base": "anyType"
   },
   "WindowsSystemObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Product_Name']",
+    "namePath": ["Observable/Object/Properties/Product_Name"],
     "prefix": "WinSystemObj",
     "elements": {
       "Windows_Temp_Directory": {"type": "StringObjectPropertyType"},
@@ -874,7 +877,11 @@
     "base": "SystemObjectType"
   },
   "SocketAddressObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hostname' or local-name() = 'IP_Address' or local-name() = 'Port']",
+    "namePath": [
+      "Observable/Object/Properties/Hostname",
+      "Observable/Object/Properties/IP_Address",
+      "Observable/Object/Properties/Port"
+    ],
     "prefix": "SocketAddressObj",
     "elements": {
       "Port": {"type": "PortObjectType"},
@@ -929,7 +936,7 @@
     "base": "BaseObjectPropertyType"
   },
   "WindowsMailslotObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinMailslotObj",
     "elements": {
       "Read_Timeout": {"type": "NonNegativeIntegerObjectPropertyType"},
@@ -989,7 +996,7 @@
     "base": "anyType"
   },
   "WindowsExecutableFileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "WinExecutableFileObj",
     "elements": {
       "Type": {"type": "PEType"},
@@ -1150,7 +1157,7 @@
     "base": "BaseObjectPropertyType"
   },
   "UnixVolumeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "UnixVolumeObj",
     "elements": {
       "Options": {"type": "StringObjectPropertyType"},
@@ -1162,7 +1169,7 @@
     "base": "VolumeObjectType"
   },
   "EmailMessageObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Raw_Body']",
+    "namePath": ["Observable/Object/Properties/Raw_Body"],
     "prefix": "EmailMessageObj",
     "elements": {
       "Header": {"type": "EmailHeaderType"},
@@ -1178,7 +1185,7 @@
     "base": "ObjectPropertiesType"
   },
   "UnixUserAccountObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+    "namePath": ["Observable/Object/Properties/Username"],
     "prefix": "UnixUserAccountObj",
     "elements": {
       "Group_ID": {"type": "UnsignedIntegerObjectPropertyType"},
@@ -1191,7 +1198,7 @@
     "base": "UserAccountObjectType"
   },
   "CodeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Code_Segment']",
+    "namePath": ["Observable/Object/Properties/Code_Segment"],
     "prefix": "CodeObj",
     "elements": {
       "Processor_Family": {
@@ -1249,7 +1256,7 @@
     "base": "BaseObjectPropertyType"
   },
   "PDFFileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "PDFFileObj",
     "elements": {
       "Version": {"type": "DoubleObjectPropertyType"},
@@ -1264,7 +1271,7 @@
     "base": "FileObjectType"
   },
   "PipeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "PipeObj",
     "elements": {"Name": {"type": "StringObjectPropertyType"}},
     "typeName": "Pipe",
@@ -1274,7 +1281,10 @@
   },
   "IANAHardwareType": {"base": "BaseObjectPropertyType"},
   "DNSRecordObjectType": {
-    "namePath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Domain_Name' or local-name() = 'IP_Address']",
+    "namePath":[
+      "Observable/Object/Properties/Domain_Name",
+      "Observable/Object/Properties/IP_Address"
+    ],
     "pattern":"Domain_Name_resolved_to_IP_Address",
     "prefix": "DNSRecordObj",
     "elements": {
@@ -1371,7 +1381,7 @@
     "base": "BaseObjectPropertyType"
   },
   "UserAccountObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+    "namePath": ["Observable/Object/Properties/Username"],
     "prefix": "UserAccountObj",
     "elements": {
       "Full_Name": {"type": "StringObjectPropertyType"},
@@ -1405,7 +1415,7 @@
     "base": "anyType"
   },
   "WindowsEventObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinEventObj",
     "elements": {
       "Type": {"type": "WinEventType"},
@@ -1449,7 +1459,7 @@
     "base": "anyType"
   },
   "WindowsTaskObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinTaskObj",
     "elements": {
       "Status": {"type": "TaskStatusType"},
@@ -1493,7 +1503,7 @@
     "base": "BaseObjectPropertyType"
   },
   "WindowsHookObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hooking_Function_Name']",
+    "namePath": ["Observable/Object/Properties/Hooking_Function_Name"],
     "prefix": "WinHookObj",
     "elements": {
       "Type": {"type": "WinHookType"},
@@ -1513,7 +1523,7 @@
     "base": "BaseObjectPropertyType"
   },
   "HostnameObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Hostname_Value']",
+    "namePath": ["Observable/Object/Properties/Hostname_Value"],
     "prefix": "HostnameObj",
     "elements": {
       "Hostname_Value": {"type": "StringObjectPropertyType"},
@@ -1566,7 +1576,7 @@
     "base": "anyType"
   },
   "WindowsServiceObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Service_Name']",
+    "namePath": ["Observable/Object/Properties/Service_Name"],
     "prefix": "WinServiceObj",
     "elements": {
       "Service_DLL_Certificate_Issuer": {"type": "StringObjectPropertyType"},
@@ -1590,7 +1600,7 @@
     "base": "WindowsProcessObjectType"
   },
   "WindowsUserAccountObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Username']",
+    "namePath": ["Observable/Object/Properties/Username"],
     "prefix": "WinUserAccountObj",
     "elements": {
       "Security_ID": {"type": "StringObjectPropertyType"},
@@ -1610,7 +1620,7 @@
     "base": "anyType"
   },
   "ArtifactObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Raw_Artifact']",
+    "namePath": ["Observable/Object/Properties/Raw_Artifact"],
     "prefix": "ArtifactObj",
     "elements": {
       "Hashes": {"type": "HashListType"},
@@ -1645,7 +1655,7 @@
     "base": "anyType"
   },
   "WindowsHandleObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinHandleObj",
     "elements": {
       "Type": {"type": "HandleType"},
@@ -1661,7 +1671,7 @@
     "base": "ObjectPropertiesType"
   },
   "X509CertificateObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Certificate']/*[local-name() = 'Serial_Number']",
+    "namePath": ["Observable/Object/Properties/Certificate/Serial_Number"],
     "prefix": "X509CertificateObj",
     "elements": {
       "Certificate_Signature": {"type": "X509CertificateSignatureType"},
@@ -1792,7 +1802,7 @@
     "base": "ObjectPropertiesType"
   },
   "WindowsMemoryPageRegionObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinMemoryPageRegionObj",
     "elements": {
       "Type": {"type": "MemoryPageTypeType"},
@@ -1860,7 +1870,7 @@
     "base": "anyType"
   },
   "MemoryObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "MemoryObj",
     "elements": {
       "Hashes": {"type": "HashListType"},
@@ -2039,7 +2049,7 @@
     "base": "anyType"
   },
   "URIObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+    "namePath": ["Observable/Object/Properties/Value"],
     "prefix": "URIObj",
     "elements": {"Value": {"type": "AnyURIObjectPropertyType"}},
     "typeName": "URI",
@@ -2073,7 +2083,7 @@
     "base": "anyType"
   },
   "WindowsSemaphoreObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinSemaphoreObj",
     "elements": {
       "Security_Attributes": {"type": "StringObjectPropertyType"},
@@ -2184,7 +2194,7 @@
     "base": "anyType"
   },
   "DiskObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Disk_Name']",
+    "namePath": ["Observable/Object/Properties/Disk_Name"],
     "prefix": "DiskObj",
     "elements": {
       "Type": {"type": "DiskType"},
@@ -2259,7 +2269,7 @@
     "base": "BaseObjectPropertyType"
   },
   "SMSMessageObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Body']",
+    "namePath": ["Observable/Object/Properties/Body"],
     "prefix": "SMSMessageObj",
     "elements": {
       "Bits_Per_Character": {"type": "PositiveIntegerObjectPropertyType"},
@@ -2289,7 +2299,7 @@
     "base": "PrivilegeType"
   },
   "PortObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Port_Value']",
+    "namePath": ["Observable/Object/Properties/Port_Value"],
     "prefix": "PortObj",
     "elements": {
       "Layer4_Protocol": {"type": "Layer4ProtocolType"},
@@ -2352,7 +2362,7 @@
     "base": "anyType"
   },
   "DomainNameObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+    "namePath": ["Observable/Object/Properties/Value"],
     "prefix": "DomainNameObj",
     "elements": {"Value": {"type": "StringObjectPropertyType/>"}},
     "typeName": "Domain Name",
@@ -2423,7 +2433,7 @@
     "base": "ProcessStatusType"
   },
   "UnixProcessObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "UnixProcessObj",
     "elements": {
       "Priority": {"type": "NonNegativeIntegerObjectPropertyType"},
@@ -2502,7 +2512,7 @@
     "base": "anyType"
   },
   "WindowsNetworkShareObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Netname']",
+    "namePath": ["Observable/Object/Properties/Netname"],
     "prefix": "WinNetworkShareObj",
     "elements": {
       "Type": {"type": "SharedResourceType"},
@@ -2555,7 +2565,7 @@
     "base": "anyType"
   },
   "VolumeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "VolumeObj",
     "elements": {
       "Actual_Available_Allocation_Units": {"type": "UnsignedLongObjectPropertyType"},
@@ -2677,7 +2687,7 @@
     "base": "anyType"
   },
   "WindowsComputerAccountObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Fully_Qualified_Name']/*[local-name() = 'Full_Name']",
+    "namePath": ["Observable/Object/Properties/Fully_Qualified_Name/Full_Name"],
     "prefix": "ns1",
     "elements": {
       "Kerberos": {"type": "KerberosType"},
@@ -2722,7 +2732,7 @@
     "base": "anyType"
   },
   "WindowsPipeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinPipeObj",
     "elements": {
       "Default_Time_Out": {"type": "NonNegativeIntegerObjectPropertyType"},
@@ -2860,7 +2870,7 @@
     "base": "anyType"
   },
   "UnixFileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "UnixFileObj",
     "elements": {
       "INode": {"type": "UnsignedLongObjectPropertyType"},
@@ -2873,7 +2883,7 @@
     "base": "FileObjectType"
   },
   "WindowsThreadObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Thread_ID']",
+    "namePath": ["Observable/Object/Properties/Thread_ID"],
     "prefix": "WinThreadObj",
     "elements": {
       "Context": {"type": "StringObjectPropertyType"},
@@ -3059,7 +3069,7 @@
     "base": "anyType"
   },
   "WindowsWaitableTimerObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinWaitableTimerObj",
     "elements": {
       "Type": {"type": "WaitableTimerType"},
@@ -3183,7 +3193,7 @@
     "base": "anyType"
   },
   "NetworkSubnetObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "NetworkSubnetObj",
     "elements": {
       "Description": {"type": "StructuredTextType"},
@@ -3241,7 +3251,7 @@
     "base": "anyType"
   },
   "DeviceObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Model']",
+    "namePath": ["Observable/Object/Properties/Model"],
     "prefix": "DeviceObj",
     "elements": {
       "System_Details": {"type": "ObjectPropertiesType"},
@@ -3258,7 +3268,7 @@
     "base": "ObjectPropertiesType"
   },
   "MutexObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "MutexObj",
     "elements": {"Name": {"type": "StringObjectPropertyType"}},
     "typeName": "Mutex",
@@ -3365,7 +3375,7 @@
     "base": "anyType"
   },
   "AccountObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Domain']",
+    "namePath": ["Observable/Object/Properties/Domain"],
     "prefix": "AccountObj",
     "elements": {
       "Last_Accessed_Time": {"type": "DateTimeObjectPropertyType"},
@@ -3472,7 +3482,7 @@
     "base": "NetworkLayerInfoType"
   },
   "APIObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Function_Name']",
+    "namePath": ["Observable/Object/Properties/Function_Name"],
     "prefix": "APIObj",
     "elements": {
       "Normalized_Function_Name": {"type": "StringObjectPropertyType"},
@@ -3511,7 +3521,10 @@
     "base": "BaseObjectPropertyType"
   },
   "NetworkFlowObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Network_Flow_Label']/*[local-name() = 'Dest_Socket_Address' or local-name() = 'Src_Socket_Address']",
+    "namePath": [
+      "Observable/Object/Properties/Network_Flow_Label/Dest_Socket_Address",
+      "Observable/Object/Properties/Network_Flow_Label/Src_Socket_Address"
+    ],
     "prefix": "NetFlowObj",
     "elements": {
       "Network_Flow_Label": {"type": "NetworkFlowLabelType"},
@@ -3570,7 +3583,7 @@
     "base": "anyType"
   },
   "WindowsPrefetchObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Application_File_Name']",
+    "namePath": ["Observable/Object/Properties/Application_File_Name"],
     "prefix": "WinPrefetchObj",
     "elements": {
       "Last_Run": {"type": "DateTimeObjectPropertyType"},
@@ -3772,7 +3785,15 @@
     "base": "anyType"
   },
   "ProductObjectType": {
-    "namePath":".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Product' or local-name() = 'Vendor' or local-name() = 'Update' or local-name() = 'Edition' or local-name() = 'Language' or local-name() = 'Version'] | .[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Custom_Properties']/*[local-name() = 'Property' and @name = \"Part\"]",
+    "namePath":[
+      "Observable/Object/Properties/Product",
+      "Observable/Object/Properties/Vendor",
+      "Observable/Object/Properties/Update",
+      "Observable/Object/Properties/Edition",
+      "Observable/Object/Properties/Language",
+      "Observable/Object/Properties/Version",
+      "Observable/Object/Properties/Custom_Properties/Property@name=Part"
+    ],
     "pattern":"cpe:Property:Vendor:Product:Version:Update:Edition:Language",
     "prefix": "ProductObj",
     "elements": {
@@ -3821,7 +3842,7 @@
     "base": "StringObjectPropertyType"
   },
   "DiskPartitionObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Partition_ID']",
+    "namePath": ["Observable/Object/Properties/Partition_ID"],
     "prefix": "DiskPartitionObj",
     "elements": {
       "Space_Used": {"type": "UnsignedLongObjectPropertyType"},
@@ -3846,7 +3867,7 @@
     "base": "anyType"
   },
   "LinkObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Value']",
+    "namePath": ["Observable/Object/Properties/Value"],
     "prefix": "LinkObj",
     "elements": {"URL_Label": {"type": "StringObjectPropertyType"}},
     "typeName": "Link",
@@ -3904,7 +3925,7 @@
   },
   "IANAEtherType": {"base": "BaseObjectPropertyType"},
   "HTTPSessionObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'HTTP_Request_Response']/*[local-name() = 'HTTP_Client_Request']/*[local-name() = 'HTTP_Request_Line']/*[local-name() = 'Value']",
+    "namePath": ["Observable/Object/Properties/HTTP_Request_Response/HTTP_Client_Request/HTTP_Request_Line/Value"],
     "prefix": "HTTPSessionObj",
     "elements": {"HTTP_Request_Response": {
       "maxOccurs": "unbounded",
@@ -3937,7 +3958,7 @@
     "base": "anyType"
   },
   "LibraryObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "LibraryObj",
     "elements": {
       "Path": {"type": "StringObjectPropertyType"},
@@ -3954,7 +3975,7 @@
     "base": "ObjectPropertiesType"
   },
   "SemaphoreObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "SemaphoreObj",
     "elements": {
       "Maximum_Count": {"type": "PositiveIntegerObjectPropertyType"},
@@ -3967,7 +3988,7 @@
     "base": "ObjectPropertiesType"
   },
   "WindowsProcessObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinProcessObj",
     "elements": {
       "Security_ID": {"type": "StringObjectPropertyType"},
@@ -4010,7 +4031,7 @@
     "base": "GroupType"
   },
   "DNSQueryObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Question']/*[local-name() = 'QName']",
+    "namePath": ["Observable/Object/Properties/Question/QName"],
     "prefix": "DNSQueryObj",
     "elements": {
       "Additional_Records": {"type": "DNSResourceRecordsType"},
@@ -4068,7 +4089,7 @@
     "base": "anyType"
   },
   "WindowsMutexObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinMutexObj",
     "elements": {
       "Security_Attributes": {"type": "StringObjectPropertyType"},
@@ -4094,7 +4115,7 @@
     "base": "anyType"
   },
   "LinuxPackageObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "LinuxPackageObj",
     "elements": {
       "EVR": {"type": "StringObjectPropertyType"},
@@ -4154,7 +4175,7 @@
     "base": "anyType"
   },
   "WindowsFileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "WinFileObj",
     "elements": {
       "Security_ID": {"type": "StringObjectPropertyType"},
@@ -4171,7 +4192,7 @@
     "base": "FileObjectType"
   },
   "ArchiveFileObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'File_Name']",
+    "namePath": ["Observable/Object/Properties/File_Name"],
     "prefix": "ArchiveFileObj",
     "elements": {
       "Archived_File": {
@@ -4395,7 +4416,7 @@
     "base": "BaseObjectPropertyType"
   },
   "UnixPipeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "UnixPipeObj",
     "elements": {"Permission_Mode": {"type": "StringObjectPropertyType"}},
     "typeName": "Unix Pipe",
@@ -4590,7 +4611,7 @@
     "base": "anyType"
   },
   "WindowsVolumeObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinVolumeObj",
     "elements": {
       "Drive_Letter": {"type": "StringObjectPropertyType"},
@@ -4711,7 +4732,7 @@
     "base": "anyType"
   },
   "WindowsFilemappingObjectType": {
-    "namePath": ".[local-name() = 'Observable']/*[local-name() = 'Object']/*[local-name() = 'Properties']/*[local-name() = 'Name']",
+    "namePath": ["Observable/Object/Properties/Name"],
     "prefix": "WinFilemappingObj",
     "elements": {
       "Maximum_Size": {"type": "UnsignedLongObjectPropertyType"},
@@ -4754,11 +4775,11 @@
     "base": "BaseObjectPropertyType"
   },
   "ObservableComposition": {
-    "aliasPath": ".[local-name() = 'Observable']/*[local-name() = 'Observable_Composition']/*[local-name() = 'Observable']",
+    "aliasPath": "Observable/Observable_Composition/Observable",
     "typeName": "Observable Composition"
   },
   "Event": {
-    "aliasPath": ".[local-name() = 'Observable']/*[local-name() = 'Event']/*[local-name() = 'Actions']/*[local-name() = 'Action']/*[local-name() = 'Associated_Objects']/*[local-name() = 'Associated_Object']/*[local-name() = 'Properties']",
+    "aliasPath": "Observable/Event/Actions/Action/Associated_Objects/Associated_Object/Properties",
     "typeName": "Event"
   }
 }

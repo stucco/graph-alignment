@@ -3,52 +3,88 @@
       "vertices":{  
          "title":"vertices",
          "description":"The list of stucco vertices",
-         "type":"array",
+         "type":"object",
          "items":{  
-            "anyOf":[  
-               {  
-                  "$ref":"#/definitions/AddressRange"
-               },
-               {  
-                  "$ref":"#/definitions/Exploit"
-               }, 
-               {  
-                  "$ref":"#/definitions/IP"
-               },
-               {  
-                  "$ref":"#/definitions/Malware"
-               },
-               {  
-                  "$ref":"#/definitions/Vulnerability"
-               },
-               {  
-                  "$ref":"#/definitions/Weakness"
-               },
-               {  
-                  "$ref":"#/definitions/Campaign"
-               },
-               {  
-                  "$ref":"#/definitions/Course_Of_Action"
-               },
-               {  
-                  "$ref":"#/definitions/Exploit_Target"
-               },
-               {  
-                  "$ref":"#/definitions/Incident"
-               },
-               {  
-                  "$ref":"#/definitions/Indicator"
-               },
-               {  
-                  "$ref":"#/definitions/Threat_Actor"
-               },
-               {  
-                  "$ref":"#/definitions/TTP"
-               },
-               {  
-                  "$ref":"#/definitions/Observable"
-               }    
-            ]
+            "Observable": {
+               "$ref":"#/definitions/Observable",
+               "vertexType": "Observable",
+               "path": "Observable",
+               "items": {
+                  "AddressRange": {
+                     "$ref":"#/definitions/AddressRange",
+                     "vertexType": "AddressRange",
+                     "observableType": "AddressObjectType",
+                     "path": "Observable/Object/Properties/Address_Value",
+                     "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5]).+([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+                  },
+                  "IP": {
+                     "$ref":"#/definitions/IP",
+                     "vertexType": "IP",
+                     "observableType": "AddressObjectType",
+                     "path": "Observable/Object/Properties/Address_Value",
+                     "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+                  }
+               }
+            }, 
+            "TTP": {
+               "$ref":"#/definitions/TTP",
+               "vertexType": "TTP",
+               "path": "TTP",
+               "items": {
+                  "Exploit": {
+                     "$ref":"#/definitions/Exploit", 
+                     "vertexType": "Exploit",
+                     "path": "TTP/Behavior/Exploits/Exploit"
+                  },
+                  "Malware": {
+                     "$ref":"#/definitions/Malware",
+                     "vertexType": "Malware",
+                     "path": "TTP/Behavior/Malware"
+                  }
+               }
+            },
+            "Exploit_Target": {
+               "$ref":"#/definitions/Exploit_Target",
+               "vertexType": "Exploit_Target",
+               "path": "Exploit_Target",
+               "items": {
+                  "Vulnerability": {
+                     "$ref": "#/definitions/Vulnerability",
+                     "vertexType": "Vulnerability",
+                     "path": "Exploit_Target/Vulnerability"
+                  },
+                  "Weakness": {
+                     "$ref": "#/definitions/Weakness",
+                     "vertexType": "Weakness",
+                     "path": "Exploit_Target/Weakness"
+                  }
+               }
+            }, 
+            "Campaign": {
+               "$ref": "#/definitions/Campaign",
+               "vertexType": "Campaign",
+               "path": "Campaign"
+            },
+            "Course_Of_Action": {
+               "$ref":"#/definitions/Course_Of_Action",
+               "vertexType": "Course_Of_Action",
+               "path": "Course_Of_Action"
+            },
+            "Incident": {
+               "$ref":"#/definitions/Incident",
+               "vertexType": "Incident",
+               "path": "Incident"
+            },
+            "Indicator": {
+               "$ref":"#/definitions/Indicator",
+               "vertexType": "Indicator",
+               "path": "Indicator"
+            },
+            "Threat_Actor": {
+               "$ref":"#/definitions/Threat_Actor",
+               "vertexType": "Threat_Actor",
+               "path": "Threat_Actor"
+            }
          }
       },
       "edges":{  
@@ -186,6 +222,11 @@
          "description":"stucco vertex base element",
          "type": "object",
          "properties":{  
+            "vertexType": {
+               "description": "vertex type occording to ontology and stix schema",
+               "type":"string",
+               "cardinality":"single"
+            },
             "sourceDocument":{  
                "description":"xml string of STIX formatted source document",
                "type":"string",
@@ -253,17 +294,12 @@
          "type":"object",
          "regex": {
             "observableType": "Address",
-            "xpath": "Observable/Object/Properties/",
+            "path": "Observable/Object/Properties/Address_Value",
             "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5]).+([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
          },
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "AddressRange"
-            },
             "name":{  
-               "xpath": [
+               "path": [
                   "Observable/Object/Properties/Address_Value"
                ],
                "type":"string",
@@ -273,7 +309,7 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath": [
+               "path": [
                   "Observable/Object/Description"
                ],
                "description":"description",
@@ -281,7 +317,7 @@
                "cardinality":"set"
             },
             "endIP":{  
-               "xpath": [
+               "path": [
                   "Observable/Object/Properties/Address_Value"
                ],
                "description":"end IP",
@@ -293,7 +329,7 @@
                "regex":"^.* - (.*$)"
             },
             "startIP":{  
-               "xpath": ["Observable/Object/Properties/Address_Value"],
+               "path": ["Observable/Object/Properties/Address_Value"],
                "description":"start IP",
                "type":"string",
                "cardinality":"single",
@@ -303,7 +339,7 @@
                "regex":"(^.*) - .*$"
             },
             "startIPInt":{  
-               "xpath": ["Observable/Object/Properties/Address_Value"],
+               "path": ["Observable/Object/Properties/Address_Value"],
                "description":"start IP, as integer",
                "type":"long",
                "cardinality":"single",
@@ -314,18 +350,18 @@
                "applyFunction":"ipToLong"
             },
             "location":{  
-               "xpath": ["Observable/Object/Location/Name"],
+               "path": ["Observable/Object/Location/Name"],
                "description":"Country Name",
                "type":"string",
                "cardinality":"single"
             },
             "source":{  
-               "xpath": ["Observable/Observable_Source/Information_Source_Type"],
+               "path": ["Observable/Observable_Source/Information_Source_Type"],
                "description":"Data source for this vertex",
                "cardinality":"set"
             },
             "endIPInt":{  
-               "xpath": ["Observable/Object/Properties/Address_Value"],
+               "path": ["Observable/Object/Properties/Address_Value"],
                "description":"end IP, as integer",
                "type":"long",
                "cardinality":"single",
@@ -334,7 +370,9 @@
                "resolutionFunction":"TBD",
                "regex":".* - (.*$)",
                "applyFunction":"ipToLong"
-            },
+            }
+         },
+         "additionalProperties": {
             "observableType": {
                "description": "CybOX object type used to describe this vertex",
                "cardinality": "single"
@@ -403,35 +441,22 @@
          "vertexType":"Exploit",
          "description":"Exploit characteristics",
          "type": "object",
-         "xpath": ["TTP/Behavior/Exploits/Exploit"],
+         "path": ["TTP/Behavior/Exploits/Exploit"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Exploit"
-            },
-            "name":{  
-               "xpath": ["TTP/Behavior/Exploits/Exploit/Title"],
-               "type":"string",
-               "cardinality":"single",
-               "comparisonFunction":"exact",
-               "comparisonWeight":1.0,
-               "resolutionFunction":"none"
-            },
             "description":{  
-               "xpath": ["TTP/Behavior/Exploits/Exploit/Description"],
+               "path": ["TTP/Behavior/Exploits/Exploit/Description"],
                "description":"descriptive summary of this Exploit family",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath": ["TTP/Behavior/Exploits/Exploit/Short_Description"],
+               "path": ["TTP/Behavior/Exploits/Exploit/Short_Description"],
                "description":"additional text description of this Exploit",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "TTP/Information_Source/Identity/Name", 
                   "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
@@ -439,6 +464,15 @@
                "type":"string",
                "cardinality":"set"
             }
+         },
+         "additionalProperties": {
+            "name":{  
+               "type":"string",
+               "cardinality":"single",
+               "comparisonFunction":"exact",
+               "comparisonWeight":1.0,
+               "description": "UUID of this Exploit"
+            },
          },
          "required":[  
             "vertexType",
@@ -477,23 +511,23 @@
             ]
          },
          "edges": {
-            "RelatedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "TTP": {
+               "relation": "RelatedTTP"
             },
-            "ExploitTarget": {
-               "inVType": [
-                  "Exploit_Target",
-               ]
+            "Malware": {
+               "relation": "RelatedTTP"
             },
-            "Exploits": {
-               "inVType": [
-                  "Vulnerability",
-                  "Weakness"
-               ]
+            "Exploit": {
+               "relation": "RelatedTTP"
+            },
+            "Exploit_Target": {
+               "relation": "ExploitTarget"
+            },
+            "Vulnerability": {
+               "relation": "Exploits"
+            },
+            "Weakness": {
+               "relation": "Exploits"
             }
          }
       },
@@ -502,18 +536,9 @@
          "vertexType":"IP",
          "description":"A specific IP address",
          "type": "object",
-         "regex": {
-            "observableType": "Address",
-            "pattern": "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
-         },
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "IP"
-            },
             "name":{  
-               "xpath": ["Observable/Object/Properties/Address_Value"],
+               "path": ["Observable/Object/Properties/Address_Value"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -521,12 +546,12 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath": ["Observable/Object/Description"],
+               "path": ["Observable/Object/Description"],
                "type":"string",
                "cardinality":"set"
             },
             "ipInt":{  
-               "xpath": ["Observable/Object/Properties/Address_Value"],
+               "path": ["Observable/Object/Properties/Address_Value"],
                "description":"start IP, as integer",
                "type":"long",
                "cardinality":"single",
@@ -536,11 +561,13 @@
                "applyFunction":"ipToLong"
             },
             "source":{  
-               "xpath": ["Observable/Observable_Source/Information_Source_Type"],
+               "path": ["Observable/Observable_Source/Information_Source_Type"],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
-            },
+            }
+         },
+         "additionalProperties": {
             "observableType": {
                "description": "CybOX object type used to describe this vertex",
                "cardinality": "single"
@@ -579,15 +606,11 @@
             ]
          },
          "edges": {
-            "Sub-Observable": {
-               "inVType": [
-                  "Observable"
-               ]
+            "Observable": {
+               "relation": "Sub-Observable"
             },
-            "Contained_Within": {
-               "inVType": [
-                  "AddressRange"
-               ]
+            "AddressRange": {
+               "relation": "Contained_Within"
             }
          }
       },
@@ -596,43 +619,45 @@
          "vertexType":"Malware",
          "description":"Any malicious software. This can refer to either a stored binary or a running instance. Malware can contain code to launch an exploit. Malware can itself be an asset that an attacker uses in future attacks (eg. a backdoor left on a compromised system.) or can automatically launch additional attacks on behalf of the original attacker. Malware can be hosted by or communicate with servers controlled by the attacker. Malware can contain code to load other malware. Malware can reuse components from other malware samples.",
          "type": "object",
-         "xpath": [ "TTP/Behavior/Malware"],
+         "path": [ "TTP/Behavior/Malware"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Malware"
-            },
             "description":{  
-               "xpath": ["TTP/Behavior/Malware/Malware_Instance/Description"],
+               "path": ["TTP/Behavior/Malware/Malware_Instance/Description"],
                "description":"descriptive summary of this malware family",
                "type":"string",
                "cardinality":"set"
             },   
             "shortDescription":{  
-               "xpath": ["TTP/Behavior/Malware/Malware_Instance/Short_Description"],
+               "path": ["TTP/Behavior/Malware/Malware_Instance/Short_Description"],
                "description":"additional text description of this Malware",
                "type":"string",
                "cardinality":"set"
             },
             "alias":{  
-               "xpath": ["TTP/Behavior/Malware/Malware_Instance/Name"],
+               "path": ["TTP/Behavior/Malware/Malware_Instance/Name"],
                "cardinality":"set"
             },
             "details":{  
-               "xpath": ["TTP/Behavior/Attack_Patterns/Attack_Pattern/Description"],
+               "path": ["TTP/Behavior/Attack_Patterns/Attack_Pattern/Description"],
                "description":"additional text description of this malware",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "TTP/Information_Source/Identity/Name",
                   "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "cardinality":"single",
+               "type": "string",
+               "description": "UUID if this Malware"
             }
          },
          "required":[  
@@ -677,33 +702,29 @@
             ]
          },
          "edges": {
-            "RelatedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "TTP": {
+               "relation": "RelatedTTP"
             },
-            "ExploitTarget": {
-               "inVType": [
-                  "Exploit_Target"
-               ]
+            "Malware": {
+               "relation": "RelatedTTP"
             },
-            "UsesIP": {
-               "inVType": [
-                  "IP"
-               ]
+            "Exploit": {
+               "relation": "RelatedTTP"
             },
-            "RelatedObservable": {
-               "inVType": [
-                  "Observable"
-               ]
+            "Exploit_Target": {
+               "relation": "ExploitTarget"
             },
-            "Exploits": {
-               "inVType": [
-                  "Vulnerability",
-                  "Weakness"
-               ]
+            "IP": {
+               "relation": "UsesIP"
+            },
+            "Observable": {
+               "relation": "RelatedObservable"
+            },
+            "Vulnerability": {
+               "relation": "Exploits"
+            },
+            "Weakness": {
+               "relation": "Exploits"
             }
          }
       },
@@ -712,15 +733,10 @@
          "vertexType":"Vulnerability",
          "description":"Vulnerability",
          "type": "object",
-         "xpath": ["Exploit_Target/Vulnerability"],
+         "path": ["Exploit_Target/Vulnerability"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Vulnerability"
-            },
             "name":{  
-               "xpath": ["Exploit_Target/Vulnerability/CVE_ID"],
+               "path": ["Exploit_Target/Vulnerability/CVE_ID"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -728,19 +744,19 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath": ["Exploit_Target/Vulnerability/Description"],
+               "path": ["Exploit_Target/Vulnerability/Description"],
                "description":"description",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath": ["Exploit_Target/Vulnerability/Short_Description"],
+               "path": ["Exploit_Target/Vulnerability/Short_Description"],
                "description":"short description",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "Exploit_Target/Vulnerability/Source",
                   "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name",
                   "Exploit_Target/Information_Source/Identity/Name"
@@ -748,15 +764,6 @@
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
-<<<<<<< HEAD
-            },
-            "publishedDate":{  
-               "xpath": ["Exploit_Target/Vulnerability/Published_DateTime"],
-               "description":"published date",
-               "type":"number",
-               "cardinality":"single"
-=======
->>>>>>> 520c5bb9459afa94dd3392f3119933ae0f185d21
             }
          },
          "required":[  
@@ -796,17 +803,17 @@
             ]
          },
          "edges": {
-            "RelatedExploitTarget": {
-               "inVType": [
-                  "Exploit_Target",
-                  "Vulnerability",
-                  "Weaknes"
-               ]
+            "Exploit_Target": {
+               "relation": "RelatedExploitTarget"
             },
-            "PotentialCOA": {
-               "inVType": [  
-                  "Course_Of_Action"
-               ]
+            "Vulnerability": {
+               "relation": "RelatedExploitTarget"
+            },
+            "Weaknes": {
+               "relation": "RelatedExploitTarget"
+            },
+            "Course_Of_Action": {
+               "relation": "PotentialCOA"
             }
          }
       },
@@ -815,15 +822,10 @@
          "vertexType":"Weakness",
          "description":"weakness",
          "type": "object",
-         "xpath": ["Exploit_Target/Weakness"],
+         "path": ["Exploit_Target/Weakness"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Weakness"
-            },
             "name":{  
-               "xpath": ["Exploit_Target/Weakness/CWE_ID"],
+               "path": ["Exploit_Target/Weakness/CWE_ID"],
                "type":"string",
                "cardinality":"single",
                "comparisonFunction":"exact",
@@ -831,13 +833,13 @@
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath": ["Exploit_Target/Weakness/Description"],
+               "path": ["Exploit_Target/Weakness/Description"],
                "description":"description",
                "type":"string",
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "Exploit_Target/Information_Source/Identity/Name",
                   "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
@@ -878,17 +880,17 @@
             ]
          },
          "edges": {
-            "RelatedExploitTarget": {
-               "inVType": [
-                  "Exploit_Target",
-                  "Vulnerability",
-                  "Weaknes"
-               ]
+            "Exploit_Target": {
+               "relation": "RelatedExploitTarget"
             },
-            "PotentialCOA": {
-               "inVType": [  
-                  "Course_Of_Action"
-               ]
+            "Vulnerability": {
+               "relation": "RelatedExploitTarget"
+            },
+            "Weaknes": {
+               "relation": "RelatedExploitTarget"
+            },
+            "Course_Of_Action": {
+               "relation": "PotentialCOA"
             }
          }
       },
@@ -897,18 +899,8 @@
          "vertexType": "Campaign",
          "description": "Instance of Threat Actor observed through sets of Incidents and/or TTP",
          "type": "object",
-         "xpath": ["Campaign"],
+         "path": ["Campaign"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Campaign"
-            },
-            "name": {
-               "type": "string",
-               "cardinality": "single",
-               "description": "Campaign name"
-            },
             "description":{  
                "applyFunction": "getElementDescriptionList",
                "description":"descriptive summary of this Campaign",
@@ -922,17 +914,24 @@
                "cardinality":"set"
             },
             "alias":{  
-               "xpath": ["Campaign/Names/Name"],
+               "path": ["Campaign/Names/Name"],
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "Campaign/Information_Source/Identity/Name",
                   "Campaign/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID id of this Campaign"
             }
          },
          "required":[  
@@ -972,27 +971,23 @@
             ]
          },
          "edges": {
-            "AssociatedCampaign": {
-               "inVType": [
-                  "Campaign"
-               ]
+            "Campaign": {
+               "relation": "AssociatedCampaign"
             },
-            "RelatedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "TTP": {
+               "relation": "RelatedTTP"
             },
-            "Attribution": {
-               "inVType": [
-                  "Threat_Actor"
-               ]
+            "Malware": {
+               "relation": "RelatedTTP"
             },
-            "RelatedIncident": {
-               "inVType": [
-                  "Incident"
-               ]
+            "Exploit": {
+               "relation": "RelatedTTP"
+            },
+            "Threat_Actor": {
+               "relation": "Attribution"
+            },
+            "Incident": {
+               "relation": "RelatedIncident"
             }
          }
       },
@@ -1001,18 +996,8 @@
          "vertexType": "Course_Of_Action",
          "description": "Measures to be taken to address cyber threat",
          "type": "object",
-         "xpath": ["Course_Of_Action"],
+         "path": ["Course_Of_Action"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Course_Of_Action"
-            },
-            "name": {
-               "type": "string",
-               "cardinality": "single",
-               "description": "UUID of this Course_Of_Action"
-            },
             "description":{  
                "applyFunction": "getElementDescriptionList",
                "description":"descriptive summary of this Course_Of_Action",
@@ -1025,18 +1010,21 @@
                "type":"string",
                "cardinality":"set"
             },
-            "alias":{  
-               "xpath": ["Course_Of_Action/Parameter_Observables/Observable"],
-               "cardinality":"set"
-            },
             "source":{  
-               "xpath": [
+               "path": [
                   "Course_Of_Action/Information_Source/Identity/Name",
                   "Course_Of_Action/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Course_Of_Action"
             }
          },
          "required":[  
@@ -1076,17 +1064,17 @@
             ]
          },
          "edges": {
-            "RelatedCOA": {
-               "inVType": [
-                  "Course_Of_Action"
-               ]
+            "Course_Of_Action": {
+               "relation": "RelatedCOA"
             },
-            "ParameterObservable": {
-               "inVType": [
-                  "Observable",
-                  "AddressRange",
-                  "IP"
-               ]
+            "Observable": {
+               "relation": "ParameterObservable"
+            },
+            "AddressRange": {
+               "relation": "ParameterObservable"
+            },
+            "IP": {
+               "relation": "ParameterObservable"
             }
          }
       },
@@ -1095,18 +1083,8 @@
          "vertexType": "Exploit_Target",
          "description": "Exploit Targets are vulnerabilities or weaknesses",
          "type": "object",
-         "xpath": ["Exploit_Target"],
+         "path": ["Exploit_Target"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Exploit_Target"
-            },
-            "name": {
-               "type": "string",
-               "cardinality": "single",
-               "description": "UUID of this Exploit_Target"
-            },
             "description":{  
                "applyFunction": "getElementDescriptionList",
                "description":"descriptive summary of this Exploit_Target",
@@ -1120,13 +1098,20 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "Exploit_Target/Information_Source/Identity/Name",
                   "Exploit_Target/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Exploit_Target"
             }
          },
          "required":[  
@@ -1166,17 +1151,17 @@
             ]
          },
          "edges": {
-            "RelatedExploitTarget": {
-               "inVType": [
-                  "Exploit_Target",
-                  "Vulnerability",
-                  "Weakness"
-               ]
+            "Exploit_Target": {
+               "relation": "RelatedExploitTarget"
             },
-            "PotentialCOA": {
-               "inVType": [
-                  "Course_Of_Action"
-               ]
+            "Vulnerability": {
+               "relation": "RelatedExploitTarget"
+            },
+            "Weakness": {
+               "relation": "RelatedExploitTarget"
+            },
+            "Course_Of_Action": {
+               "relation": "PotentialCOA"
             }
          }
       },
@@ -1185,18 +1170,8 @@
          "vertexType": "Incident",
          "description": "Instances of Indicators and/or Threat Actors performing specific threat actions",
          "type": "object",
-         "xpath": ["Incident"],
+         "path": ["Incident"],
          "properties": {  
-            "name": {
-               "type": "string",
-               "cardinality": "single",
-               "description": "UUID of this Incident"
-            },
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Incident"
-            },
             "description":{  
                "applyFunction": "getElementDescriptionList",
                "description":"descriptive summary of this Incident",
@@ -1209,23 +1184,21 @@
                "type":"string",
                "cardinality":"set"
             },
-            "alias":{  
-               "xpath": [  
-                  "Incident/External_ID",
-                  "Incident/Related_Observables/Related_Observable/Observable",
-                  "Incident/Leveraged_TTPs/Leveraged_TTP/TTP",
-                  "Incident/Attributed_Threat_Actors/Threat_Actor/Threat_Actor"
-               ],
-               "cardinality":"set"
-            },
             "source":{  
-               "xpath": [
+               "path": [
                   "Incident/Information_Source/Identity/Name",
                   "Incident/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            },
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Incident"
             }
          },
          "required":[  
@@ -1265,46 +1238,35 @@
             ]
          },
          "edges": {
-            "RelatedIncident": {
-               "inVType": [
-                  "Incident"
-               ]
+            "Incident": {
+               "relation": "RelatedIncident"
             },
-            "RelatedIndicator": {
-               "inVType": [
-                  "Indicator"
-               ]
+            "Indicator": {
+               "relation": "RelatedIndicator"
             },
-            "LeveragedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "TTP": {
+               "relation": "LeveragedTTP"
             },
-            "COATaken": {
-               "outElementName": "COA_Taken",
-               "inVType": [
-                  "Course_Of_Action"
-               ]
+            "Malware": {
+               "relation": "LeveragedTTP"
             },
-            "COARequested": {
-               "outElementName": "COA_Requested",
-               "inVType": [
-                  "Course_Of_Action"
-               ]
+            "Exploit": {
+               "relation": "LeveragedTTP"
             },
-            "RelatedThreatActor": {
-               "inVType": [
-                  "Threat_Actor"
-               ]
+            "Course_Of_Action": {
+               "relation": "COATakenOrRequested"
             },
-            "RelatedObservable": {
-               "inVType": [
-                  "Observable",
-                  "AddressRange",
-                  "IP"
-               ]
+            "Threat_Actor": {
+               "relation": "RelatedThreatActor"
+            },
+            "Observable": {
+               "relation": "RelatedObservable"
+            },
+            "AddressRange": {
+               "relation": "RelatedObservable"
+            },
+            "IP": {
+               "relation": "RelatedObservable"
             }
          }
       },
@@ -1313,48 +1275,35 @@
          "vertexType": "Indicator",
          "description": "Indicating Observable patterns combined with additional contextual information",
          "type": "object",
-         "xpath": ["Indicator"],
+         "path": ["Indicator"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Indicator"
-            },
-            "name": {
-               "type": "string",
-               "cardinality": "single",
-               "description": "UUID of this Indicator"
-            },
             "description":{  
-               "xpath": ["Description"],
+               "path": ["Indicator/Description"],
                "description":"descriptive summary of this Indicator",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath": ["Short_Description"],
+               "path": ["Indicator/Short_Description"],
                "description":"short descriptive summary of this Indicator",
                "type":"string",
                "cardinality":"set"
             },
-            "alias":{  
-               "xpath": [
-                  "Indicator/Alternative_ID",
-                  "Indicator/Indicated_TTP/TTP",
-                  "Indicator/Related_Campaigns/Related_Campaign/Campaign",
-                  "Indicator/Observable",
-                  "Indicator/Suggested_COAs/Suggested_COA/Course_Of_Action"
-               ],
-               "cardinality":"set"
-            },
             "source":{  
-               "xpath": [
+               "path": [
                   "Indicator/Producer/Identity/Name",
                   "Indicator/Producer/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Indicator"
             }
          },
          "required":[  
@@ -1394,34 +1343,32 @@
             ]
          },
          "edges": {
-            "RelatedIndicator": {
-               "inVType": [
-                  "Indicator"
-               ]
+            "Indicator": {
+               "relation": "RelatedIndicator"
             },
             "Observable": {
-               "inVType": [
-                  "Observable",
-                  "AddressRange",
-                  "IP"
-               ]
+               "relation": "Observable"
             },
-            "SuggestedCOA": {
-               "inVType": [
-                  "Course_Of_Action"
-               ]
+            "AddressRange": {
+               "relation": "Observable"
             },
-            "RelatedCampaign": {
-               "inVType": [
-                  "Campaign"
-               ]
+            "IP": {
+               "relation": "Observable"
             },
-            "IndicatedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "Course_Of_Action": {
+               "relation": "SuggestedCOA"
+            },
+            "Campaign": {
+               "relation": "RelatedCampaign"
+            },
+            "TTP": {
+               "relation": "IndicatedTTP"
+            },
+            "Malware": {
+               "relation": "IndicatedTTP"
+            },
+            "Exploit": {
+               "relation": "IndicatedTTP"
             }
          }
       },
@@ -1430,38 +1377,29 @@
          "vertexType": "Threat_Actor",
          "description": "Characterizations of malicious actors or adversaries representing a cyber attack",
          "type": "object",
-         "xpath": ["Threat_Actor"],
+         "path": ["Threat_Actor"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Threat_Actor"
-            },
             "name":{  
-               "xpath": ["Threat_Actor/Identity/Name"],
+               "path": ["Threat_Actor/Identity/Name"],
                "cardinality":"single",
                "comparisonFunction":"exact",
                "comparisonWeight":1.0,
                "resolutionFunction":"none"
             },
             "description":{  
-               "xpath": ["Description"],
+               "path": ["Threat_Actor/Description"],
                "description":"descriptive summary of this Threat_Actor",
                "type":"string",
                "cardinality":"set"
             },
             "shortDescription":{  
-               "xpath": ["Short_Description"],
+               "path": ["Threat_Actor/Short_Description"],
                "description":"short descriptive summary of this Threat_Actor",
                "type":"string",
                "cardinality":"set"
             },
-            "alias":{  
-               "xpath": ["Threat_Actor/Identity/Related_Identities/Related_Identity/Identity/Name"],
-               "cardinality":"set"
-            },
             "source":{  
-               "xpath": [
+               "path": [
                   "Threat_Actor/Information_Source/Identity/Name",
                   "Threat_Actor/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
@@ -1507,22 +1445,20 @@
             ]
          },
          "edges": {
-            "AssociatedActor": {
-               "inVType": [
-                  "Threat_Actor"
-               ]
+            "Threat_Actor": {
+               "relation": "AssociatedActor"
             },
-            "HistoricalCampaign": {
-               "inVType": [
-                  "Campaign"
-               ]
+            "Campaign": {
+               "relation": "HistoricalCampaign"
             },
-            "ObservedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "TTP": {
+               "relation": "ObservedTTP"
+            },
+            "Malware": {
+               "relation": "ObservedTTP"
+            },
+            "Exploit": {
+               "relation": "ObservedTTP"
             }
          }
       },
@@ -1531,13 +1467,8 @@
          "vertexType": "TTP",
          "description": "Adversary Tactics, Techniques and Procedures leveraged by adversary, such as malware, exploits, tools, etc",
          "type": "object",
-         "xpath": ["TTP"],
+         "path": ["TTP"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "TTP"
-            },
             "description":{  
                "applyFunction": "getElementDescriptionList",
                "description":"descriptive summary of this TTP",
@@ -1551,13 +1482,20 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath": [
+               "path": [
                   "TTP/Information_Source/Identity/Name",
                   "TTP/Information_Source/Contributing_Sources/Source/Identity/Name"
                ],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this TTP"
             }
          },
          "required":[  
@@ -1597,23 +1535,23 @@
             ]
          },
          "edges": {
-            "RelatedTTP": {
-               "inVType": [
-                  "TTP",
-                  "Malware",
-                  "Exploit"
-               ]
+            "TTP": {
+               "relation": "RelatedTTP"
             },
-            "ExploitTarget": {
-               "inVType": [
-                  "Exploit_Target"
-               ]
+            "Malware": {
+               "relation": "RelatedTTP"
             },
-            "Exploits": {
-               "inVType": [
-                  "Vulnerability",
-                  "Weakness"
-               ]
+            "Exploit": {
+               "relation": "RelatedTTP"
+            },
+            "Exploit_Target": {
+               "relation": "ExploitTarget"
+            },
+            "Vulnerability": {
+               "relation": "Exploits"
+            },
+            "Weakness": {
+               "relation": "Exploits"
             }
          }
       },
@@ -1622,13 +1560,8 @@
          "vertexType": "Observable",
          "description": "Observable is representing a description of a single cyber observable through",
          "type": "object",
-         "xpath": ["Observable"],
+         "path": ["Observable"],
          "properties":{  
-            "vertexType":{  
-               "type":"string",
-               "cardinality":"single",
-               "default": "Observable"
-            },
             "description":{  
                "applyFunction": "getElementDescriptionList",
                "description":"descriptive summary of this Observable",
@@ -1636,10 +1569,17 @@
                "cardinality":"set"
             },
             "source":{  
-               "xpath": ["Observable/Observable_Source/Information_Source_Type"],
+               "path": ["Observable/Observable_Source/Information_Source_Type"],
                "description":"Data source for this vertex",
                "type":"string",
                "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "name is identified using cybox_ontology.json"
             },
             "observableType": {
                "description": "CybOX object type used to describe this vertex; specified in cybox_ontology.json",
@@ -1682,12 +1622,14 @@
             ]
          },
          "edges": {
-            "Sub-Observable": {
-               "inVType": [
-                  "Observable",
-                  "AddressRange",
-                  "IP"
-               ]
+            "Observable": {
+               "relation": "Sub-Observable"
+            },
+            "AddressRange": {
+               "relation": "Sub-Observable"
+            },
+            "IP": {
+               "relation": "Sub-Observable"
             }
          }
       }

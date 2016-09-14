@@ -1,5 +1,7 @@
 package gov.ornl.stucco;
 
+import gov.ornl.stucco.preprocessors.PreprocessSTIX.Vertex;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -15,12 +17,12 @@ import org.json.JSONArray;
 
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.output.Format;
-import org.jdom2.Element;
+import org.jdom2.Element; 
 import org.jdom2.Namespace;
 import org.jdom2.Attribute; 
 import org.jdom2.xpath.XPathFactory; 
-import org.jdom2.xpath.XPathExpression; 
-
+import org.jdom2.xpath.XPathExpression;  
+ 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory; 
 
@@ -34,22 +36,6 @@ public class GraphConstructor {
 		
 	private Logger logger = null;
 
-	private static String[] vertTypeArray = {
-		"IP", 
-		"AddressRange", 
-		"Exploit", 
-		"Malware", 
-		"Vulnerability", 
-		"Weakness", 
-		"Campaign", 
-		"Course_Of_Action", 
-		"Exploit_Target", 
-		"Incident", 
-		"Indicator", 
-		"Observable", 
-		"Threat_Actor", 
-		"TTP"
-	};	
 	/* 
 	 *	vertices are stored as a key/value, or id/vertex, 
 	 *	because search jsonObject is faster and easier, than xml 
@@ -58,7 +44,9 @@ public class GraphConstructor {
 	private JSONObject vertices = null;
 	private JSONArray edges = null;
 
-	private Map<String, Element> stixElements = null;
+	private Map<String, Vertex> stixElements = null;
+	private Map<String, Map<Object, String>> vertBookkeeping = null;
+	private Map<String, String> duplicateMap = null;
 
 	public String print(Element e) {
 		XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
@@ -71,7 +59,7 @@ public class GraphConstructor {
 		logger = LoggerFactory.getLogger(GraphConstructor.class);
 	}
 
-	public JSONObject constructGraph(Map<String, Element> stixElements) {
+	public JSONObject constructGraph(Map<String, Vertex> stixElements) {
 		if (stixElements == null) {
 			return null;
 		} else {
@@ -79,168 +67,207 @@ public class GraphConstructor {
 			graph = new JSONObject();
 			vertices = new JSONObject();
 			edges = new JSONArray();
+			vertBookkeeping = new HashMap<String, Map<Object, String>>();
+			duplicateMap = new HashMap<String, String>();
 			constructGraph();
 		}
 
 		return graph;
 	}
-	
+
 	private void constructGraph() {	
 		/* turning elements into vertices first, so if any of them are not valid or 
 		   do not contain required fields we would not create edges for those vertices */
-		for (Map.Entry<String, Element> entry : stixElements.entrySet()) {
+		JSONObject vertexTypes = ConfigFileLoader.stuccoOntology.getJSONObject("properties").getJSONObject("vertices").getJSONObject("items");
+		for (Map.Entry<String, Vertex> entry : stixElements.entrySet()) {
 			/* some vertices are created out of order; example is when required field value is in references element */
-			if (vertices.has(entry.getKey())) {
+			String id = entry.getKey();
+			if (vertices.has(id)) {
 				continue;
 			}
-			Element element = entry.getValue();
-			String vertexType = determineVertexType(element); 
-			JSONObject newVertex = constructVertex(element, vertexType);
-			vertices.put(element.getAttributeValue("id"), newVertex);
-		}	
-			
-		/* now working on edges; looking for all referenced elements and constructing new edges */	
-		XPathFactory xpfac = XPathFactory.instance();
-		String path = ".//*[@object_reference or @idref]";
-		XPathExpression xp = xpfac.compile(path);
-		for (Map.Entry<String, Element> entry : stixElements.entrySet()) {
-			Element outElement = entry.getValue();
-			String outVertID = outElement.getAttributeValue("id");
-			/* if out vertex with this id was not valid and not created, so we do not need to construct an edge for it */
-			if (!vertices.has(outVertID)) {
-				continue;
-			}		
-			/* searching outElement for referencies */
-			List<Element> refList = (List<Element>) xp.evaluate(outElement);
-			for (Element ref : refList) {	
-				String inVertID = null;
-				if ((inVertID = ref.getAttributeValue("idref")) == null) {
-					inVertID = ref.getAttributeValue("object_reference");
-				}	
-				/* again, if in vertex (referenced element) was invalid and not created, we do not need this edge */
-				if (!vertices.has(inVertID)) {
-					continue;
-				} 
-				/* searching for relation using stucco_ontology */
-				String relationship = getRelationship(ref, outVertID, inVertID);
-				if (relationship == null) {
-					relationship = vertices.getJSONObject(outVertID).getString("vertexType") + "Related" + vertices.getJSONObject(inVertID).getString("vertexType");												
-					logger.info("Could not determine relation between vertices:");
-					logger.info("		outVertType = " + vertices.getJSONObject(outVertID).getString("vertexType"));
-					logger.info("		inVertType = " + vertices.getJSONObject(inVertID).getString("vertexType"));
-					logger.info("		-> assigned constructed relationship: " + relationship);
-				}			
-				JSONObject newEdge = constructNewEdge(outVertID, inVertID, relationship);
-				edges.put(newEdge);	
-			}
+			Vertex v = entry.getValue();
+			constructSubgraph(id, v, vertexTypes);
 		}
+		graph.put("vertices", vertices);
+		graph.put("edges", edges);
+	}
+
+	private String constructSubgraph(String id, Vertex v, JSONObject vertexTypes) {	
+		String vertexType = determineVertexType(v, vertexTypes); 
+		JSONObject newVertex = constructVertex(v, vertexType);
+		String outVertID = checkForDuplicate(id, vertexType, newVertex);
 		
-		if (vertices.length() != 0) {
-			graph.put("vertices", vertices);
+		for (String path : v.referencePaths.keySet()) {
+			List<String> list = v.referencePaths.get(path);
+			for (String idref : list) {
+				String inVertID = null;
+				String inVertexType = null;
+				if (vertices.has(idref)) {
+					inVertID = idref;
+					inVertexType = vertices.getJSONObject(inVertID).getString("vertexType");
+				} else if (duplicateMap.containsKey(inVertID)) {
+					inVertID = duplicateMap.get(idref);
+					inVertexType = vertices.getJSONObject(inVertID).getString("vertexType");
+				} else {
+					Vertex inV = (stixElements.containsKey(idref)) ? stixElements.get(idref) : null;
+					if (inV == null) {
+						logger.debug("Could not find outVertex to construct an edge with outVertID = " + outVertID);
+					} else {
+						inVertID = constructSubgraph(idref, inV, vertexTypes);
+					}
+				}
+				
+				if (inVertID != null) {
+					inVertexType = vertices.getJSONObject(inVertID).getString("vertexType");
+					String relationship = getRelationship(vertexType, inVertexType);
+					if (relationship == null) {
+						logger.debug("Find relationship between outVertType = " + vertexType + " and inVertType = " + inVertexType);
+						relationship = "Related_" + inVertexType;
+					}
+					JSONObject newEdge = constructNewEdge(outVertID, inVertID, relationship);
+					edges.put(newEdge);	
+				}
+			}
 		}
 
-		if (edges.length() != 0) {
-			graph.put("edges", edges);
+		return outVertID;
+	}
+
+	/* 
+	 *	finds a relationship based on provided, if relationship is not provided, 
+	 *	it is looking for the path of referenced element to try to determine it based on rules from stucc_ontology;
+	 *	if related path is not found, then looking in graph_config 
+	 */
+
+	//TODO: change ontology to have inVertType as a key insteadof relashionship
+	private String getRelationship(String outVertType, String inVertType) {
+		String relationship = null;
+		JSONObject outVertConfig = ConfigFileLoader.getVertexOntology(outVertType);
+		if (outVertConfig.has("edges")) {
+			JSONObject edges = outVertConfig.getJSONObject("edges");
+			if (edges.has(inVertType)) {
+				relationship = edges.getJSONObject(inVertType).getString("relation");
+			}
 		}
+
+		return relationship;
+	}
+
+	private String checkForDuplicate(String id, String vertexType, JSONObject newVertex) {
+		boolean duplicate = false;
+		//TODO: add additional comparison for malware and campaign based on their alias
+		//TODO: merge properties of duplicates
+		if (vertBookkeeping.containsKey(vertexType)) {
+			Map<Object, String> vertNameBookkeeping = vertBookkeeping.get(vertexType);
+			Object vertName = newVertex.get("name");
+			if (vertNameBookkeeping.containsKey(vertName)) {
+				String duplicateId = vertNameBookkeeping.get(vertName);
+				duplicateMap.put(id, duplicateId);
+				
+				return duplicateId; 
+			} 
+		}
+		vertices.put(id, newVertex);
+
+		return id;
 	}
 
 	/* 
 	 *	function to traverse graph_config.json 
 	 *	to determine what is a vertexType of this stix element 
 	 */
-	private String determineVertexType(Element element) {
-		for (int i = 0; i < vertTypeArray.length; i++) {
-			String vertexType = vertTypeArray[i];
-			JSONObject typeOntology = ConfigFileLoader.getVertexOntology(vertexType);
-			if (typeOntology.has("xpath")) {
-				if (findIfPathExists(element, typeOntology.getString("xpath"))) {
-					return vertexType;
+	private String determineVertexType(Vertex v, JSONObject vTypesDef) {
+		String vertexType = v.type;
+		JSONObject vTypeDef = vTypesDef.getJSONObject(v.type);
+		if (vTypeDef.has("items")) {
+			JSONObject vSubTypesDef = vTypeDef.getJSONObject("items");
+			for (Object key : vSubTypesDef.keySet()) {
+				String subType = key.toString();
+				JSONObject vSubTypeDef = vSubTypesDef.getJSONObject(subType);
+				String path = vSubTypeDef.getString("path");
+				if (v.type.equals("Observable")) {
+					if (v.contentPaths.containsKey(path)) {
+						boolean found = true;
+						if (vSubTypeDef.has("observableType")) {
+							String observableType = vSubTypeDef.getString("observableType");
+							if (!observableType.equals(v.observableType)) {
+								continue;
+							}
+						}
+						if (vSubTypeDef.has("pattern") && found) {
+							String pattern = vSubTypeDef.getString("pattern");
+							String content = v.contentPaths.get(path).get(0).toString();
+							if (content.matches(pattern)) {
+								vertexType = subType;
+								break;
+							}	
+						}
+					}
+				} else {
+					for (String contentPath : v.contentPaths.keySet()) {
+						if (contentPath.startsWith(path)) {
+							return subType;
+						}
+					}
 				}
-			} else if (typeOntology.has("regex")) {
-				if (findIfRegexMatches(element, typeOntology.getJSONObject("regex"))) {
-					return vertexType;
-				}
-			} else {
-				logger.info("Element " + element.getName() + " does not have xpath or regex to deternime it's vertexType!");
 			}
-		}
-		return null;
+		} 
+
+		return vertexType;
 	}
-
-	/* 
-	 *	looking for a specific path in the element that determines it's vertexType 
-	 */
-	private boolean findIfPathExists(Element element, String path) {
-		XPathFactory xpfac = XPathFactory.instance();
-		XPathExpression xp = xpfac.compile(path);
-		Element foundElement = (Element) xp.evaluateFirst(element);
-
-		return (foundElement == null) ? false : true;
-	}
-
-	/* 
-	 *	founction to find vertexType based on the existence of required xml element 
-	 *	and its value matching a provided regex 
-	 */
-	private boolean findIfRegexMatches(Element element, JSONObject json) {
-		String path = json.getString("xpath");
-		String pattern = json.getString("pattern");
-		XPathFactory xpfac = XPathFactory.instance();
-		XPathExpression xp = xpfac.compile(path);
-		Element foundElement = (Element) xp.evaluateFirst(element);
-		
-		return (foundElement == null) ? false : foundElement.getTextNormalize().matches(pattern);
-	}	
 
 	/* 
 	 *	function to find properties context based on provided paths in stucco_ontology.json 
 	 *	and add found properties to new json vertex 
 	 */
-	private JSONObject constructVertex(Element element, String vertexType) {
+	private JSONObject constructVertex(Vertex v, String vertexType) {
 		JSONObject newVertex = new JSONObject();
-		if (!ConfigFileLoader.getVertexOntology(vertexType).has("properties")) {
-			System.out.println(ConfigFileLoader.getVertexOntology(vertexType).toString(2));
-			print(element);
-		}
 		JSONObject properties = ConfigFileLoader.getVertexOntology(vertexType).getJSONObject("properties");
-		for (Object property : properties.keySet()) {
-			String propertyName = property.toString();
-			JSONObject propertyInfo = properties.getJSONObject(propertyName);
-			if (propertyInfo.has("xpath")) {
-				Object content = getElementContent(element, propertyInfo);
+		for (String property : properties.keySet()) {
+			JSONObject propertyInfo = properties.getJSONObject(property);
+			if (propertyInfo.has("path")) {
+				Object content = getElementContent(v, propertyInfo);
 				if (content != null) {
-					newVertex.put(propertyName, content);
+					newVertex.put(property, content);
 				}
 			} else {
 				if (propertyInfo.has("applyFunction")) {
 					String applyFunction = propertyInfo.getString("applyFunction");
 					Object content = null;
 					if (applyFunction.equals("getElementDescriptionList")) {
-						content = getElementDescriptionList(element);
+						content = getDescriptionList(v);
 					} else if (applyFunction.equals("getElementShortDescriptionList")) {
-						content = getElementShortDescriptionList(element);
+						content = getShortDescriptionList(v);
 					}
 					if (content != null) {
-						newVertex.put(propertyName, content);
+						newVertex.put(property, content);
 					}
-				} 
-					//else if (!propertyName.equals("vertexType")) {
-					//logger.error("Could not find xpath or applyFunction for " + vertexType + ", property: " + propertyName + "!");
-					//}
+				}
 			}
 		}
-		JSONObject observableTypeInfo = getObservableTypeInfo(element);
-		if (observableTypeInfo != null) {
-			newVertex.put("observableType", observableTypeInfo.getString("typeName"));
-			newVertex.put("name", getObservableName(element, observableTypeInfo));
-			// for now it is only observable with even has alias and observable composition; 
-			if (observableTypeInfo.has("aliasPath")) {
-				newVertex.put("alias", getObservableAlias(element, observableTypeInfo));
+
+		if (v.observableType != null) {
+			JSONObject observableTypeInfo = ConfigFileLoader.getObservableType(v.observableType);
+
+			if (observableTypeInfo != null) {
+				newVertex.put("observableType", observableTypeInfo.getString("typeName"));
+				Object name = getObservableName(v, observableTypeInfo);
+				if (newVertex.get("observableType").equals("Product")) {
+					newVertex.put("name", cleanCpeName(name.toString()));
+				} else {
+					newVertex.put("name", name);
+				}
+				// for now it is only observable with even has alias and observable composition; 
+				if (observableTypeInfo.has("aliasPath")) {
+					newVertex.put("alias", getObservableAlias(v, observableTypeInfo));
+				}
 			}
 		}
-		newVertex.put("sourceDocument", new XMLOutputter().outputString(element).replaceAll("\\s\\s+", ""));
+		newVertex.put("sourceDocument", v.xml);
 		newVertex.put("vertexType", vertexType);
+		//System.out.println(newVertex.toString(2));
 		// malware and campaign can have multiple names, so we put all of them into alias field first, and then move one to name field
+		/*
 		if (vertexType.equals("Malware") || vertexType.equals("Campaign")) {
 			if (newVertex.has("alias")) {
 				Set<Object> alias = (HashSet<Object>) newVertex.get("alias");
@@ -255,10 +282,11 @@ public class GraphConstructor {
 				return newVertex;
 			}
 		}
-		if (!newVertex.has("name")) {
-			newVertex.put("name", element.getAttributeValue("id"));
-		}
+		*/
 
+		if (!newVertex.has("name")) {
+			newVertex.put("name", v.id);
+		}
 		return newVertex;
 	}
 
@@ -266,86 +294,72 @@ public class GraphConstructor {
 	 *	function helper: finds element's content based on provided xpath;
 	 *	used in construction of properties of new json vertex 
 	 */
-	private Object getElementContent(Element element, JSONObject propertyInfo) {
-		String xpath = propertyInfo.optString("xpath");
-		XPathFactory xpfac = XPathFactory.instance();
-		XPathExpression xp = xpfac.compile(xpath);
+	private Object getElementContent(Vertex v, JSONObject propertyInfo) {
 		String pattern = propertyInfo.optString("pattern");
+		JSONArray paths = propertyInfo.getJSONArray("path");
 		if (propertyInfo.get("cardinality").equals("single")) {
-			/* checking for cardinality and no pattern (content will be not a combination of contents from different elements),
-			   then limit xpath search to first found element, so it will not continue looking */
-			if (pattern.isEmpty()) { 
-				Element foundElement = (Element) xp.evaluateFirst(element);
-				return (foundElement == null) ? null : processElementContent(foundElement, propertyInfo);
-			} else {
-				List<Element> foundElementList = (List<Element>) xp.evaluate(element);
-				if (foundElementList.isEmpty()) {
-					return null;
-				}
-				/* this case is for composite propertyValue with pattern; like cpe with part, vendor, product, etc
-				   which require content of a set of elements arranged according a pattern */
-				boolean componentsFound = false;
-				Object propertyValue = null;
-				for (Element foundElement : foundElementList) {
-					String elementName = foundElement.getName();
-					propertyValue = processElementContent(foundElement, propertyInfo);
-					if (propertyValue == null) {
-						pattern = pattern.replace(elementName, ""); 
-					} else {
-						pattern = pattern.replace(elementName, propertyValue.toString()); 
-						componentsFound = true;
-					}
-				}
-				return (pattern.isEmpty() || !componentsFound) ? null : pattern;
-			}
-		} else { /* this is a case when cardinality = set */
-			/* testing for cardinality = set, and returning a set of resulting values */
-			List<Element> foundElementList = (List<Element>) xp.evaluate(element);
-			if (foundElementList.isEmpty()) {
-				return null;
-			}
 			if (pattern.isEmpty()) {
-				Set<Object> set = new HashSet<Object>();
-				for (Element foundElement : foundElementList) {
-					Object propertyValue = processElementContent(foundElement, propertyInfo);
-					if (propertyValue != null) {
-						set.add(propertyValue);
+				Object content = null;
+				if (paths.length() > 1) {
+					logger.debug("MULTIPLE PATHS FOR PROPERTY OF SINGLE CARDINALITY: " + propertyInfo);
+				}
+				String path = paths.getString(0);
+				if (v.contentPaths.containsKey(path)) {
+					content = v.contentPaths.get(path).get(0);
+				} else if (v.referencePaths.containsKey(path)) {
+					content = getReferencedElementName(v.referencePaths.get(path).get(0));
+				}
+
+				return (content == null) ? content : processContent(content, propertyInfo);
+
+			} else {
+				boolean componentsFound = false;
+				for (int i = 0; i < paths.length(); i++) {
+					String path = paths.getString(i);
+					if (v.contentPaths.containsKey(path)) {
+						List<Object> list = v.contentPaths.get(path);
+						Object content = (list == null) ? "" : list.get(0);
+						String[] p = path.split("/");
+						pattern = pattern.replace(p[p.length - 1], content.toString());
+						componentsFound = (componentsFound || !content.toString().isEmpty());
+					} else if (v.referencePaths.containsKey(path)) {
+						Object content = getReferencedElementName(v.referencePaths.get(path).get(0));
+						String[] p = path.split("/");
+						pattern = pattern.replace(p[p.length - 1], content.toString());
+						componentsFound = (componentsFound || !content.toString().isEmpty());
 					}
 				}
-			//	return (set.isEmpty()) ? null : new JSONArray(set);
-				return (set.isEmpty()) ? null : set;
-			} else {
-				//TODO double check on propertyValue with pattern and cardinality = set ...
-				// not sure how to handle those yet, but it should not happen ... here is a check for it
-				logger.info("More than one value was found with pattern and set cardinality!!!");
-				return null;
-			}		
+				return (pattern.isEmpty() || !componentsFound) ? null : pattern;	
+			}
+		} else {
+			Set<Object> content = new HashSet<Object>();
+			for (int i = 0; i < paths.length(); i++) {
+				String path = paths.getString(i);
+				if (v.contentPaths.containsKey(path)) {
+					List<Object> list = v.contentPaths.get(path);
+					for (Object value : list) {
+						content.add(processContent(value, propertyInfo));
+					}
+				}
+				if (v.referencePaths.containsKey(path)) {
+					List<String> idrefList = v.referencePaths.get(path);
+					for (String idref : idrefList) {
+						Object value = getReferencedElementName(idref);
+						if (value != null) {
+							content.add(processContent(value, propertyInfo));
+						}
+					}
+				}
+			}
+
+			return content;
 		}
 	}
 
 	/* 
 	 *	turning element content into vertex properties, such as looking for description, name, etc. 
 	 */
-	private Object processElementContent(Element foundElement, JSONObject propertyInfo) {
-		Object propertyValue = null;
-		if (foundElement.getAttribute("idref") != null) {
-			String idref = foundElement.getAttributeValue("idref");
-			propertyValue = getReferencedElementName(idref);
-		} else if (foundElement.getAttribute("object_reference") != null) {
-			String object_reference = foundElement.getAttributeValue("object_reference");
-			propertyValue = getReferencedElementName(object_reference);
-		} else {
-			propertyValue = foundElement.getTextNormalize();
-		}
-			//TODO decide later on what to do with delimiters ....
-		//	if (foundElement.hasAttribute("delimiter")) {
-		//		String delimiter = foundElement.getAttributeValue("delimiter");
-		//		Split[] propertyValueList = propertyValue.split(delimiter);
-		//	}
-
-		if (propertyValue == null || propertyValue.equals("")) {
-			return null;
-		}
+	private Object processContent(Object propertyValue, JSONObject propertyInfo) {
 		/* regex required in cases like differ IP and AddressRange, where besides value everything else is the same */
 		if (propertyInfo.has("regex")) {
 			String regexPattern = propertyInfo.getString("regex");
@@ -360,7 +374,6 @@ public class GraphConstructor {
 			if (propertyInfo.getString("applyFunction").equals("ipToLong")) {
 				long ipInt = ipToLong(propertyValue.toString()); 
 				return ipInt;
-			//	propertyValue = String.valueOf(ipInt); 
 			} 
 		}
 
@@ -375,203 +388,119 @@ public class GraphConstructor {
 		}
 	}
 
-	/* 
-	 *	if during construction of vertex, required element value is not present, but referenced, then 
-	 *	we are getting referenced element and recursively looking for a desired value 
-	 */
-	private String getReferencedElementName(String idref) {
+	private Object getReferencedElementName(String idref) {
+		Object name = null;
 		if (vertices.has(idref)) {
-			JSONObject referencedVertex = vertices.getJSONObject(idref);
-			return referencedVertex.getString("name");
+			JSONObject vertex = vertices.getJSONObject(idref);
+			name = vertex.get("name");
 		} else {
 			if (stixElements.containsKey(idref)) {
-				Element referencedElement = stixElements.get(idref);
-				String referencedVertexType = determineVertexType(referencedElement);
-				if (referencedVertexType != null) {
-					JSONObject referencedVertex = constructVertex(referencedElement, referencedVertexType);
-					// commented out verification, since many times elements do not have all the required fields, 
-					// but throwing them away ends up in loss of important connections
-					// if (verifyStuccoVertex(referencedVertex)) {
-						vertices.put(idref, referencedVertex);
-						return referencedVertex.getString("name");
-					// } 
-				} else {
-					logger.info("Could not find vertexType!");
-				}
+				Vertex v = stixElements.get(idref);
+				JSONObject vertexTypes = ConfigFileLoader.stuccoOntology.getJSONObject("properties").getJSONObject("vertices").getJSONObject("items");
+				idref = constructSubgraph(idref, v, vertexTypes);
+				name = vertices.getJSONObject(idref).get("name");
 			}
 		}
-		return null;
-	} 
 
-	/* 
-	 *	determines if observable is an object, event, or observable composition;
-	 *	required to construct fields, associated with those types 
-	 */
-	private JSONObject getObservableTypeInfo(Element element) {
-		String name = element.getName();
-		if (!name.equals("Observable")) {
-			return null;
-		}
-		Element object = element.getChild("Object", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
-		if (object == null) {
-			Element event = element.getChild("Event", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
-			if (event != null) {
-				return ConfigFileLoader.getObservableType("Event");
+		return name;
+	}
+
+	private Object getDescriptionList(Vertex v) {
+		Set<Object> description = new HashSet<Object>();
+		for (String path : v.contentPaths.keySet()) {
+			if (path.endsWith("Description")) {
+				description.addAll(v.contentPaths.get(path));
 			}
-			Element observableComposition = element.getChild("Observable_Composition", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
-			if (observableComposition != null) {
-				return ConfigFileLoader.getObservableType("ObservableComposition");
-			} 
-			
-			return null;
 		}
-		Element properties = object.getChild("Properties", Namespace.getNamespace("cybox","http://cybox.mitre.org/cybox-2"));
-		if (properties == null) {
-			return null;
+
+		return description;
+	}
+
+	private Object getShortDescriptionList(Vertex v) {
+		Set<Object> shortDescription = new HashSet<Object>();
+		for (String path : v.contentPaths.keySet()) {
+			if (path.endsWith("Short_Description")) {
+				shortDescription.addAll(v.contentPaths.get(path));
+			}
 		}
-		String type = properties.getAttributeValue("type", Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance")).split(":")[1];
-		if (type != null) {
-			return ConfigFileLoader.getObservableType(type);
-		}
-		return null;
+
+		return shortDescription;
 	}
 
 	/* 
 	 *	determines name value for most observables based on xpath provided in cybox_ontology.json 
 	 */
-	private String getObservableName(Element element, JSONObject observableTypeInfo) {
-		String namePath = observableTypeInfo.optString("namePath");
-		if (namePath == null || namePath.isEmpty()) {
+	private Object getObservableName(Vertex v, JSONObject observableTypeInfo) {
+		JSONArray namePaths = observableTypeInfo.optJSONArray("namePath");
+		if (namePaths == null) {
 			return null;
 		} else {
-			XPathFactory xpfac = XPathFactory.instance();
-			XPathExpression xp = xpfac.compile(namePath);
 			String pattern = observableTypeInfo.optString("pattern");
 			if (pattern.isEmpty()) {
-				Element foundElement = (Element) xp.evaluateFirst(element);
-				if (foundElement == null) {
-					return null;
-				} else {
-					String name = null;
-					String object_reference = null;
-					if ((object_reference = foundElement.getAttributeValue("object_reference")) != null) {
-						name = getReferencedElementName(object_reference);
-					} else {
-						name = foundElement.getTextNormalize();
+				Object content = null;
+				for (int i = 0; i < namePaths.length(); i++) {
+					String path = namePaths.getString(i);
+					if (v.contentPaths.containsKey(path)) {
+						return v.contentPaths.get(path).get(0);
+					} else if (v.referencePaths.containsKey(path)) {
+						List<String> list = v.referencePaths.get(path);
+						if (list.size() > 1) {
+							logger.debug("List of idRef is more tham one for pattern: " + path);
+						}
+						Object e = getReferencedElementName(list.get(0));
+
+						return e;
 					}
-					return (name == null || name.isEmpty()) ? null : name;
 				}
 			} else {
-				List<Element> foundElementList = (List<Element>) xp.evaluate(element);
-				String propertyValue = null;
-				for (Element foundElement : foundElementList) {
-					if (foundElement.getAttribute("object_reference") != null) {
-						String object_reference = foundElement.getAttributeValue("object_reference");
-						propertyValue = getReferencedElementName(object_reference);
-					} else {
-						propertyValue = foundElement.getTextNormalize();
+				boolean componentsFound = false;
+				for (int i = 0; i < namePaths.length(); i++) {
+					String path = namePaths.getString(i);
+					if (v.contentPaths.containsKey(path)) {
+						List<Object> list = v.contentPaths.get(path);
+						Object content = (list == null) ? "" : list.get(0);
+						String[] p = path.split("/");
+						pattern = pattern.replace(p[p.length - 1], content.toString());
+						componentsFound = (componentsFound || !content.toString().isEmpty());
+					} else if (v.referencePaths.containsKey(path)) {
+						Object content = getReferencedElementName(v.referencePaths.get(path).get(0));
+						String[] p = path.split("/");
+						pattern = pattern.replace(p[p.length - 1], content.toString());
+						componentsFound = (componentsFound || !content.toString().isEmpty());
 					}
-					pattern = (propertyValue.isEmpty()) ? pattern.replace(foundElement.getName(), "") : pattern.replace(foundElement.getName(), propertyValue);
-				}
-				/* cleaning pattern that left after composing software/hardware name with missing cpe components */
-				if (observableTypeInfo.get("typeName").equals("Product")) {
-					pattern = cleanCpeName(pattern);
 				}
 				return pattern;
 			}
+			/* cleaning pattern that left after composing software/hardware name with missing cpe components */
+			//if (observableTypeInfo.get("typeName").equals("Product")) {
+			//	pattern = cleanCpeName(pattern);
+			//}
+
+			return null;
 		}
 	}
 
-  /* 
+	/* 
    *	function in used in cases like observable composition, where vertex does not have a unique name,
    *	but it can have alias with names of all the objects it is composed of;
    *	required for alignment/comparison 
    */
-	private Object getObservableAlias(Element element, JSONObject observableTypeInfo) {
+	private Object getObservableAlias(Vertex v, JSONObject observableTypeInfo) {
 		Set<Object> set = new HashSet<Object>();
 		String aliasPath = observableTypeInfo.getString("aliasPath");
-		XPathFactory xpfac = XPathFactory.instance();
-		XPathExpression xp = xpfac.compile(aliasPath);
-		List<Element> list = (List<Element>) xp.evaluate(element);
-		for (Element foundElement : list) {
-			if (foundElement.getAttribute("idref") != null) {
-				String content = getReferencedElementName(foundElement.getAttributeValue("idref"));
-				set.add(content);
-			} else {
-				String content = foundElement.getTextNormalize();
-				if (!content.isEmpty()) {
-					set.add(foundElement.getTextNormalize());
+		if (v.contentPaths.containsKey(aliasPath)) {
+			set.addAll(v.contentPaths.get(aliasPath));
+		} else if (v.referencePaths.containsKey(aliasPath)) {
+			List<String> aliasIdref = v.referencePaths.get(aliasPath);
+			for (String idref : aliasIdref) {
+				Object name = getReferencedElementName(idref);
+				if (name != null) {
+					set.add(name);
 				}
 			}
 		}
 
 		return (set.isEmpty()) ? null : set;
-	}
-
-	/* 
-	 *	finds a relationship based on provided, if relationship is not provided, 
-	 *	it is looking for the path of referenced element to try to determine it based on rules from stucc_ontology;
-	 *	if related path is not found, then looking in graph_config 
-	 */
-	private String getRelationship(Element refElement, String outVertID, String inVertID) {
-		String outVertType = vertices.getJSONObject(outVertID).getString("vertexType");
-		String inVertType = vertices.getJSONObject(inVertID).getString("vertexType");
-		String refPath = refElement.getQualifiedName();
-		while (refElement.getParentElement() != null) {
-			refElement = refElement.getParentElement();
-			refPath = refElement.getQualifiedName() + "/" + refPath;
-		}
-		JSONObject outVertConfig = ConfigFileLoader.getVertexOntology(outVertType);
-		if (outVertConfig.has("edges")) {
-			JSONObject edges = outVertConfig.getJSONObject("edges");
-			String relationship = getRelationshipHelper(edges, refPath, refElement.getName(), inVertType);
-			if (relationship != null) {
-				return relationship;
-			}
-		}
-
-		return null;
-	}	
-	
-	private String getRelationshipHelper(JSONObject edges, String refPath, String refElementName, String inVertType) {
-		for (Object relation : edges.keySet()) {
-			JSONObject edgeConfig = edges.getJSONObject(relation.toString());
-			if (edgeConfig.has("outElementName")) {
-				if (refElementName.equals("Related_Object") || !refElementName.equals(edgeConfig.getString("outElementName"))) {
-					continue;	
-				}
-			}
-			JSONArray inVTypeArray = edgeConfig.getJSONArray("inVType");
-			for (int i = 0; i < inVTypeArray.length(); i++) {
-				String inVType = inVTypeArray.getString(i);
-				if (inVType.equals(inVertType)) {
-					return relation.toString();
-				}
-			}
-		}
-
-		return null;
-	}
-
-	/* 
-	 *	testing if elements id equals idref, or if element contains child with id equals idref;
-	 *	required to construct an edges 
-	 */
-	private boolean containsIDRef(Element element, String idref) {
-		String id = null;
-		if ((id = element.getAttributeValue("id")) != null) {
-			if (id.equals(idref)) {
-				return true;
-			}
-		}
-		List<Element> children = element.getChildren();
-		for (Element child : children) {
-			if (containsIDRef(child, idref)) {
-				return true;
-			} 
-		}
-		
-		return false;
 	}
 
 	private JSONObject constructNewEdge(String outVertID, String inVertID, String relationship) {
@@ -581,36 +510,6 @@ public class GraphConstructor {
 		newEdge.put("relation", relationship);
 
 		return newEdge;
-	}	
-
-	private Object getElementDescriptionList(Element element) {
-		Set<Object> descriptionList = getElementDescriptionList(element, "Description");
-		
-		return (descriptionList.isEmpty()) ? null : descriptionList;
-	}
-
-	private Object getElementShortDescriptionList(Element element) {
-		Set<Object> descriptionList = getElementDescriptionList(element, "Short_Description");
-
-		return (descriptionList.isEmpty()) ? null : descriptionList;
-	}
-
-	/* collecting all the descriptions from xml element into list for default element to vertex convertion */
-	private Set<Object> getElementDescriptionList(Element element, String descriptionType) {
-		Set<Object> descriptionList = new HashSet<Object>();
-		if (element.getName().equals(descriptionType)) {
-			String content = element.getTextNormalize();
-			if (!content.isEmpty()) {
-				descriptionList.add(content);
-			}
-		} else {
-			List<Element> children = element.getChildren();
-			for (Element child : children) {
-				descriptionList.addAll(getElementDescriptionList(child, descriptionType));
-			}	
-		}
-
-		return descriptionList;
 	}
 
 	/* 
@@ -628,7 +527,6 @@ public class GraphConstructor {
 		return ipLong;
 	}
 
-	
 	private String cleanCpeName(String propertyValue) {
 		String[] cpe = "Property:Vendor:Product:Version:Update:Edition:Language".split(":");
 		for (String cpeComponent : cpe) {
