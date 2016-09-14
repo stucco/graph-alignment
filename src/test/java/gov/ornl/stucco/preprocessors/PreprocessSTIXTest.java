@@ -71,7 +71,6 @@ public class PreprocessSTIXTest {
 		try {
 		  for (String id : vertices.keySet()) {
 		    PreprocessSTIX.Vertex v = vertices.get(id);
-		    v.print();
 		    String xml = v.xml;
 		    if (v.type.equals("Observable")) {
 		    	count++;
