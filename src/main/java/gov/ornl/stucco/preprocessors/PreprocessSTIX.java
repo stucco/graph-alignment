@@ -216,8 +216,8 @@ public class PreprocessSTIX {
     Map<String, String> vertNS = new HashMap<String, String>();
     boolean done = false;
     String pathString = null;
-
     initElement(reader, writer, vertNS, path, vertex);
+    writer.writeAttribute("xmlns", "http://xml/metadataSharing.xsd");
 
     reader.next();
 
@@ -229,7 +229,9 @@ public class PreprocessSTIX {
           path.add(localName);
           pathString = toString(path);
 
-          if (stixElementMap.containsKey(localName) && !reader.getNamespaceURI().equals("http://stix.mitre.org/TTP-1")) {
+          if (stixElementMap.containsKey(localName) && 
+            // !reader.getNamespaceURI().equals("http://stix.mitre.org/TTP-1")) {
+            (reader.getPrefix().equals("stixCommon") || localName.equals("Observable"))) {
             String idref = reader.getAttributeValue(null, "idref");
             if (idref == null) {
               String prefix = reader.getPrefix();
@@ -274,6 +276,7 @@ public class PreprocessSTIX {
         }
     }
 
+    vertNS.remove("null");
     vertex.xml = sw.toString().replaceFirst(" ", toString(vertNS));
     vertices.put(vertex.id, vertex);
 
@@ -431,6 +434,7 @@ public class PreprocessSTIX {
       }
     }
     Namespace ns = stixElementMap.get(vertex.type);
+    vertNS.remove("null");
     vertNS.put(ns.getPrefix(), ns.getURI());
     vertex.xml = xml.replaceFirst(" ", toString(vertNS));
     vertices.put(vertex.id, vertex);
@@ -654,6 +658,7 @@ public class PreprocessSTIX {
     vertNS.put(prefix, namespaceURI);
     globalNS.put(prefix, namespaceURI);
     writer.writeStartElement(prefix, localName, namespaceURI);
+
     writeNamespaces(reader, vertNS);
     writeAttributes(reader, writer, vertNS);
     if (vertex.id == null) {
