@@ -23,7 +23,7 @@ public class DBConnectionJson {
 
 	private DBConnectionFactory factory;
     private DBConnectionAlignment connect = null;
-
+ 
 	public DBConnectionJson(){
 		String type = System.getenv("STUCCO_DB_TYPE");
         if (type == null) {
@@ -221,5 +221,9 @@ public class DBConnectionJson {
 	
 	public DBConstraint getConstraint(String prop, Condition cond, Object val ){
 		return connect.getConstraint(prop, cond, val );
+	}
+
+	public void bulkLoadGraph(JSONObject graph) {
+		connect.bulkLoadGraph(graph);
 	}
 }
