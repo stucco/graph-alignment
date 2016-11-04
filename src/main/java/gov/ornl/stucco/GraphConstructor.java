@@ -126,9 +126,9 @@ public class GraphConstructor {
 						logger.debug("Find relationship between outVertType = " + vertexType + " and inVertType = " + inVertexType);
 						relationship = "Related_" + inVertexType;
 					}
-					JSONObject newEdge = constructNewEdge(outVertID, inVertID, relationship);
+					JSONObject newEdge = constructNewEdge(outVertID, inVertID, vertexType, inVertexType, relationship);
 					edges.put(newEdge);	
-				}
+				} 
 			}
 		}
 
@@ -557,10 +557,12 @@ public class GraphConstructor {
 		return (set.isEmpty()) ? null : set;
 	}
 
-	private JSONObject constructNewEdge(String outVertID, String inVertID, String relationship) {
+	private JSONObject constructNewEdge(String outVertID, String inVertID, String outVertTable, String inVertTable, String relationship) {
 		JSONObject newEdge = new JSONObject();
 		newEdge.put("inVertID", inVertID);
 		newEdge.put("outVertID", outVertID);
+		newEdge.put("outVertTable", outVertTable);
+		newEdge.put("inVertTable", inVertTable);
 		newEdge.put("relation", relationship);
 
 		return newEdge;
