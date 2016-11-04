@@ -70,9 +70,85 @@ public class GraphConstructorTest {
 		System.out.println(outputter.outputString(element));
 	}
 
+	private boolean validate(Map<String, Vertex> vertices) {
+		boolean valid = true;
+		try {
+		  for (String id : vertices.keySet()) {
+		    PreprocessSTIX.Vertex v = vertices.get(id);
+		    String xml = v.xml;
+		    if (v.type.equals("Observable")) {
+		      Observable ob = new Observable().fromXMLString(xml);
+		      if (!ob.validate()) {
+		      	valid = false;
+		      	System.out.println(ob.toXMLString(true));
+		      }
+		      // System.out.println(ob.validate());
+		    } else if (v.type.equals("Indicator")) {
+		      Indicator ob = new Indicator().fromXMLString(xml);
+		      if (!ob.validate()) {
+		      	System.out.println(ob.toXMLString(true));
+		      	valid = false;
+		      }
+		      // System.out.println(ob.validate());
+		    } else if (v.type.equals("Incident")) {
+		      Incident ob = new Incident().fromXMLString(xml);
+		      if (!ob.validate()) {
+		      	System.out.println(ob.toXMLString(true));
+		      	valid = false;
+		      }
+		      //System.out.println(ob.validate());
+		    } else if (v.type.equals("TTP")) {
+		    	TTP ttp = new TTP().fromXMLString(xml);
+		      if (!ttp.validate()) {
+		      	System.out.println(ttp.toXMLString(true));
+		      	valid = false;
+		      }
+		    	//System.out.println(ttp.validate());
+		    } else if (v.type.equals("Campaign")) {
+		    	Campaign camp = new Campaign().fromXMLString(xml);
+		      if (!camp.validate()) {
+		      	System.out.println(camp.toXMLString(true));
+		      	valid = false;
+		      }
+		    	// System.out.println(camp.validate());
+		    } else if (v.type.equals("Threat_Actor")) {
+		    	ThreatActor ta = new ThreatActor().fromXMLString(xml);
+		      if (!ta.validate()) {
+		      	System.out.println(ta.toXMLString(true));
+		      	valid = false;
+		      }
+		    	// System.out.println(ta.validate());
+		    } else if (v.type.equals("Exploit_Target")) {
+		    	ExploitTarget et = new ExploitTarget().fromXMLString(xml);
+		      if (!et.validate()) {
+		      	System.out.println(et.toXMLString(true));
+		      	valid = false;
+		      }
+		    	// System.out.println(et.validate());
+		    } else if (v.type.equals("Course_Of_Action")) {
+		    	CourseOfAction coa = new CourseOfAction().fromXMLString(xml);
+		      if (!coa.validate()) {
+		      	System.out.println(coa.toXMLString(true));
+		      	valid = false;
+		      }
+		    	// System.out.println(coa.validate());
+		    } else {
+		    	System.out.println("COULD NOT FIND -------------- > " + v.type);
+		    	valid = false;
+		    }
+		    if (!valid) {
+		    	return false;
+		    }
+		  }
+		} catch (SAXException e) {
+		  e.printStackTrace();
+		}
+
+		return valid;
+	}
+
 	@Test 
 	public void testVulnerabilityExploit() throws Exception {
-
 		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testVulnerabilityExploit()");
 
 		String stix1 =
@@ -80,6 +156,7 @@ public class GraphConstructorTest {
 			"<stix:STIX_Package"+
 			"    id=\"stucco:metasploit-2e579a0a-0c44-4311-b6f0-a8fee86c3949\""+
 			"    timestamp=\"2015-12-07T23:26:28.613Z\""+
+			"    xmlns=\"http://xml/metadataSharing.xsd\""+
 			"    xmlns:et=\"http://stix.mitre.org/ExploitTarget-1\""+
 			"    xmlns:stix=\"http://stix.mitre.org/stix-1\""+
 			"    xmlns:stixCommon=\"http://stix.mitre.org/common-1\""+
@@ -126,7 +203,6 @@ public class GraphConstructorTest {
 			"    <stix:Exploit_Targets>"+
 			"        <stixCommon:Exploit_Target"+
 			"            id=\"Exploit_Target-13770b0f-fcd6-416a-9e43-2da475797760\""+
-			"            xmlns=\"\""+
 			"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"et:ExploitTargetType\">"+
 			"            <et:Title>Vulnerability</et:Title>"+
 			"            <et:Vulnerability>"+
@@ -140,8 +216,11 @@ public class GraphConstructorTest {
 
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix1);
+		assertTrue(validate(stixElements));
+
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
+
 		JSONObject vertices = graph.getJSONObject("vertices");
 
 		assertTrue(true);
@@ -268,8 +347,11 @@ public class GraphConstructorTest {
 
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
+
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
+
 		JSONObject vertices = graph.getJSONObject("vertices");
 
 		System.out.println("Testing Malware Vertex ... ");
@@ -404,8 +486,11 @@ public class GraphConstructorTest {
 
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
+
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
+
 		JSONObject vertices = graph.getJSONObject("vertices");
 
 		System.out.println("Testing Malware Vertex ... ");
@@ -591,8 +676,11 @@ public class GraphConstructorTest {
 
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
+
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
+
 		JSONObject vertices = graph.getJSONObject("vertices");
 
 		System.out.println("Testing Flow Vertex ... ");
@@ -880,9 +968,11 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
+
 		JSONObject vertices = graph.getJSONObject("vertices");
 
 		System.out.println("Testing Organization Vertex ... ");
@@ -904,7 +994,6 @@ public class GraphConstructorTest {
 		//sourceElement = stixElements.get(id);
 		assertTrue(vertices.has("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f"));
 		vertex = vertices.getJSONObject("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f");
-		System.out.println(vertex.toString(2));
 		assertEquals(vertex.getString("vertexType"), "Observable");
 		assertEquals(vertex.getString("observableType"), "AS");
 		assertEquals(vertex.getString("name"), "O1COMM");
@@ -919,7 +1008,6 @@ public class GraphConstructorTest {
 
 		assertTrue(vertices.has("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95"));
 		vertex = vertices.getJSONObject("stucco:addressRange-5d7163b7-6a6d-4538-ad0f-fc0de204aa95");
-		System.out.println(vertex.toString(2));
 		assertEquals(vertex.getString("vertexType"), "AddressRange");
 		assertEquals(vertex.getString("observableType"), "Address");
 		assertEquals(vertex.getString("name"), "69.19.190.0 - 69.19.190.255");
@@ -1018,6 +1106,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -1141,6 +1230,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -1340,6 +1430,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -1515,6 +1606,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -2089,6 +2181,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -2245,11 +2338,11 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
 		JSONObject vertices = graph.getJSONObject("vertices");
-
 
 		JSONObject vertex = vertices.getJSONObject("stucco:Incident-19ef98a1-c297-4756-a99d-43b885ef0129");
 		
@@ -2331,6 +2424,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -2473,6 +2567,7 @@ public class GraphConstructorTest {
 
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -2546,6 +2641,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -2576,7 +2672,7 @@ public class GraphConstructorTest {
 		}
 	}
 
-	@Test 
+	//@Test 
 	public void testTTP() {
 		
 		System.out.println("[RUNNING] gov.ornl.stucco.GraphConstructorTest.testTTP()");
@@ -2613,6 +2709,7 @@ public class GraphConstructorTest {
 		
 		PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 		Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+		assertTrue(validate(stixElements));
 		
 		GraphConstructor graphConstructor = new GraphConstructor();
 		JSONObject graph = graphConstructor.constructGraph(stixElements);
@@ -2795,6 +2892,7 @@ public class GraphConstructorTest {
 			
 			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(stix);
+			assertTrue(validate(stixElements));
 			
 			GraphConstructor graphConstructor = new GraphConstructor();
 			JSONObject graph = graphConstructor.constructGraph(stixElements);

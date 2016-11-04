@@ -138,6 +138,7 @@ public class AlignTest {
 
 	@Test 
 	public void testStixIDUpdate() {
+
 		System.out.println("[RUNNING:] alignment.alignment_v2.testStixIDUpdate()");
 		String graphString1 = 
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+
@@ -234,14 +235,15 @@ public class AlignTest {
 		try {
 			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 			GraphConstructor graphConstructor = new GraphConstructor();
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
+
 			DBConnectionJson db = align.getConnection();
 			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
-			JSONObject graph = graphConstructor.constructGraph(stixElements);
-			align.load(graph);
+			JSONObject graph1 = graphConstructor.constructGraph(stixElements);
+			align.load(graph1);
 			stixElements = preprocessSTIX.normalizeSTIX(graphString2);
-			graph = graphConstructor.constructGraph(stixElements);
-			align.load(graph);
+			JSONObject graph2 = graphConstructor.constructGraph(stixElements);
+			align.load(graph2);
 			JSONObject malware = db.getVertByName("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
 			String sourceDocument = malware.getString("sourceDocument");
 			Element malwareXml = parseXMLText(sourceDocument).getRootElement();
@@ -251,10 +253,13 @@ public class AlignTest {
 			Element observable = observableCharacterization.getChild("Observable", Namespace.getNamespace("cybox", "http://cybox.mitre.org/cybox-2"));
 			String idref = observable.getAttributeValue("idref");
 			assertEquals(idref, "Observable-ef0e7868-0d1f-4f56-kkkk-83hgkdbvktos");
-			long vertsCount = db.getVertCount();
-			assertEquals(vertsCount, 2);
-			long edgeCount = db.getEdgeCount();
-			assertEquals(edgeCount, 1);
+
+			for (String id : (Set<String>) graph1.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
+			for (String id : (Set<String>) graph2.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -325,17 +330,16 @@ public class AlignTest {
 		try {
 			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 			GraphConstructor graphConstructor = new GraphConstructor();
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			DBConnectionJson db = align.getConnection();
 			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
-			JSONObject graph = graphConstructor.constructGraph(stixElements);
-			align.load(graph);
+			JSONObject graph1 = graphConstructor.constructGraph(stixElements);
+			align.load(graph1);
 			stixElements = preprocessSTIX.normalizeSTIX(graphString2);
-			graph = graphConstructor.constructGraph(stixElements);
-			align.load(graph);
-			assertTrue(db.getVertCount() == 1);
+			JSONObject graph2 = graphConstructor.constructGraph(stixElements);
+			align.load(graph2);
 			JSONObject vulnerability = db.getVertByName("103.36.125.189");
 			assertEquals(vulnerability.getString("vertexType"), "IP");
 			Set<Object> descriptionSet = (HashSet<Object>) vulnerability.get("description");
@@ -343,11 +347,19 @@ public class AlignTest {
 			Set<Object> sourceSet = (HashSet<Object>) vulnerability.get("source");
 			assertTrue(sourceSet.contains("1d4.us"));
 			assertTrue(sourceSet.contains("GeoIP"));
+
+			for (String id : (Set<String>) graph1.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
+			for (String id : (Set<String>) graph2.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	//TODO: at this time postgresql supports search for duplicate by constraints ... need to implement search for duplicate in a future
 	@Test 
 	public void testDuplicateVulnerabilityByType() {
 		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateVulnerabilityByType()");
@@ -394,6 +406,7 @@ public class AlignTest {
 			"            <et:Title>Vulnerability</et:Title>"+
 			"            <et:Vulnerability>"+
 			"                <et:Description>Bufer overflow in IBM AIX 5.x in bicsa.a.</et:Description>"+
+			"                <et:CVE_ID>CVE-2009-3699</et:CVE_ID>"+
 			"                <et:Source>Metasploit</et:Source>"+
 			"            </et:Vulnerability>"+
 			"        </stixCommon:Exploit_Target>"+
@@ -403,16 +416,16 @@ public class AlignTest {
 		try {
 			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
 			GraphConstructor graphConstructor = new GraphConstructor();
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			DBConnectionJson db = align.getConnection();
 			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(graphString1);
-			JSONObject graph = graphConstructor.constructGraph(stixElements);
-			align.load(graph);
+			JSONObject graph1 = graphConstructor.constructGraph(stixElements);
+			align.load(graph1);
 			stixElements = preprocessSTIX.normalizeSTIX(graphString2);
-			graph = graphConstructor.constructGraph(stixElements);
-			align.load(graph);
+			JSONObject graph2 = graphConstructor.constructGraph(stixElements);
+			align.load(graph2);
 			JSONObject vulnerability = db.getVertByName("CVE-2009-3699");
 			assertEquals(vulnerability.getString("vertexType"), "Vulnerability");
 			Set<Object> descriptionSet = (HashSet<Object>) vulnerability.get("description");
@@ -422,6 +435,13 @@ public class AlignTest {
 			Set<Object> sourceSet = (HashSet<Object>) vulnerability.get("source");
 			assertTrue(sourceSet.contains("NVD"));
 			assertTrue(sourceSet.contains("Metasploit"));
+			
+			for (String id : (Set<String>) graph1.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
+			for (String id : (Set<String>) graph2.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -431,7 +451,7 @@ public class AlignTest {
 	public void testDuplicateMalwareByAlias() {
 		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateMalwareByAlias()");
 
-		String graph1 = 
+		String graph1String = 
 			"{\"vertices\": {\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\": { " +
 			"  \"sourceDocument\": \"<ttp:TTP xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\" xmlns:stucco=\\\"gov.ornl.stucco\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" id=\\\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\\\" xsi:type=\\\"ttp:TTPType\\\"><ttp:Title>Malware<\\/ttp:Title><ttp:Behavior><ttp:Malware><ttp:Malware_Instance id=\\\"stucco:malware-scanner\\\"><ttp:Type>Scanner<\\/ttp:Type><ttp:Name>Scanner Name<\\/ttp:Name><ttp:Title>Scanner<\\/ttp:Title><ttp:Description>Scanner Description1<\\/ttp:Description><\\/ttp:Malware_Instance><\\/ttp:Malware><\\/ttp:Behavior><ttp:Resources><ttp:Infrastructure><ttp:Observable_Characterization cybox_major_version=\\\"2.0\\\" cybox_minor_version=\\\"1.0\\\"><cybox:Observable xmlns:cybox=\\\"http://cybox.mitre.org/cybox-2\\\" idref=\\\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\\\" /><\\/ttp:Observable_Characterization><\\/ttp:Infrastructure><\\/ttp:Resources><ttp:Information_Source><stixCommon:Contributing_Sources xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\"><stixCommon:Source><stixCommon:Identity><stixCommon:Name>1d4.us<\\/stixCommon:Name><\\/stixCommon:Identity><\\/stixCommon:Source><\\/stixCommon:Contributing_Sources><\\/ttp:Information_Source><\\/ttp:TTP>\", " +
 			"  \"vertexType\": \"Malware\", " +
@@ -441,7 +461,7 @@ public class AlignTest {
 			"  \"source\": [\"1d4.us\"] " +
 			"}}} ";
 
-		String graph2 = 
+		String graph2String = 
 			"{\"vertices\": {\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc4\": { " +
 			"  \"sourceDocument\": \"<ttp:TTP xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\" xmlns:stucco=\\\"gov.ornl.stucco\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" id=\\\"stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3\\\" xsi:type=\\\"ttp:TTPType\\\"><ttp:Title>Malware<\\/ttp:Title><ttp:Behavior><ttp:Malware><ttp:Malware_Instance id=\\\"stucco:malware-scanner\\\"><ttp:Type>Scanner<\\/ttp:Type><ttp:Name>Scanner<\\/ttp:Name><ttp:Name>Scanner Alias<\\/ttp:Name><ttp:Name>Scanner Name<\\/ttp:Name><ttp:Title>Scanner Description<\\/ttp:Title><ttp:Description>Scanner Description2<\\/ttp:Description><\\/ttp:Malware_Instance><\\/ttp:Malware><\\/ttp:Behavior><ttp:Resources><ttp:Infrastructure><ttp:Observable_Characterization cybox_major_version=\\\"2.0\\\" cybox_minor_version=\\\"1.0\\\"><cybox:Observable xmlns:cybox=\\\"http://cybox.mitre.org/cybox-2\\\" idref=\\\"Observable-ef0e7868-0d1f-4f56-ab90-b8ecfea62229\\\" /><\\/ttp:Observable_Characterization><\\/ttp:Infrastructure><\\/ttp:Resources><ttp:Information_Source><stixCommon:Contributing_Sources xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\"><stixCommon:Source><stixCommon:Identity><stixCommon:Name>Source<\\/stixCommon:Name><\\/stixCommon:Identity><\\/stixCommon:Source><\\/stixCommon:Contributing_Sources><\\/ttp:Information_Source><\\/ttp:TTP>\", " +
 			"  \"vertexType\": \"Malware\", " +
@@ -456,16 +476,16 @@ public class AlignTest {
 			"}}} ";
 
 		try {
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
 			DBConnectionJson db = align.getConnection();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
-			JSONObject graph = new JSONObject(graph1);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
-			graph = new JSONObject(graph2);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
+			JSONObject graph1 = new JSONObject(graph1String);
+			jsonArrayToSetConverter(graph1);
+			align.load(graph1);
+			JSONObject graph2 = new JSONObject(graph2String);
+			jsonArrayToSetConverter(graph2);
+			align.load(graph2);
 
 			JSONObject malware = db.getVertByName("stucco:malware-2cbe5820-572c-493f-8008-7cb7bf344dc3");
 			assertEquals(malware.getString("vertexType"), "Malware");
@@ -475,68 +495,13 @@ public class AlignTest {
 			Set<Object> sourceSet = (HashSet<Object>) malware.get("source");
 			assertTrue(sourceSet.contains("1d4.us"));
 			assertTrue(sourceSet.contains("Source"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
-	//removed alias from indicator ... 
-	//@Test 
-	public void testDuplicateIndicatorByAlias() {
-		System.out.println("[RUNNING:] alignment.alignment_v2.testDuplicateIndicatorByAlias()");
-
-		String graph1 = 
-			"{\"vertices\": {\"fireeye:indicator-0036bca2-8c0a-4f09-934d-89a98fc41850\": { " +
-			"    \"sourceDocument\": \"<indicator:Indicator xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\" xmlns:fireeye=\\\"http://www.fireeye.com\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" timestamp=\\\"2015-05-15T09:00:00.000000Z\\\" id=\\\"fireeye:indicator-0036bca2-8c0a-4f09-934d-89a98fc41850\\\" xsi:type=\\\"indicator:IndicatorType\\\"><indicator:Title>Domain: microsoftupdate.ns01.biz<\\/indicator:Title><indicator:Type xmlns:stixVocabs=\\\"http://stix.mitre.org/default_vocabularies-1\\\" xsi:type=\\\"stixVocabs:IndicatorTypeVocab-1.1\\\">Domain Watchlist<\\/indicator:Type><indicator:Observable idref=\\\"fireeye:observable-915b7cb4-e520-48dd-9273-1bdb4e71a823\\\" /><indicator:Indicated_TTP><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:ttp-e55c6eaa-bf0f-4b6b-9572-5cd0d3f62134\\\" /><\\/indicator:Indicated_TTP><indicator:Indicated_TTP><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:ttp-59fae6a2-4a3b-418e-8ca7-06a845820666\\\" /><\\/indicator:Indicated_TTP><indicator:Suggested_COAs><indicator:Suggested_COA><stixCommon:Course_Of_Action xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:courseofaction-70b3d5f6-374b-4488-8688-729b6eedac5b\\\" /><\\/indicator:Suggested_COA><\\/indicator:Suggested_COAs><\\/indicator:Indicator>\", " +
-			"    \"vertexType\": \"Indicator\", " +
-			"    \"name\": \"fireeye:indicator-0036bca2-8c0a-4f09-934d-89a98fc41850\", " +
-			"    \"alias\": [ " +
-			"      \"c1bcc9513f27c33d24f7ed0fc5700b47\", " +
-			"      \"fireeye:courseofaction-70b3d5f6-374b-4488-8688-729b6eedac5b\", " +
-			"      \"a144440d16fb69cf4522f789aacb3ef2\", " +
-			"      \"microsoftupdate.ns01.biz\" " +
-			"    ] " +
-			"}}} ";
-
-		String graph2 = 
-			"{\"vertices\": {\"fireeye:indicator-b62b4960-e82e-4f91-9306-72086cc92e3f\": { " +
-			"    \"sourceDocument\": \"<indicator:Indicator xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\" xmlns:fireeye=\\\"http://www.fireeye.com\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" timestamp=\\\"2015-05-15T09:00:00.000000Z\\\" id=\\\"fireeye:indicator-b62b4960-e82e-4f91-9306-72086cc92e3f\\\" xsi:type=\\\"indicator:IndicatorType\\\"><indicator:Title>Domain: pansenes.3322.org<\\/indicator:Title><indicator:Type xmlns:stixVocabs=\\\"http://stix.mitre.org/default_vocabularies-1\\\" xsi:type=\\\"stixVocabs:IndicatorTypeVocab-1.1\\\">Domain Watchlist<\\/indicator:Type><indicator:Observable idref=\\\"fireeye:observable-7c035577-8446-428c-ab4c-fe7359fde735\\\" /><indicator:Indicated_TTP><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:ttp-5a74a069-0759-4c93-8ea3-70c53a223230\\\" /><\\/indicator:Indicated_TTP><indicator:Indicated_TTP><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:ttp-3f39dad8-de02-468d-bd4b-de7ad4a4e357\\\" /><\\/indicator:Indicated_TTP><indicator:Indicated_TTP><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:ttp-534b451e-a5ee-4264-89a0-b57cd2d9a21d\\\" /><\\/indicator:Indicated_TTP><indicator:Indicated_TTP><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:ttp-7781ffbf-2a5c-4a54-a489-2fddd85b7363\\\" /><\\/indicator:Indicated_TTP><indicator:Suggested_COAs><indicator:Suggested_COA><stixCommon:Course_Of_Action xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" idref=\\\"fireeye:courseofaction-70b3d5f6-374b-4488-8688-729b6eedac5b\\\" /><\\/indicator:Suggested_COA><\\/indicator:Suggested_COAs><\\/indicator:Indicator>\", " +
-			"    \"vertexType\": \"Indicator\", " +
-			"    \"name\": \"fireeye:indicator-b62b4960-e82e-4f91-9306-72086cc92e3f\", " +
-			"    \"alias\": [ " +
-			"      \"c1bcc9513f27c33d24f7ed0fc5700b47\", " +
-			"      \"fireeye:courseofaction-70b3d5f6-374b-4488-8688-729b6eedac5b\", " +
-			"      \"a144440d16fb69cf4522f789aacb3ef2\", " +
-			"      \"36cc4c909462db0f067b11a5e719a4ee\", " +
-			"      \"pansenes.3322.org\", " +
-			"      \"a5ec5a677346634a42c9f9101ce9d861\" " +
-			"    ] " +
-			"  }, " +
-			"}}} ";
-
-		try {
-			Align align = new Align();
-			DBConnectionJson db = align.getConnection();
-			align.setSearchForDuplicates(true);
-			align.setAlignVertProps(true);
-			JSONObject graph = new JSONObject(graph1);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
-			graph = new JSONObject(graph2);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
-
-			assertNull(db.getVertByName("fireeye:indicator-b62b4960-e82e-4f91-9306-72086cc92e3f"));
-			JSONObject indicator = db.getVertByName("fireeye:indicator-0036bca2-8c0a-4f09-934d-89a98fc41850");
-			assertEquals(indicator.getString("vertexType"), "Indicator");
-			Set<Object> aliasSet = (HashSet<Object>) indicator.get("alias");
-			assertTrue(aliasSet.contains("c1bcc9513f27c33d24f7ed0fc5700b47"));
-			assertTrue(aliasSet.contains("fireeye:courseofaction-70b3d5f6-374b-4488-8688-729b6eedac5b"));
-			assertTrue(aliasSet.contains("a144440d16fb69cf4522f789aacb3ef2"));
-			assertTrue(aliasSet.contains("36cc4c909462db0f067b11a5e719a4ee"));
-			assertTrue(aliasSet.contains("pansenes.3322.org"));
-			assertTrue(aliasSet.contains("a5ec5a677346634a42c9f9101ce9d861"));
-			assertTrue(aliasSet.contains("fireeye:indicator-b62b4960-e82e-4f91-9306-72086cc92e3f"));
+			for (String id : (Set<String>) graph1.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
+			for (String id : (Set<String>) graph2.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -557,7 +522,7 @@ public class AlignTest {
 			"      \"startIPInt\": 3630349312,"+
 			"      \"name\": \"216.98.188.0 - 216.98.188.255\","+
 			"      \"description\": [\"216.98.188.0 through 216.98.188.255\"],"+
-			"      \"source\": \"CAIDA\","+
+			"      \"source\": [\"CAIDA\"],"+
 			"      \"endIPInt\": 3630349567,"+
 			"      \"observableType\": \"Address\""+
 			"    },"+
@@ -566,7 +531,7 @@ public class AlignTest {
 			"      \"vertexType\": \"IP\","+
 			"      \"ipInt\": 3630349313,"+
 			"      \"name\": \"216.98.188.1\","+
-			"      \"description\": \"216.98.188.1\","+
+			"      \"description\": [\"216.98.188.1\"],"+
 			"      \"source\": [\"LoginEvent\"],"+
 			"      \"observableType\": \"Address\""+
 			"    }" +
@@ -575,7 +540,7 @@ public class AlignTest {
 		
 		try {
 			JSONObject graph = new JSONObject(graphString);
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
 			align.load(graph);
 			DBConnectionJson db = align.getConnection();
 			JSONObject vert = null;
@@ -611,6 +576,10 @@ public class AlignTest {
 			//edgeID = edgeIDList.get(0);	
 			//edge = db.getEdgeByID(edgeID);
 			//assertNotNull(edge);
+
+			for (String id : (Set<String>) graph.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -636,21 +605,22 @@ public class AlignTest {
 			"    \"Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb\": {"+
 			"      \"vertexType\": \"Indicator\","+
 			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-c7561b63-ab62-433e-a5c2-b330c1dcc341\\\" /><\\/indicator:Indicated_TTP><indicator:Suggested_COAs xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><indicator:Suggested_COA><stixCommon:Course_Of_Action xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"coa:CourseOfActionType\\\" idref=\\\"Course_Of_Action-ae6c9867-9433-481c-80e5-4672d92811bb\\\" /><\\/indicator:Suggested_COA><\\/indicator:Suggested_COAs><\\/stix:Indicator>\","+
-			"      \"name\": \"Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb\","+
-			"		\"alias\": [" +
-			"			\"TTP-c7561b63-ab62-433e-a5c2-b330c1dcc341\"," +
-			"			\"Course_Of_Action-ae6c9867-9433-481c-80e5-4672d92811bb\"]" +
+			"      \"name\": \"Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb\""+
 			"    }"+
 			"  },"+
 			"  \"edges\": ["+
 			"    {"+
 			"      \"outVertID\": \"Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb\","+
 			"      \"inVertID\": \"TTP-c7561b63-ab62-433e-a5c2-b330c1dcc341\","+
+			"      \"outVertTable\": \"Indicator\","+
+			"      \"inVertTable\": \"TTP\","+
 			"      \"relation\": \"IndicatedTTP\""+
 			"    },"+
 			"    {"+
 			"      \"outVertID\": \"Indicator-c304f71f-788d-46cb-919d-da1ca4c781bb\","+
 			"      \"inVertID\": \"Course_Of_Action-ae6c9867-9433-481c-80e5-4672d92811bb\","+
+			"      \"outVertTable\": \"Indicator\","+
+			"      \"inVertTable\": \"Course_Of_Action\","+
 			"      \"relation\": \"SuggestedCOA\""+
 			"    }"+
 			"  ]"+
@@ -662,34 +632,35 @@ public class AlignTest {
 			"    \"Indicator-a32549e9-02ea-4891-8f4d-e3b0412ac402\": {"+
 			"      \"vertexType\": \"Indicator\","+
 			"      \"sourceDocument\": \"<stix:Indicator xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"indicator:IndicatorType\\\" id=\\\"Indicator-a32549e9-02ea-4891-8f4d-e3b0412ac402\\\"><indicator:Title xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\">Indicator One Title<\\/indicator:Title><indicator:Indicated_TTP xmlns:indicator=\\\"http://stix.mitre.org/Indicator-2\\\"><stixCommon:TTP xmlns:stixCommon=\\\"http://stix.mitre.org/common-1\\\" xsi:type=\\\"ttp:TTPType\\\" idref=\\\"TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70\\\" /><\\/indicator:Indicated_TTP><\\/stix:Indicator>\","+
-			"      \"name\": \"Indicator-a32549e9-02ea-4891-8f4d-e3b0412ac402\","+
-			"		\"alias\": [\"TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70\"]" +
+			"      \"name\": \"Indicator-a32549e9-02ea-4891-8f4d-e3b0412ac402\""+
 			"    },"+
 			"    \"TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70\": {"+
 			"      \"vertexType\": \"TTP\","+
 			"      \"sourceDocument\": \"<stix:TTP xmlns:stix=\\\"http://stix.mitre.org/stix-1\\\" xmlns:xsi=\\\"http://www.w3.org/2001/XMLSchema-instance\\\" xsi:type=\\\"ttp:TTPType\\\" id=\\\"TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70\\\"><ttp:Title xmlns:ttp=\\\"http://stix.mitre.org/TTP-1\\\">Related TTP<\\/ttp:Title><\\/stix:TTP>\","+
-			"      \"name\": \"TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70\""+
+			"      \"name\": \"TTP-c7561b63-ab62-433e-a5c2-b330c1dcc341\""+
 			"    }"+
 			"  },"+
 			"  \"edges\": ["+
 			"    {"+
 			"      \"outVertID\": \"Indicator-a32549e9-02ea-4891-8f4d-e3b0412ac402\","+
 			"      \"inVertID\": \"TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70\","+
+			"      \"outVertTable\": \"Indicator\","+
+			"      \"inVertTable\": \"TTP\","+
 			"      \"relation\": \"IndicatedTTP\""+
 			"    }"+
 			"  ]"+
 			"}";
 
 		try {
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			DBConnectionJson db = align.getConnection();
 
+			JSONObject graph1 = new JSONObject(graphSectionOne);
+			jsonArrayToSetConverter(graph1);
+			align.load(graph1);
 			JSONObject graph = new JSONObject(graphSectionOne);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
-			graph = new JSONObject(graphSectionOne);
 			jsonArrayToSetConverter(graph);
 
 			System.out.println("Testing TTP ...");
@@ -739,17 +710,24 @@ public class AlignTest {
 			align.load(graph);
 			System.out.println("Testing Indicator duplicate ...");
 			vert = db.getVertByName("Indicator-a32549e9-02ea-4891-8f4d-e3b0412ac402");
-			assertNull(vert);	
+			assertNotNull(vert);	
 			
 			System.out.println("Testing TTP duplicate ...");
 			vert = db.getVertByName("TTP-e94f0d8c-8f73-41a6-a834-9bcada3d3c70");
 			assertNull(vert);	
+
+			for (String id : (Set<String>) graph.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
+			for (String id : (Set<String>) graph1.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testLoadNestedIndicatorsTest() {
 		System.out.println("[Running] alignment.alignment_v2.AlignTest.testLoadNestedIndicatorsTest()");
 		
@@ -801,26 +779,36 @@ public class AlignTest {
 				"    {"+
 				"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\","+
 				"      \"inVertID\": \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cb\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"TTP\","+
 				"      \"relation\": \"IndicatedTTP\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\","+
 				"      \"inVertID\": \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c4\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"Course_Of_Action\","+
 				"      \"relation\": \"SuggestedCOA\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc25\","+
 				"      \"inVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"Indicator\","+
 				"      \"relation\": \"RelatedIndicator\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025b\","+
 				"      \"inVertID\": \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b6\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"TTP\","+
 				"      \"relation\": \"IndicatedTTP\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7a\","+
 				"      \"inVertID\": \"TTP-512ead41-e81e-468c-a3c0-09c3218aede7\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"TTP\","+
 				"      \"relation\": \"IndicatedTTP\""+
 				"    }"+
 				"  ]"+
@@ -869,42 +857,52 @@ public class AlignTest {
 				"    {"+
 				"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\","+
 				"      \"inVertID\": \"TTP-2aea7e21-46a9-4e52-9338-6196fc33c3cc\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"TTP\","+
 				"      \"relation\": \"IndicatedTTP\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\","+
 				"      \"inVertID\": \"Course_Of_Action-b3d87523-0107-44a8-a3fc-bdda0c28c8c5\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"Course_Of_Action\","+
 				"      \"relation\": \"SuggestedCOA\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-d68b90a2-09c3-4cac-9e78-03a490b1dc26\","+
 				"      \"inVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7b\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"Indicator\","+
 				"      \"relation\": \"RelatedIndicator\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-8cb410ca-6cd5-4e64-a49a-28798837025c\","+
 				"      \"inVertID\": \"TTP-787e5622-4f09-4f41-b8f3-19b8535889b7\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"TTP\","+
 				"      \"relation\": \"IndicatedTTP\""+
 				"    },"+
 				"    {"+
 				"      \"outVertID\": \"Indicator-5cce612d-29d4-438c-980c-82d7f66bdb7b\","+
 				"      \"inVertID\": \"TTP-512ead41-e81e-468c-a3c0-09c3218aede8\","+
+				"      \"outVertTable\": \"Indicator\","+
+				"      \"inVertTable\": \"TTP\","+
 				"      \"relation\": \"IndicatedTTP\""+
 				"    }"+
 				"  ]"+
 				"}";
 
 		try {
-			Align align = new Align();
+			Align align = AlignFactory.getAlign();
 			align.setSearchForDuplicates(true);
 			align.setAlignVertProps(true);
 			DBConnectionJson db = align.getConnection();
-			JSONObject graph = new JSONObject(graphSectionOne);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
-			graph = new JSONObject(graphSectionTwo);
-			jsonArrayToSetConverter(graph);
-			align.load(graph);
+			JSONObject graph1 = new JSONObject(graphSectionOne);
+			jsonArrayToSetConverter(graph1);
+			align.load(graph1);
+			JSONObject graph2 = new JSONObject(graphSectionTwo);
+			jsonArrayToSetConverter(graph2);
+			align.load(graph2);
 			List<DBConstraint> constraints1 = new ArrayList<DBConstraint>();
 			constraints1.add(db.getConstraint("vertexType", Condition.eq, "Indicator"));
 			List<String> indicatorList = db.getVertIDsByConstraints(constraints1);
@@ -923,6 +921,13 @@ public class AlignTest {
 			assertTrue(indicatedTTP.size() == 1);
 			List<String> suggestedCOA = db.getInVertIDsByRelation(indicatorList.get(0), "SuggestedCOA");
 			assertTrue(suggestedCOA.size() == 1);
+
+			for (String id : (Set<String>) graph1.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
+			for (String id : (Set<String>) graph2.getJSONObject("vertices").keySet()) {
+				db.removeVertByID(id);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
