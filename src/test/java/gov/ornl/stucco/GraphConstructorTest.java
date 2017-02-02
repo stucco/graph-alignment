@@ -982,7 +982,7 @@ public class GraphConstructorTest {
 		JSONObject vertex = vertices.getJSONObject("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598");
 		assertEquals(vertex.getString("vertexType"), "Observable");
 		assertEquals(vertex.getString("observableType"), "Whois");
-		assertEquals(vertex.getString("name"), "stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598");
+		assertEquals(vertex.getString("name"), "O1.com");
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
 		String description = vertex.get("description").toString();
 		assertTrue(description.contains("Organization O1.com located in US has a range of IP addresses"));
@@ -996,7 +996,7 @@ public class GraphConstructorTest {
 		vertex = vertices.getJSONObject("stucco:as-16650bdd-96a4-46f4-9fec-032ac7092f5f");
 		assertEquals(vertex.getString("vertexType"), "Observable");
 		assertEquals(vertex.getString("observableType"), "AS");
-		assertEquals(vertex.getString("name"), "O1COMM");
+		assertEquals(vertex.getString("name"), "19864");
 		//	assertEquals(vertex.getString("number"), "19864");
 		assertEquals(vertex.get("source").toString(), "[CAIDA]");
 		description = vertex.get("description").toString();
@@ -1029,8 +1029,8 @@ public class GraphConstructorTest {
 			String outVertID = edge.getString("outVertID");
 			String outVertName = vertices.getJSONObject(outVertID).getString("name");
 			String relation = edge.getString("relation");
-			if (inVertName.equals("O1COMM") && 
-				outVertName.equals("stucco:organization-548c49e0-4a24-443d-80f6-ec6885bab598") && 
+			if (inVertName.equals("19864") && 
+				outVertName.equals("O1.com") && 
 				relation.equals("Sub-Observable")) {
 				edgeExists = true;
 				break;
@@ -1048,7 +1048,7 @@ public class GraphConstructorTest {
 			String outVertName = vertices.getJSONObject(outVertID).getString("name");
 			String relation = edge.getString("relation");
 			if (inVertName.equals("69.19.190.0 - 69.19.190.255") && 
-				outVertName.equals("O1COMM") && 
+				outVertName.equals("19864") && 
 				relation.equals("Sub-Observable")) {
 				edgeExists = true;
 				break;
@@ -5680,8 +5680,7 @@ public class GraphConstructorTest {
 		observableType = vertex.getString("observableType");
 		assertEquals(observableType, "Socket Address");
 	
-	/*
-		System.out.println("Testing Network Subnet ...");
+			System.out.println("Testing Network Subnet ...");
 		stix =  
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
 			"<stix:STIX_Package xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" xmlns:stix=\"http://stix.mitre.org/stix-1\"> " + 
@@ -5707,8 +5706,8 @@ public class GraphConstructorTest {
 		assertEquals(name, "stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
 		observableType = vertex.getString("observableType");
 		assertEquals(observableType, "Event");
-	*/
-		System.out.println("Testing Network Subnet ...");
+	
+		System.out.println("Testing Observable Composition ...");
 		stix =  
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?> " + 
 			"<stix:STIX_Package xmlns=\"http://xml/metadataSharing.xsd\" " + 
@@ -5732,8 +5731,91 @@ public class GraphConstructorTest {
 		vertex = vertices.getJSONObject("stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
 		name = vertex.getString("name");
 		assertEquals(name, "stucco:Observable-cbd0ef95-cf60-4f58-9b86-6a87107bb85f");
-		//observableType = vertex.getString("observableType");
-		//assertEquals(observableType, "ObservableComposition");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Observable Composition");
 		
+		System.out.println("Testing Observable Composition ...");
+		stix =  
+			"  <cybox:Observables xmlns:cyboxCommon=\"http://cybox.mitre.org/common-2\" " +
+			"   xmlns:cybox=\"http://cybox.mitre.org/cybox-2\" " +
+			"   xmlns:FileObj=\"http://cybox.mitre.org/objects#FileObject-2\" " +
+			"   xmlns:WinRegistryKeyObj=\"http://cybox.mitre.org/objects#WinRegistryKeyObject-2\" " +
+			"   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+			"   xmlns:example=\"http://example.com/\" " +
+			"   cybox_major_version=\"2\"  " +
+			"   cybox_minor_version=\"1\"> " +
+			"     <cybox:Observable id=\"example:f6bb0360-46ac-49b9-9ca1-9008e937ea24\"> " +
+			"         <cybox:Observable_Composition operator=\"AND\"> " +
+			"            <cybox:Observable id=\"example:ca588488-5900-401e-b02f-0080d83e2472\"> " +
+			"               <cybox:Object> " +
+			"                  <cybox:Properties xsi:type=\"FileObj:FileObjectType\"> " +
+			"                     <FileObj:File_Path condition=\"Contains\" fully_qualified=\"false\">system32\twext.exe</FileObj:File_Path> " +
+			"                     <FileObj:File_Name>twext.exe</FileObj:File_Name> " +
+			"                  </cybox:Properties> " +
+			"               </cybox:Object> " +
+			"            </cybox:Observable> " +
+			"            <cybox:Observable id=\"example:b1fc168c-c9be-4b4a-925e-206b9afed76a\"> " +
+			"               <cybox:Object> " +
+			"                  <cybox:Properties xsi:type=\"WinRegistryKeyObj:WindowsRegistryKeyObjectType\"> " +
+			"                     <WinRegistryKeyObj:Key condition=\"Equals\">Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon</WinRegistryKeyObj:Key> " +
+			"                     <WinRegistryKeyObj:Hive condition=\"Equals\">HKEY_LOCAL_MACHINE</WinRegistryKeyObj:Hive> " +
+			"                     <WinRegistryKeyObj:Values> " +
+			"                        <WinRegistryKeyObj:Value> " +
+			"                           <WinRegistryKeyObj:Name condition=\"Equals\">Userinit</WinRegistryKeyObj:Name> " +
+			"                           <WinRegistryKeyObj:Data condition=\"Contains\">system32\\twext.exe</WinRegistryKeyObj:Data> " +
+			"                        </WinRegistryKeyObj:Value> " +
+			"                     </WinRegistryKeyObj:Values> " +
+			"                  </cybox:Properties> " +
+			"               </cybox:Object> " +
+			"            </cybox:Observable> " +
+			"         </cybox:Observable_Composition> " +
+			"      </cybox:Observable> " +
+			"  </cybox:Observables> ";
+		stixElements = preprocessSTIX.normalizeSTIX(stix);
+		graph = graphConstructor.constructGraph(stixElements);
+		
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("example:f6bb0360-46ac-49b9-9ca1-9008e937ea24");
+		name = vertex.getString("name");
+		assertEquals(name, "example:f6bb0360-46ac-49b9-9ca1-9008e937ea24");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Observable Composition");
+
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("example:ca588488-5900-401e-b02f-0080d83e2472");
+		name = vertex.getString("name");
+		assertEquals(name, "twext.exe");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "File");
+
+		vertices = graph.getJSONObject("vertices");	
+		vertex = vertices.getJSONObject("example:b1fc168c-c9be-4b4a-925e-206b9afed76a");
+		name = vertex.getString("name");
+		assertEquals(name, "Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon");
+		observableType = vertex.getString("observableType");
+		assertEquals(observableType, "Windows Registry Key");
+		
+	}
+
+	@Test
+	public void test_large_file() {
+		try {
+			java.nio.file.Path path = java.nio.file.Paths.get("output.xml");
+			String info = new String(java.nio.file.Files.readAllBytes(path));
+
+			PreprocessSTIX preprocessSTIX = new PreprocessSTIX();
+			Map<String, Vertex> stixElements = preprocessSTIX.normalizeSTIX(info);
+			
+			GraphConstructor graphConstructor = new GraphConstructor();
+			JSONObject graph = graphConstructor.constructGraph(stixElements);
+			System.out.println(graph.toString(2));
+
+			JSONObject vertices = graph.getJSONObject("vertices");
+			System.out.println("vertices size: " + vertices.length());
+			JSONArray edges = graph.getJSONArray("edges");
+			System.out.println("edges size: " + edges.length());
+		}	catch (java.io.IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -310,7 +310,7 @@
       "Src_Link_Addr": {"type": "NDPLinkAddrType"},
       "Prefix_Info": {"type": "NDPPrefixInfoType"},
       "MTU": {"type": "NDPMTUType"}
-    },
+    }, 
     "base": "anyType"
   },
   "PEImportedFunctionsType": {
@@ -323,7 +323,7 @@
     "base": "anyType"
   },
   "ASObjectType": {
-    "namePath": ["Observable/Object/Properties/Name"],
+    "namePath": ["Observable/Object/Properties/Number"],
     "prefix": "ASObj",
     "elements": {
       "Number": {"type": "NonNegativeIntegerObjectPropertyType"},
@@ -2241,7 +2241,7 @@
       "Byte_Length": {"type": "HexBinaryObjectPropertyType"},
       "Observation_Domain_ID": {"type": "IntegerObjectPropertyType"},
       "Sequence_Number": {"type": "IntegerObjectPropertyType"}
-    },
+    }, 
     "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
     "base": "anyType"
   },
@@ -2386,7 +2386,9 @@
     "URI": "http://cybox.mitre.org/objects#NetworkFlowObject-2",
     "base": "anyType"
   },
-  "WhoisObjectType": {
+
+  "WhoisObjectType": { 
+    "namePath": ["Observable/Object/Properties/Registrants/Registrant/Organization"],
     "prefix": "WhoisObj",
     "elements": {
       "Status": {"type": "WhoisStatusesType"},

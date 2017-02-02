@@ -401,6 +401,11 @@ public class PreprocessSTIX {
             writeIdrefAttribute(writer, idref, vertNS);
 
           } else {
+            if (localName.equals("Event") && vertex.observableType == null) {
+              vertex.observableType = "Event";
+            } else if (localName.equals("Observable_Composition") && vertex.observableType == null) {
+              vertex.observableType = "ObservableComposition";
+            }
             writeStartElement(reader, writer, localName, vertNS);
             path.add(localName);
           }
