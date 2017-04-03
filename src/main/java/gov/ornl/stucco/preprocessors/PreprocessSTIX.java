@@ -16,6 +16,9 @@ import java.util.HashSet;
 import java.util.UUID;  
 import java.util.Iterator;  
 import java.util.ArrayDeque;    
+
+import java.lang.CharSequence;
+
 import java.io.StringWriter; 
 
 import java.io.StringReader;     
@@ -51,6 +54,7 @@ public class PreprocessSTIX {
     public String observableType;
     public Map<String, List<Object>> contentPaths;
     public Map<String, List<String>> referencePaths;
+    public Map<String, String> vertNS;
 
     public Vertex() {}
 
@@ -99,6 +103,7 @@ public class PreprocessSTIX {
     map.put("Course_Of_Action", "coa:CourseOfActionType");
     map.put("Campaign", "campaign:CampaignType");
     map.put("Threat_Actor", "ta:ThreatActorType");
+//    map.put("Siting", "indicator:Sighting");
     stixTypes = Collections.unmodifiableMap(map);
 
     Map<String, Namespace> nsmap = new HashMap<String, Namespace>();
@@ -110,11 +115,13 @@ public class PreprocessSTIX {
     nsmap.put("Incident", Namespace.getNamespace("incident", "http://stix.mitre.org/Incident-1"));
     nsmap.put("Campaign", Namespace.getNamespace("campaign", "http://stix.mitre.org/Campaign-1"));
     nsmap.put("Threat_Actor", Namespace.getNamespace("ta", "http://stix.mitre.org/ThreatActor-1"));
+    nsmap.put("Sighting", Namespace.getNamespace("indicator", "http://stix.mitre.org/Indicator-2"));
     stixElementMap = Collections.unmodifiableMap(nsmap);
   }
 
   public PreprocessSTIX() {
     outputFactory = XMLOutputFactory.newInstance();
+    outputFactory.setProperty("escapeCharacters", false);
     inputFactory = XMLInputFactory.newInstance();
     inputFactory.setProperty(inputFactory.IS_COALESCING, true);
   }
@@ -209,7 +216,11 @@ public class PreprocessSTIX {
     vertex.type = reader.getLocalName();
     vertex.contentPaths = new HashMap<String, List<Object>>();
     vertex.referencePaths = new HashMap<String, List<String>>();
-    vertex.id = reader.getAttributeValue(null, "id");
+    if (vertex.type.equals("Sighting")) {
+      vertex.id = makeID("Sighting");
+    } else {
+      vertex.id = reader.getAttributeValue(null, "id");
+    }
 
     Set<String> idrefSet = new HashSet<String>();
     ArrayDeque<String> path = new ArrayDeque<String>();
@@ -230,34 +241,69 @@ public class PreprocessSTIX {
           pathString = toString(path);
 
           if (stixElementMap.containsKey(localName) && 
-            // !reader.getNamespaceURI().equals("http://stix.mitre.org/TTP-1")) {
-            (reader.getPrefix().equals("stixCommon") || localName.equals("Observable"))) {
-            String idref = reader.getAttributeValue(null, "idref");
-            if (idref == null) {
-              String prefix = reader.getPrefix();
-              String namespaceURI = reader.getNamespaceURI();
-              vertNS.put(prefix, namespaceURI);
+            (reader.getPrefix().equals("stixCommon") || localName.equals("Observable") || localName.equals("Sighting"))) {
+              if (localName.equals("Sighting")) {
+                StringWriter newSw = new StringWriter();
+                XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
+                String id = writeElement(reader, newWriter, newSw);
 
-              StringWriter newSw = new StringWriter();
-              XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
-              idref = (localName.equals("Observable")) ? writeObservable(reader, newWriter, newSw) : writeElement(reader, newWriter, newSw);
-              addToReferenceList(vertex.referencePaths, pathString, idref);
+                Vertex sighting = vertices.get(id);
+                writer.writeCharacters(sighting.xml);
+                vertNS.putAll(sighting.vertNS);
+                if (vertex.referencePaths.containsKey(pathString)) {
+                  vertex.referencePaths.get(pathString).add(sighting.id);
+                } else {
+                  List<String> referencePaths = new ArrayList<String>();
+                  referencePaths.add(sighting.id);
+                  vertex.referencePaths.put(pathString, referencePaths);
+                }
+                path.removeLast();
+                pathString = toString(path);
+                for (Map.Entry<String, List<String>> entry : sighting.referencePaths.entrySet()) {
+                  String key = pathString + "/" + entry.getKey();
+                  if (vertex.referencePaths.containsKey(key)) {
+                    vertex.referencePaths.get(key).addAll(new ArrayList<String>(entry.getValue()));
+                  } else {
+                    vertex.referencePaths.put(key, new ArrayList<String>(entry.getValue()));
+                  } 
+                }
+                for (Map.Entry<String, List<Object>> entry : sighting.contentPaths.entrySet()) {
+                  String key = pathString + "/" + entry.getKey();
+                  if (vertex.contentPaths.containsKey(key)) {
+                    vertex.contentPaths.get(key).addAll(new ArrayList<Object>(entry.getValue()));
+                  } else {
+                    vertex.contentPaths.put(key, new ArrayList<Object>(entry.getValue()));
+                  }
+                }
+                sighting.xml = sighting.xml.replaceFirst(" ", toString(sighting.vertNS));
+              } else {
+                String idref = reader.getAttributeValue(null, "idref");
+                if (idref == null) {
+                  String prefix = reader.getPrefix();
+                  String namespaceURI = reader.getNamespaceURI();
+                  vertNS.put(prefix, namespaceURI);
 
-              writer.writeEmptyElement(prefix, localName, namespaceURI);  
-              writeIdrefAttribute(writer, idref, vertNS);
-      
-              if (!localName.equals("Observable")) { 
-                writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", stixTypes.get(localName));
-                Namespace ns = stixElementMap.get(localName);
-                prefix = ns.getPrefix();
-                namespaceURI = ns.getURI();
-                vertNS.put(prefix, namespaceURI);
+                  StringWriter newSw = new StringWriter();
+                  XMLStreamWriter newWriter = outputFactory.createXMLStreamWriter(newSw);
+                  idref = (localName.equals("Observable")) ? writeObservable(reader, newWriter, newSw) : writeElement(reader, newWriter, newSw);
+                  addToReferenceList(vertex.referencePaths, pathString, idref);
+
+                  writer.writeEmptyElement(prefix, localName, namespaceURI);  
+                  writeIdrefAttribute(writer, idref, vertNS);
+          
+                  if (!localName.equals("Observable")) { 
+                    writer.writeAttribute("xsi", "http://www.w3.org/2001/XMLSchema-instance", "type", stixTypes.get(localName));
+                    Namespace ns = stixElementMap.get(localName);
+                    prefix = ns.getPrefix();
+                    namespaceURI = ns.getURI();
+                    vertNS.put(prefix, namespaceURI);
+                  }
+                  path.removeLast();
+                } else {
+                  addToReferenceList(vertex.referencePaths, pathString, idref);
+                  writeStartElement(reader, writer, localName, vertNS);
+                }
               }
-              path.removeLast();
-            } else {
-              addToReferenceList(vertex.referencePaths, pathString, idref);
-              writeStartElement(reader, writer, localName, vertNS);
-            }
           } else {
             writeStartElement(reader, writer, localName, vertNS);
           }
@@ -277,7 +323,12 @@ public class PreprocessSTIX {
     }
 
     vertNS.remove("null");
-    vertex.xml = sw.toString().replaceFirst(" ", toString(vertNS));
+    if (vertex.type.equals("Sighting")) {
+      vertex.vertNS = vertNS;
+      vertex.xml = sw.toString();
+    } else {
+      vertex.xml = sw.toString().replaceFirst(" ", toString(vertNS));
+    }
     vertices.put(vertex.id, vertex);
 
     return vertex.id;

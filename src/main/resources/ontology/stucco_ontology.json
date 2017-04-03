@@ -27,7 +27,7 @@
                }
             }, 
             "TTP": {
-               "$ref":"#/definitions/TTP",
+               "$ref":"#/definitions/TTP", 
                "vertexType": "TTP",
                "path": "TTP",
                "items": {
@@ -79,6 +79,11 @@
                "$ref":"#/definitions/Indicator",
                "vertexType": "Indicator",
                "path": "Indicator"
+            },
+            "Sighting": {
+               "$ref":"#/definitions/Sighting",
+               "vertexType": "Sighting",
+               "path": "Sighting"
             },
             "Threat_Actor": {
                "$ref":"#/definitions/Threat_Actor",
@@ -1369,6 +1374,76 @@
             },
             "Exploit": {
                "relation": "IndicatedTTP"
+            },
+            "Sighting": {
+               "relation": "Sighting"
+            }
+         }
+      },
+      "Sighting": {
+         "title": "Sighting",
+         "vertexType": "Sighting",
+         "description": "Characterizes a set of sighting reports for Indicator.",
+         "type": "object",
+         "path": ["Sighting"],
+         "properties":{  
+            "description":{  
+               "path": ["Sighting/Description"],
+               "description":"descriptive summary of this Sighting",
+               "type":"string",
+               "cardinality":"set"
+            },
+            "source":{  
+               "path": [
+                  "Sighting/Source/Identity/Name",
+                  "Sighting/Source/Contributing_Sources/Source/Identity/Name"
+               ],
+               "description":"Data source for this vertex",
+               "type":"string",
+               "cardinality":"set"
+            }
+         },
+         "additionalProperties": {
+            "name": {
+               "type": "string",
+               "cardinality": "single",
+               "description": "UUID of this Source"
+            }
+         },
+         "required":[  
+            "vertexType",
+            "name",
+            "description"
+         ],
+         "indexes":{  
+            "hash":[  
+               {  
+                  "keys":[  
+                     "name"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "vertexType"
+                  ]
+               },
+               {  
+                  "keys":[  
+                     "source"
+                  ]
+               }
+            ],
+            "fullText":[  
+               {  
+                  "keys":[  
+                     "description"
+                  ]
+               }
+            ]
+         },
+         "edges": {
+            "Observable": {
+               "relation": "Observable"
             }
          }
       },
