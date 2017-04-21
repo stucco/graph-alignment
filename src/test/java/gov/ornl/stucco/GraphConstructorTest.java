@@ -5797,7 +5797,7 @@ public class GraphConstructorTest {
 		
 	}
 
-	@Test
+	//@Test
 	public void test_large_file() {
 		try {
 			java.nio.file.Path path = java.nio.file.Paths.get("output.xml");
